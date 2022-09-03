@@ -1,0 +1,11 @@
+{
+  "name": "entity",
+  "description": "A bot.",
+  "author": "Serge",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.2.0",
+    "dotenv": "^16.0.1",
+    "snoowrap": "^1.23.0"
+  }
+}
