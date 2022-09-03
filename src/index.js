@@ -1,34 +1,33 @@
-const { Client, Intents } = require("discord.js");
-const cfg = require("./config.json");
+const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
+require("dotenv").config();
 const snoowrap = require("snoowrap");
+const commands = require("./handlers/commands");
 
 const client = new Client({
+  presence: {
+    activities: [{ name: 'everyone!', type: ActivityType.Listening }]
+  },
 	intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MEMBERS,
-        Intents.FLAGS.GUILD_MESSAGES,
-    ]
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildEmojisAndStickers,
+    GatewayIntentBits.MessageContent
+  ]
 });
 
 const r = new snoowrap({
-    userAgent: cfg.userAgent,
-    clientId: cfg.clientId,
-    clientSecret: cfg.clientSecret,
-    username: cfg.username,
-    password: cfg.password
+  userAgent: process.env.USER_AGENT,
+  clientId: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+  username: process.env.USERNAME,
+  password: process.env.PASSWORD
 });
 
-
-module.exports = {
-    client, 
-    r
-};
+module.exports = { client, r };
 
 client.on("ready", () => {
-    const commandHandler = require("./handlers/commands");
-    commandHandler(client);
-
-    client.user.setPresence({ activities: [{ name: `everyone! Type e!help for help.`, type: `LISTENING` }] });
-	console.log("Start/Restart completed. Bot has been alive'd.");
-});
-client.login(cfg.tokens["Entity TB"]);
+  commands(client);
+  console.log("Start completed. Bot has been alive'd.");
+})
+client.login(process.env.ENTITY_CANARY);
