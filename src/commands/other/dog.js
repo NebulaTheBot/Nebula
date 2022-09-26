@@ -1,18 +1,24 @@
-const { EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const { r } = require("../../index");
 
 module.exports = {
-  name: "dog",
-  description: "Sends a picture of an awesome dog :D",
-  callback: interaction => {
-    r.getSubreddit("lookatmydog").getRandomSubmission({ time: "all" }).then(submission => {
+  options: [
+    new SlashCommandBuilder()
+      .setName("dog")
+      .setDescription("Sends a random post of r/lookatmydog into the chat.")
+  ],
+    
+  callback: interaction => r
+    .getSubreddit("lookatmydog")
+    .getRandomSubmission({ time: "all" })
+    .then(submission => {
       const thumbnail = submission.url;
       const upvotes = submission.ups;
       
       let embed = new EmbedBuilder()
         .setTitle(`${submission.title}`)
         .setFooter({ text: `Powered by snoowrap. | Upvotes: ${upvotes}` })
-        .setColor("Blue");
+        .setColor("Random");
   
       if (upvotes === null) embed.setFooter({ text: "Powered by snoowrap. | Upvotes: 0" });
 
@@ -23,5 +29,4 @@ module.exports = {
       if (thumbnail !== "self") embed.setImage(`${thumbnail}`);      
       interaction.reply({ embeds: [embed] });
     })
-  }
 }

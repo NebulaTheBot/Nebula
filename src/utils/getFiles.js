@@ -1,17 +1,22 @@
 const fs = require("fs");
+const path = require("path");
 
-const getFiles = (dir, suffix) => {
-  const files = fs.readdirSync(process.cwd() + dir, { withFileTypes: true });
-  let commandFiles = [];
+function getFiles(dpath, suffix) {
+	const commandFiles = fs.readdirSync(dpath, { withFileTypes: true });
+  const files = [];
 
-  for (const file of files) {
-    if (file.isDirectory()) commandFiles = [
-      ...commandFiles,
-      ...getFiles(`${dir}/${file.name}`, suffix),
-    ];
-    
-    else if (file.name.endsWith(suffix)) commandFiles.push(`..${dir.replace("\\", "/")}/${file.name}`);
-  }
-  return commandFiles;
-};
+	for (const file of commandFiles) {
+    try {
+      if (file.isDirectory()) {
+        files.push(...getFiles(path.join(dpath, file.name), suffix));
+        continue;
+      }
+
+      if (file.name.endsWith(suffix)) files.push(path.join(dpath, file.name));
+    } catch (error) {}
+	}
+
+  return files;
+}
+
 module.exports = getFiles;

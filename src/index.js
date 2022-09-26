@@ -1,7 +1,7 @@
 const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
-require("dotenv").config();
 const snoowrap = require("snoowrap");
-const commands = require("./handlers/commands");
+const Events = require("./handlers/events");
+require("dotenv").config();
 
 const client = new Client({
   presence: {
@@ -16,17 +16,14 @@ const client = new Client({
 });
 
 const r = new snoowrap({
-  userAgent: process.env.USER_AGENT,
-  clientId: process.env.CLIENT_ID,
-  clientSecret: process.env.CLIENT_SECRET,
-  username: process.env.USERNAME,
-  password: process.env.PASSWORD
+  userAgent: process.env.REDDIT_USER_AGENT,
+  clientId: process.env.REDDIT_CLIENT_ID,
+  clientSecret: process.env.REDDIT_CLIENT_SECRET,
+  username: process.env.REDDIT_USERNAME,
+  password: process.env.REDDIT_PASSWORD
 });
 
-module.exports = { client, r };
+const events = new Events(client);
 
-client.on("ready", () => {
-  commands(client);
-  console.log("Start completed. Bot has been alive'd.");
-})
+module.exports = { client, r, events };
 client.login(process.env.ENTITY_CANARY);

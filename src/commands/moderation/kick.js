@@ -1,25 +1,26 @@
-const { ApplicationCommandOptionType, EmbedBuilder } = require("discord.js");
-const { OWNER, ADMIN } = require("../../config.json");
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { OWNER, ADMIN } = require("../../../config.json");
 const { client } = require("../../index");
 
 module.exports = {
-  name: "kick",
-  description: "Kicks a user.",
   options: [
-    {
-      name: "user",
-      description: "The user you want to kick.",
-      required: true,
-      type: ApplicationCommandOptionType.User,
-    },
-    {
-      name: "reason",
-      description: "The reason of kicking.",
-      required: false,
-      type: ApplicationCommandOptionType.String,
-    }
+    new SlashCommandBuilder()
+      .setName("kick")
+      .setDescription("The user you want to kick.")
+      .addUserOption(user => {
+        return user
+          .setName("user")
+          .setDescription("The user you want to kick")
+          .setRequired(true)
+      })
+      .addStringOption(string => {
+        return string
+          .setName("reason")
+          .setDescription("The reason of kicking.")
+          .setRequired(false)
+      })
   ],
-
+  
   callback: interaction => {
     if (interaction.user.id !== OWNER && !ADMIN.includes(interaction.user.id)) return;
 
@@ -39,9 +40,7 @@ module.exports = {
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor("Green");
     
-    if (reason) embed1.addFields([
-      { name: "Reason", value: `${reason}` }
-    ]);
+    if (reason) embed1.addFields([{ name: "Reason", value: `${reason}` }]);
 
     user.kick();
     interaction.reply({ embeds: [embed], ephemeral: true });

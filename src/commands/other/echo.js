@@ -1,39 +1,38 @@
-const { EmbedBuilder, ApplicationCommandOptionType } = require("discord.js");
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
-  name: "echo",
-  description: "Sends your message in a fancy embed or in a normal message.",
   options: [
-    {
-      name: "message",
-      description: "Sends your message as a normal message.",
-      type: ApplicationCommandOptionType.Subcommand,
-      options: [{
-        name: "content",
-        description: "The content of the message.",
-        required: true,
-        type: ApplicationCommandOptionType.String,
-      }],
-    },
-    {
-      name: "embed",
-      description: "Sends your message as an embed.",
-      type: ApplicationCommandOptionType.Subcommand,
-      options: [
-        {
-          name: "title",
-          description: "The title of an embed.",
-          required: true,
-          type: ApplicationCommandOptionType.String
-        },
-        {
-          name: "description",
-          description: "The description of an embed (small text)",
-          required: false,
-          type: ApplicationCommandOptionType.String
-        }
-      ],
-    }
+    new SlashCommandBuilder()
+      .setName("echo")
+      .setDescription("Sends your message in a fancy embed or in a normal message.")
+      .addSubcommand(subcommand => {
+        return subcommand
+          .setName("message")
+          .setDescription("Sends your message as a normal message.")
+          .addStringOption(string => {
+            return string
+              .setName("content")
+              .setDescription("The content of the message.")
+              .setRequired(true)
+          })
+      })
+      .addSubcommand(subcommand => {
+        return subcommand
+        .setName("embed")
+        .setDescription("Sends your message as an embed.")
+        .addStringOption(string => {
+          return string
+            .setName("title")
+            .setDescription("The title of an embed.")
+            .setRequired(true)
+        })
+        .addStringOption(string => {
+          return string
+            .setName("description")
+            .setDescription("The description of an embed. (small text under the title)")
+            .setRequired(false)
+        })
+      })
   ],
 
   callback: async interaction => {
@@ -54,7 +53,7 @@ module.exports = {
 
       let embed = new EmbedBuilder()
         .setTitle(`${title}`)
-        .setColor("Blue");
+        .setColor("Random");
 
       if (description) embed.setDescription(description);
       
@@ -62,8 +61,8 @@ module.exports = {
         .setTitle("You have sent a message.")
         .setColor("Green");
       
-      await interaction.channel.send({ embeds: [embed] });
       await interaction.reply({ embeds: [embed1], ephemeral: true });
+      await interaction.channel.send({ embeds: [embed] });
     }
   }
 }

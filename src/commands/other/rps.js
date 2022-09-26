@@ -1,50 +1,53 @@
 const {
   EmbedBuilder, ActionRowBuilder, ButtonBuilder,
-  ButtonStyle, SelectMenuBuilder, ApplicationCommandOptionType,
+  SelectMenuBuilder, SlashCommandBuilder
 } = require("discord.js");
 const { client } = require("../../index");
 
 module.exports = {
-  name: "rps",
-  description: "A rock-paper-scissors mini-game.",
-  options: [{
-    name: "item",
-    description: "Select an item!",
-    required: true,
-    type: ApplicationCommandOptionType.String,
-    choices: [
-      {
-        name: "rock",
-        value: "rock"
-      },
-      {
-        name: "paper",
-        value: "paper"
-      },
-      {
-        name: "scissors",
-        value: "scissors"
-      }
-    ],
-  }],
+  options: [
+    new SlashCommandBuilder()
+      .setName("rps")
+      .setDescription("A rock-paper-scissors mini-game.")
+      .addStringOption(string => {
+        return string
+          .setName("item")
+          .setDescription("Select an item.")
+          .setRequired(true)
+          .addChoices(
+            {
+              name: "rock",
+              value: "rock"
+            },
+            {
+              name: "paper",
+              value: "paper"
+            },
+            {
+              name: "scissors",
+              value: "scissors"
+            }
+          )
+      })
+  ],
 
   callback: interaction => {
     let embed = new EmbedBuilder()
       .setTitle(`${interaction.member.nickname} invited you to play rock-paper-scissors!`)
       .setFooter({ text: "You have 30 seconds to accept or decline." })
-      .setColor("Blue");
+      .setColor("Random");
 
     const cross = client.emojis.cache.get("979649982183391293");
     const buttons = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId("accept")
         .setLabel("✅ Accept")
-        .setStyle(ButtonStyle.Primary),
+        .setStyle("Primary"),
       new ButtonBuilder()
         .setCustomId("decline")
         .setEmoji(`${cross}`)
         .setLabel("Decline")
-        .setStyle(ButtonStyle.Danger)
+        .setStyle("Danger")
     );
 
     interaction.reply({ embeds: [embed], components: [buttons] });
@@ -101,7 +104,7 @@ module.exports = {
               
             let embed = new MessageEmbed()
               .setTitle("You have chosen the option.")
-              .setColor("Blue");
+              .setColor("Random");
 
             click.editReply({ embeds: [embed], components: [] });
 

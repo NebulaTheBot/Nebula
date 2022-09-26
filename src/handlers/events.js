@@ -1,21 +1,42 @@
 const getFiles = require("../utils/getFiles");
+const path = require("path");
 
-module.exports = async client => {
-  const events = [];
-  const eventFiles = getFiles("/events", ".js");
+class Events {
+  events = [];
+  client = null;
 
-  for (const event of eventFiles) {
-    let eventFile = require(event);
-
-    events[eventFile.name.toLowerCase()] = eventFile;
-    events.push(eventFile);
-  };
+  constructor(client) {
+    this.client = client;
+    this.reloadEvents();
+  }
   
-  client.on("interactionCreate", interaction => {
-    if (!interaction.isChatInputCommand()) return;
+  reloadEvents = () => {
+    const eventFiles = getFiles(path.join(process.cwd(), "src", "events"), ".js");
 
-    commands[interaction.commandName]
-      .callback(interaction)
-      .catch(error => console.error(error));
-  });
+    for (const event of eventFiles) this.reloadEvent(event);
+  }
+
+  reloadEvent = name => {
+    const eventFiles = getFiles(path.join(process.cwd(), "src", "events"), ".js");
+    this.removeEvent(name);
+
+    const eventFilePath = eventFiles.find(eventFile => eventFile.name == name);
+    const event = require(event);
+    const Event = eventRequire.event;
+    let eventFile = new Event(this.client);
+    let clientEvent = this.client.on(eventRequire.name, eventFile.run);
+    
+    this.events.push({ name: eventRequire.name, event: clientEvent });
+  }
+
+  removeEvent = name => {
+    const event = this.events.find(event => event.name === name);
+    if (event == null) return false;
+
+    this.client.off(event.event);
+    this.events.splice(this.events.indexOf(event), 1);
+    return true;
+  }
 }
+
+module.exports = Events;

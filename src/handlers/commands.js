@@ -1,27 +1,40 @@
 const getFiles = require("../utils/getFiles");
+const path = require("path");
 
-module.exports = async client => {
-  const commands = [];
-  const commandFiles = getFiles("/commands", ".js");
-
-  for (const command of commandFiles) {
-    let commandFile = require(command);
-
-    commands[commandFile.name.toLowerCase()] = commandFile;
-    commands.push(commandFile);
-  };
-
-  for (const guildID of client.guilds.cache.keys()) {
-    const guild = client.guilds.cache.get(guildID);
-    // guild.commands.set([]);
-    await guild.commands.set(commands);
-  };
+class Commands {
+  commands = [];
+  client = null;
   
-  client.on("interactionCreate", interaction => {
-    if (!interaction.isChatInputCommand()) return;
+  constructor(client) {
+    this.client = client;
+    this.reloadCommands();
+  }
+  
+  reloadCommands = async () => {
+    const commandFiles = getFiles(path.join(process.cwd(), "src", "commands"), ".js");
+  
+    for (const command of commandFiles) {
+      this.removeCommand(command.name);
 
-    commands[interaction.commandName]
-      .callback(interaction)
-      .catch(error => console.error(error));
-  });
+      let commandFile = require(command);
+      const commandOptions = commandFile.options[0];
+      if (commandOptions?.name == null) continue;
+
+      this.commands.push(commandOptions);
+    };
+
+    for (const guildID of this.client.guilds.cache.keys()) {
+      const guild = this.client.guilds.cache.get(guildID);
+      await guild.commands.set(this.commands).catch(() => {});
+    };
+  }
+
+  removeCommand = async () => {
+    for (const guildID of this.client.guilds.cache.keys()) {
+      const guild = this.client.guilds.cache.get(guildID);
+      await guild.commands.delete(this.commands).catch(() => {});
+    };
+  }
 }
+
+module.exports = Commands;
