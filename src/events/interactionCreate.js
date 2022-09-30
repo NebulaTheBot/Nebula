@@ -1,16 +1,15 @@
 const { EmbedBuilder } = require("discord.js");
 const { getBulk } = require("../utils/db");
-const { ready } = require("./ready");
 
 class interactionCreate {
   client = null;
   commands = [];
+  events = [];
 
-  constructor(client) {
+  constructor(client, commands, events) {
     this.client = client;
-
-    const commands = new (ready.event)(client);
-    this.commands = commands.commands();
+    this.commands = commands;
+    this.events = events;
   }
 
   run = async interaction => {
@@ -18,9 +17,10 @@ class interactionCreate {
 
     try {
       const guildCmd = (await getBulk("commands").catch(() => {}))
-        .find(cmd => cmd.commandName === interaction.commandName && cmd.guildID === interaction.guild.id);
+        .find(cmd => cmd.name === interaction.commandName && cmd.guildID === interaction.guild.id);
 
-      if (guildCmd == null) return commands[interaction.commandName].callback(interaction);
+      if (guildCmd == null) return this.commands.commands[interaction.commandName]
+        .callback(interaction, this.client, this.events);
 
       const noPermsEmbed = new EmbedBuilder()
         .setTitle("You don't have enough permissions")
@@ -84,11 +84,12 @@ class interactionCreate {
 
       if (!isAllowed) return interaction.reply({ embeds: [wrongChannelEmbed], ephemeral: true });
 
-      commands[interaction.commandName].callback(interaction);
+      this.commands.commands[interaction.commandName]
+        .callback(interaction, this.client, this.events);
     } catch (error) {
       console.error(error);
     }
   }
 }
 
-module.exports = { name: "interactionCreate", event: interactionCreate }
+module.exports = { name: "interactionCreate", event: interactionCreate };

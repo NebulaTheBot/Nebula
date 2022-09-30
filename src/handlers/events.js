@@ -3,34 +3,37 @@ const path = require("path");
 
 class Events {
   events = [];
+  commands = [];
   client = null;
+  eventFiles = getFiles(path.join(process.cwd(), "src", "events"), ".js");
 
-  constructor(client) {
+  constructor(client, commands) {
     this.client = client;
+    this.commands = commands;
     this.reloadEvents();
   }
   
   reloadEvents = () => {
-    const eventFiles = getFiles(path.join(process.cwd(), "src", "events"), ".js");
-
-    for (const event of eventFiles) this.reloadEvent(event);
+    for (const event of this.eventFiles) this.reloadEvent(event);
   }
 
   reloadEvent = name => {
-    const eventFiles = getFiles(path.join(process.cwd(), "src", "events"), ".js");
     this.removeEvent(name);
 
-    const eventFilePath = eventFiles.find(eventFile => eventFile.name == name);
-    const event = require(event);
+    const findEventFile = this.eventFiles.find(eventFile => eventFile === name);
+    const eventRequire = require(findEventFile);
+
     const Event = eventRequire.event;
-    let eventFile = new Event(this.client);
-    let clientEvent = this.client.on(eventRequire.name, eventFile.run);
+    let event = new Event(this.client, this.commands, this.events);
+    let clientEvent = this.client.on(eventRequire.name, event.run);
     
     this.events.push({ name: eventRequire.name, event: clientEvent });
   }
 
+  removeEvents = () => this.client.off(this.events);
+
   removeEvent = name => {
-    const event = this.events.find(event => event.name === name);
+    const event = this.eventFiles.find(eventFile => eventFile.name === name);
     if (event == null) return false;
 
     this.client.off(event.event);

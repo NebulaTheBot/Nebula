@@ -1,5 +1,5 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { r } = require("../../index");
+const { r } = require("../../constants");
 
 module.exports = {
   options: [

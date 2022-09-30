@@ -2,7 +2,6 @@ const {
   EmbedBuilder, ActionRowBuilder, ButtonBuilder,
   SelectMenuBuilder, SlashCommandBuilder
 } = require("discord.js");
-const { client } = require("../../index");
 
 module.exports = {
   options: [
@@ -31,7 +30,7 @@ module.exports = {
       })
   ],
 
-  callback: interaction => {
+  callback: (interaction, client) => {
     let embed = new EmbedBuilder()
       .setTitle(`${interaction.member.nickname} invited you to play rock-paper-scissors!`)
       .setFooter({ text: "You have 30 seconds to accept or decline." })

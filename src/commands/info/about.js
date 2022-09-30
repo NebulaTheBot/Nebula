@@ -11,7 +11,7 @@ module.exports = {
     const embed = new EmbedBuilder()
 			.setTitle("Entity Canary")
 			.addFields([
-				{ name: "Version", value: "0.1.0", inline: true },
+				{ name: "Version", value: "0.1.1", inline: true },
 				{ name: "Latest update", value: "The Grand Update", inline: true },
 				{ name: "State", value: "Alpha" },
 				{ name: "Entities involved", value: `

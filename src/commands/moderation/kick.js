@@ -1,6 +1,5 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const { OWNER, ADMIN } = require("../../../config.json");
-const { client } = require("../../index");
 
 module.exports = {
   options: [
@@ -21,7 +20,7 @@ module.exports = {
       })
   ],
   
-  callback: interaction => {
+  callback: (interaction, client) => {
     if (interaction.user.id !== OWNER && !ADMIN.includes(interaction.user.id)) return;
 
     const user = interaction.options.getUser("user");
