@@ -4,7 +4,7 @@ const {
 } = require("discord.js");
 
 module.exports = {
-  options: [
+  options: [(
     new SlashCommandBuilder()
       .setName("rps")
       .setDescription("A rock-paper-scissors mini-game.")
@@ -14,23 +14,14 @@ module.exports = {
           .setDescription("Select an item.")
           .setRequired(true)
           .addChoices(
-            {
-              name: "rock",
-              value: "rock"
-            },
-            {
-              name: "paper",
-              value: "paper"
-            },
-            {
-              name: "scissors",
-              value: "scissors"
-            }
+            { name: "rock", value: "rock" },
+            { name: "paper", value: "paper" },
+            { name: "scissors", value: "scissors" }
           )
       })
-  ],
+  )],
 
-  callback: (interaction, client) => {
+  callback(interaction, client) {
     let embed = new EmbedBuilder()
       .setTitle(`${interaction.member.nickname} invited you to play rock-paper-scissors!`)
       .setFooter({ text: "You have 30 seconds to accept or decline." })

@@ -1,5 +1,12 @@
 const getFiles = require("../utils/getFiles");
+const { requireReload } = require("../constants");
 const path = require("path");
+const chalk = require("chalk");
+const AsciiTable = require("ascii-table");
+
+const table = new AsciiTable()
+  .setHeading("Commands", "State")
+  .setBorder("|", "-", "0", "0");
 
 class Commands {
   commands = [];
@@ -8,11 +15,15 @@ class Commands {
   
   constructor(client) {
     this.client = client;
-    this.reloadCommands();
+    this.reloadCommands(false);
+    for (const command of this.commands) table.addRow(command.name, "✅");
+
+    console.log(chalk.blue(table.toString()));
+    console.log(chalk.greenBright("Commands? Registered."));
   }
-  
-  reloadCommands = async () => {  
-    for (const command of this.commandFiles) this.reloadCommand(command);
+
+  reloadCommands = async (remCmds = true) => {
+    for (const command of this.commandFiles) this.reloadCommand(command, remCmds);
 
     for (const guildID of this.client.guilds.cache.keys()) {
       const guild = this.client.guilds.cache.get(guildID);
@@ -20,16 +31,14 @@ class Commands {
     };
   }
 
-  reloadCommand = name => {
-    this.removeCommand(name);
+  reloadCommand = (name, remCmds = true) => {
+    if (remCmds) this.removeCommand(name);
 
     const findCommandFile = this.commandFiles.find(commandFile => commandFile === name);
-    const commandFile = require(findCommandFile);
-    const commandOptions = commandFile?.options[0];
+    const commandOptions = requireReload(findCommandFile)?.options[0];
     if (!commandOptions) return;
 
-    this.commands[commandOptions.name.toLowerCase()] = commandFile;
-    this.commands.push(commandFile);
+    this.commands.push(commandOptions);
   }
 
   removeCommands = async () => {
@@ -40,12 +49,13 @@ class Commands {
   }
 
   removeCommand = async name => {
-    const command = this.commandFiles.find(commandFile => commandFile.name === name);
-    if (command == null) return false;
+    const findCommandFile = this.commandFiles.find(commandFile => commandFile === name);
+    const commandOptions = requireReload(findCommandFile)?.options[0];
+    if (commandOptions == null) return false;
 
     for (const guildID of this.client.guilds.cache.keys()) {
       const guild = this.client.guilds.cache.get(guildID);
-      await guild.commands.delete(command).catch(() => {});
+      await guild.commands.delete(commandOptions).catch(() => {});
     };
     return true;
   }

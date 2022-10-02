@@ -2,7 +2,7 @@ const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const { OWNER, ADMIN } = require("../../../config.json");
 
 module.exports = {
-  options: [
+  options: [(
     new SlashCommandBuilder()
       .setName("kick")
       .setDescription("The user you want to kick.")
@@ -18,9 +18,9 @@ module.exports = {
           .setDescription("The reason of kicking.")
           .setRequired(false)
       })
-  ],
+  )],
   
-  callback: (interaction, client) => {
+  callback(interaction, client) {
     if (interaction.user.id !== OWNER && !ADMIN.includes(interaction.user.id)) return;
 
     const user = interaction.options.getUser("user");

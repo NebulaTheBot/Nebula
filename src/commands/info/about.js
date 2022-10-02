@@ -1,29 +1,21 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
-	options: [
+	options: [(
 		new SlashCommandBuilder()
 			.setName("about")
 			.setDescription("Shows information about the bot.")
-	],
+	)],
 		
-  callback: interaction => {
+  callback(interaction) {
     const embed = new EmbedBuilder()
-			.setTitle("Entity Canary")
+			.setTitle("About")
 			.addFields([
-				{ name: "Version", value: "0.1.1", inline: true },
-				{ name: "Latest update", value: "The Grand Update", inline: true },
-				{ name: "State", value: "Alpha" },
-				{ name: "Entities involved", value: `
-					**Head Developer**: Serge
-					**Developers**: CodingFox, ThyTonyStank
-					**Helper**: flojo
-					**Testers**: astolfo, flojo`
-				},
-				{ name: "Sponsors", value: "[FyreBlitz Hosting](https://www.fyreblitz.com/)" },
+				{ name: "Version", value: "0.1.2", inline: true },
+				{ name: "Working on", value: "The Grand Update", inline: true },
+				{ name: "State", value: "Alpha", inline: true },
 			])
 			.setColor("Random")
-			.setFooter({ text: "Made by Serge with love." });
 
     interaction.reply({ embeds: [embed] });
   }

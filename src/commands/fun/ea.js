@@ -1,13 +1,13 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
-	options: [
+	options: [(
 		new SlashCommandBuilder()
 			.setName("ea")
 			.setDescription("Tells a joke about EA being money hungry.")
-	],
+	)],
 
-  callback: interaction => {
+  callback(interaction) {
     const messages = [
 			"EA Sports, it's in your wallet!", 
 			"EA Sports, it's in your lack of cash!", 

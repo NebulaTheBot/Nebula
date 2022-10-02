@@ -2,7 +2,7 @@ const { EmbedBuilder, ChannelType, SlashCommandBuilder } = require("discord.js")
 const { OWNER, ADMIN } = require("../../../config.json");
 
 module.exports = {
-  options: [
+  options: [(
     new SlashCommandBuilder()
       .setName("clear")
       .setDescription("Clears messages.")
@@ -19,9 +19,9 @@ module.exports = {
           .setRequired(false)
           .addChannelTypes(ChannelType.GuildText)
       })
-  ],
+  )],
 
-  callback: (interaction, client) => {
+  callback(interaction, client) {
     if (interaction.user.id !== OWNER && !ADMIN.includes(interaction.user.id)) return;
 
     const amount = interaction.options.getNumber("amount");

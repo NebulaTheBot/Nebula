@@ -2,31 +2,32 @@ const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const { r } = require("../../constants");
 
 module.exports = {
-  options: [
+  options: [(
     new SlashCommandBuilder()
       .setName("cat")
       .setDescription("Sends a random post of r/cats into the chat.")
-  ],
+  )],
     
-  callback: interaction => r
-    .getSubreddit("Cats")
-    .getRandomSubmission({ time: "all" })
-    .then(submission => {
-      const image = submission.url;
-      const upvotes = submission.ups;
-      
-      let embed = new EmbedBuilder()
-        .setTitle(`${submission.title}`)
-        .setFooter({ text: `Powered by snoowrap. | Upvotes: ${upvotes}` })
-        .setColor("Random");
+  callback(interaction) {
+    r.getSubreddit("Cats")
+      .getRandomSubmission({ time: "all" })
+      .then(submission => {
+        const image = submission.url;
+        const upvotes = submission.ups;
 
-      if (upvotes === null) embed.setFooter({ text: "Powered by snoowrap. | Upvotes: 0" });
+        let embed = new EmbedBuilder()
+          .setTitle(`${submission.title}`)
+          .setFooter({ text: `Powered by snoowrap. | Upvotes: ${upvotes}` })
+          .setColor("Random");
 
-      if (image === "self") embed
-        .setDescription("The post had no image, sorry.")
-        .setColor("Red");
+        if (upvotes === null) embed.setFooter({ text: "Powered by snoowrap. | Upvotes: 0" });
 
-      if (image !== "self") embed.setImage(`${thumbnail}`);
-      interaction.reply({ embeds: [embed] });
-    })
+        if (image === "self") embed
+          .setDescription("The post had no image, sorry.")
+          .setColor("Red");
+
+        if (image !== "self") embed.setImage(`${thumbnail}`);
+        interaction.reply({ embeds: [embed] });
+      })
+  }
 }

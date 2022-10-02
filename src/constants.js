@@ -1,4 +1,5 @@
 const snoowrap = require("snoowrap");
+require("dotenv").config();
 
 const r = new snoowrap({
   userAgent: process.env.REDDIT_USER_AGENT,
@@ -8,4 +9,14 @@ const r = new snoowrap({
   password: process.env.REDDIT_PASSWORD
 });
 
-module.exports = { r };
+function clearModule(moduleName) {
+  let mp = require.resolve(moduleName);
+  if (require.cache[mp]) delete require.cache[mp];
+}
+
+function requireReload(moduleName) {
+  clearModule(moduleName);
+  return require(moduleName);
+}
+
+module.exports = { r, requireReload };

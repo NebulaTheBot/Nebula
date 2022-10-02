@@ -1,7 +1,7 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
-  options: [
+  options: [(
     new SlashCommandBuilder()
       .setName("echo")
       .setDescription("Sends your message in a fancy embed or in a normal message.")
@@ -18,24 +18,24 @@ module.exports = {
       })
       .addSubcommand(subcommand => {
         return subcommand
-        .setName("embed")
-        .setDescription("Sends your message as an embed.")
-        .addStringOption(string => {
-          return string
-            .setName("title")
-            .setDescription("The title of an embed.")
-            .setRequired(true)
-        })
-        .addStringOption(string => {
-          return string
-            .setName("description")
-            .setDescription("The description of an embed. (small text under the title)")
-            .setRequired(false)
-        })
+          .setName("embed")
+          .setDescription("Sends your message as an embed.")
+          .addStringOption(string => {
+            return string
+              .setName("title")
+              .setDescription("The title of an embed.")
+              .setRequired(true)
+          })
+          .addStringOption(string => {
+            return string
+              .setName("description")
+              .setDescription("The description of an embed. (small text under the title)")
+              .setRequired(false)
+          })
       })
-  ],
+  )],
 
-  callback: async interaction => {
+  async callback(interaction) {
     const subcommand = interaction.options.getSubcommand();
 
     if (subcommand === "message") {

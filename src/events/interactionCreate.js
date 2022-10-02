@@ -1,10 +1,12 @@
 const { EmbedBuilder } = require("discord.js");
 const { getBulk } = require("../utils/db");
+const getFiles = require("../utils/getFiles");
+const path = require("path");
 
 class interactionCreate {
-  client = null;
   commands = [];
   events = [];
+  client = null;
 
   constructor(client, commands, events) {
     this.client = client;
@@ -16,11 +18,14 @@ class interactionCreate {
     if (!interaction.isChatInputCommand()) return;
 
     try {
+      const commandFiles = getFiles(path.join(process.cwd(), "src", "commands"), ".js");
+      const command = commandFiles.find(file => file.indexOf(interaction.commandName + ".js") !== -1);
+      const callback = require(command)?.callback;
+
       const guildCmd = (await getBulk("commands").catch(() => {}))
         .find(cmd => cmd.name === interaction.commandName && cmd.guildID === interaction.guild.id);
 
-      if (guildCmd == null) return this.commands.commands[interaction.commandName]
-        .callback(interaction, this.client, this.events);
+      if (guildCmd == null) return callback(interaction, this.client, this.commands, this.events);
 
       const noPermsEmbed = new EmbedBuilder()
         .setTitle("You don't have enough permissions")
@@ -84,8 +89,7 @@ class interactionCreate {
 
       if (!isAllowed) return interaction.reply({ embeds: [wrongChannelEmbed], ephemeral: true });
 
-      this.commands.commands[interaction.commandName]
-        .callback(interaction, this.client, this.events);
+      callback(interaction, this.client, this.events, this.commands);
     } catch (error) {
       console.error(error);
     }
