@@ -9,19 +9,19 @@ module.exports = {
 
   callback(interaction) {
     const embed = new EmbedBuilder()
-      .setTitle("Credits")
+      .setTitle("Entities involved")
+			.setDescription(`
+				**Head Developer**: Serge
+				**Bot Developers**: itsakuro, CodingFox, ThyTonyStank
+				**Web Developers**: Pigpot, ThyTonyStank
+				**Helper**: flojo
+				**Testers**: astolfo, flojo
+			`)
 			.addFields([
-				{ name: "Entities involved", value: `
-					**Developers**: CodingFox, ThyTonyStank
-					**Helper**: flojo
-					**Testers**: astolfo, flojo
-					`
-				},
-				{ name: "Special mentions", value: "**Dumbass**: Serge" },
-				{ name: "Sponsors", value: "[FyreBlitz Hosting](https://www.fyreblitz.com/)" },
+				{ name: "Sponsors", value: "[FyreBlitz Hosting](https://www.fyreblitz.com/)" }
 			])
-			.setColor("Random")
-			.setFooter({ text: "Made by CodingFox with love." });
+			.setFooter({ text: "Made by Serge with love." })
+			.setColor("Random");
     
     interaction.reply({ embeds: [embed] });
   }

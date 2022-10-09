@@ -11,7 +11,7 @@ module.exports = {
     const embed = new EmbedBuilder()
 			.setTitle("About")
 			.addFields([
-				{ name: "Version", value: "0.1.2", inline: true },
+				{ name: "Version", value: "0.2", inline: true },
 				{ name: "Working on", value: "The Grand Update", inline: true },
 				{ name: "State", value: "Alpha", inline: true },
 			])

@@ -33,16 +33,15 @@ module.exports = {
         .setTitle("Too many messages provided.")
         .setColor("Red");
 
-      interaction.reply({ embeds: [embed], ephemeral: true });
-      return;
+      return interaction.reply({ embeds: [embed], ephemeral: true });
     }
 
     let embed = new EmbedBuilder()
       .setTitle(`Deleted ${amount} messages!`)
       .setColor("Green");
     
-    const embed1 = new EmbedBuilder()
-      .setTitle(`Cleared at ${channel.name}`)
+    let embed1 = new EmbedBuilder()
+      .setTitle(`Cleared at ${interaction.channel.name}`)
       .addFields([
         { name: "Amount", value: `${amount}` },
         { name: "Moderator", value: `${interaction.member.nickname}` }
@@ -50,7 +49,12 @@ module.exports = {
       .setColor("Green");
 
     interaction.reply({ embeds: [embed], ephemeral: true });
-    if (channel) return channel.bulkDelete(amount, true);
+
+    if (channel) {
+      embed.setTitle(`Cleared at ${channel.name}`);
+      return channel.bulkDelete(amount, true);
+    }
+    
     interaction.channel.bulkDelete(amount, true);
     channel1.send({ embeds: [embed1] });
   }
