@@ -10,17 +10,16 @@ module.exports = {
   callback(interaction) {
     const embed = new EmbedBuilder()
       .setTitle("Entities involved")
-			.setDescription(`
-				**Head Developer**: Serge
-				**Bot Developers**: itsakuro, CodingFox, ThyTonyStank
-				**Web Developers**: Pigpot, ThyTonyStank
-				**Helper**: flojo
-				**Testers**: astolfo, flojo
-			`)
-			.addFields([
-				{ name: "Sponsors", value: "[FyreBlitz Hosting](https://www.fyreblitz.com/)" }
-			])
-			.setFooter({ text: "Made by Serge with love." })
+			.setDescription([
+        "**Head developer**: Serge",
+        "**Bot developers**: itsakuro, CodingFox, ThyTonyStank",
+        "**Web developers**: Pigpot, ThyTonyStank",
+        "**Helper**: flojo",
+        "**Testers**: astolfo, flojo",
+        "**Developers who worked in the past**: TechStudent10",
+        "\n**Sponsors**: [FyreBlitz Hosting](https://www.fyreblitz.com/)"
+      ].join("\n"))
+			.setFooter({ text: "Made by the Entity team with love." })
 			.setColor("Random");
     
     interaction.reply({ embeds: [embed] });

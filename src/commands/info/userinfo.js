@@ -5,23 +5,24 @@ module.exports = {
     new SlashCommandBuilder()
       .setName("userinfo")
       .setDescription("Shows your (or someone else's) info.")
-      .addUserOption(user => {
-        return user
-          .setName("user")
-          .setDescription("Select the user that you want to see.")
-          .setRequired(false)
-      })
+      // .addUserOption(user => {
+      //   return user
+      //     .setName("user")
+      //     .setDescription("Select the user that you want to see.")
+      //     .setRequired(false)
+      // })
   )],
 
   callback(interaction) {
-    const user = interaction.options.getUser("user");
-    console.log(user);
+    const member = interaction.member;
+    // const user = interaction.options.getUser("user");
+    console.log(member);
     
     const embed = new EmbedBuilder()
-      .setTitle(`${interaction.member.nickname}#${interaction.user.discriminator}`)
+      .setTitle(`Info for ${member.nickname}#${interaction.user.discriminator}`)
+      .setFooter({ text: `User ID: ${member.id} | Created at: <t:${parseInt(guild.createdTimestamp / 1000)}:d>` })
+      .setThumbnail(member.displayAvatarURL())
       .setColor("Random");
-
-    if (user) embed.setTitle(``)
 
     interaction.reply({ embeds: [embed] });
   }

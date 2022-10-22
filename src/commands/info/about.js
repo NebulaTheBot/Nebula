@@ -10,12 +10,12 @@ module.exports = {
   callback(interaction) {
     const embed = new EmbedBuilder()
 			.setTitle("About")
-			.addFields([
-				{ name: "Version", value: "0.2", inline: true },
-				{ name: "Working on", value: "The Grand Update", inline: true },
-				{ name: "State", value: "Alpha", inline: true },
-			])
-			.setColor("Random")
+			.setDescription([
+				"**Version**: 0.1.0",
+				"**Working on**: The Grand Update",
+				"**State**: Alpha"
+			].join("\n"))
+			.setColor("Random");
 
     interaction.reply({ embeds: [embed] });
   }
