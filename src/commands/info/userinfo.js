@@ -1,4 +1,5 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { infoColors } = require("../../constants");
 
 module.exports = {
   options: [(
@@ -14,14 +15,26 @@ module.exports = {
   )],
 
   callback(interaction) {
+    const member = interaction.member;
     const user = interaction.options.getUser("user");
-    console.log(user);
     
     const embed = new EmbedBuilder()
-      .setTitle(`${interaction.member.nickname}#${interaction.user.discriminator}`)
-      .setColor("Random");
-
-    if (user) embed.setTitle(``)
+      .setTitle(`Info for ${member.user.username}#${member.user.discriminator}`)
+      .addFields([
+        {
+          name: `Username: ${member.user.username}`,
+          value: `**Server nickname**: ${member.nickname}`,
+          inline: true
+        },
+        {
+          name: `Created at: <t:${new Date(member.user.createdAt / 1000).valueOf()}:d>`,
+          value: `**Joined at**: <t:${parseInt(member.joinedTimestamp / 1000)}:d>`,
+          inline: true
+        }
+      ])
+      .setFooter({ text: `User ID: ${member.id}` })
+      .setThumbnail(member.displayAvatarURL())
+      .setColor(infoColors[Math.floor(Math.random() * infoColors.length)]);
 
     interaction.reply({ embeds: [embed] });
   }

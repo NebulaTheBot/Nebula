@@ -12,7 +12,7 @@ module.exports = {
     r.getSubreddit("Cats")
       .getRandomSubmission({ time: "all" })
       .then(submission => {
-        const image = submission.url;
+        const thumbnail = submission.url;
         const upvotes = submission.ups;
 
         let embed = new EmbedBuilder()
@@ -22,7 +22,7 @@ module.exports = {
 
         if (upvotes === null) embed.setFooter({ text: "Powered by snoowrap. | Upvotes: 0" });
 
-        if (image === "self") embed
+        if (thumbnail === "self") embed
           .setDescription("The post had no image, sorry.")
           .setColor("Red");
 

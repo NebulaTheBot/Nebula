@@ -1,4 +1,5 @@
-const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandBuilder, PermissionsBitField } = require("discord.js");
+const { infoColors } = require("../../constants");
 
 module.exports = {
   options: [(
@@ -9,29 +10,60 @@ module.exports = {
 
   async callback(interaction) {
     const guild = interaction.member.guild;
-    console.log(guild);
+    const level = guild.verificationLevel;
+    const boostTier = guild.premiumTier;
+    const everyone = guild.roles.everyone;
 
-    const year = guild.createdAt.getFullYear();
-    const month = (`0${guild.createdAt.getMonth() + 1}`).slice(-2);
-    const day = (`0${guild.createdAt.getDate()}`).slice(-2);
-    const fullDate = `${day}/${month}/${year}`;
+    const allMembers = await guild.members.fetch();
+    const allChannels = await guild.channels.fetch();
 
-    const fetchGuildOwner = await guild.fetchOwner();
-    const guildOwner = `${fetchGuildOwner.nickname}#${fetchGuildOwner.user.discriminator}`;
+    const viewChannel = PermissionsBitField.Flags.ViewChannel;
+    const textChannels = allChannels.filter(c => c.type === 0, 15).size;
+    const voiceChannels = allChannels.filter(c => c.type === 2).size;
+    const hiddenTextChannels = allChannels.filter(c => !c.permissionsFor(everyone).has(viewChannel) && c.type === 0, 15).size;
+    const hiddenVoiceChannels = allChannels.filter(c => !c.permissionsFor(everyone).has(viewChannel) && c.type === 2).size;
 
-    let embed = new EmbedBuilder()
-      .setTitle(`Info for ${guild.name}`)
+    const embed = new EmbedBuilder()
+      .setTitle(`Showing info for ${guild.name}`)
       .addFields([
-        { name: "Owner", value: `${guildOwner}`, inline: true },
-        { name: "Created at", value: `${fullDate}`, inline: true },
-        { name: "Member count", value: `${guild.memberCount}`, inline: true },
-        { name: "Boost status", value: `
-          Level ${guild.premiumTier +1}
-          ${guild.premiumSubscriptionCount}/${guild.premiumTier == 0 ? 2 : guild.premiumTier == 1 ? 7 : 14} boosts
-        `, inline: true }
+        {
+          name: "📃 | General",
+          value: [
+            guild.features.includes("COMMUNITY") ? `**Description**: ${guild.description == null ? "None" : guild.description}` : null,
+            `**Owner**: <@${guild.ownerId}>`,
+            `**Created at**: <t:${parseInt(guild.createdTimestamp / 1000)}:d>`,
+            `**Security level**: ${level === 0 ? "None" : level === 1 ? "Low" : level === 2 ? "Medium" : level === 3 ? "High" : "Highest"}`,
+            `**Community**: ${guild.features.includes("COMMUNITY") ? "Enabled" : "Disabled"}`
+          ].join("\n")
+        },
+        {
+          name: `👥 | Members: ${guild.memberCount}`,
+          value: [
+            `**Users**: ${allMembers.filter(m => !m.user.bot).size}`,
+            `**Bots**: ${allMembers.filter(m => m.user.bot).size}`
+          ].join("\n"),
+          inline: true
+        },
+        {
+          name: `📜 | Channels: ${textChannels + voiceChannels}`,
+          value: [
+            `**Text**: ${textChannels} (hidden: ${hiddenTextChannels})`,
+            `**Voice**: ${voiceChannels} (hidden: ${hiddenVoiceChannels})`
+          ].join("\n"),
+          inline: true
+        },
+        {
+          name: `🌟 | Boosts: ${guild.premiumSubscriptionCount}${boostTier === 0 ? "/2" : boostTier === 1 ? "/7" : boostTier === 2 ? "/14" : null}`,
+          value: [
+            `**Level**: ${boostTier +1}`,
+            `**Boosters**: ${allMembers.filter(m => m.premiumSince).size}`
+          ].join("\n"),
+          inline: true
+        }
       ])
       .setFooter({ text: `Server ID: ${guild.id}` })
-      .setColor("Random");
+      .setThumbnail(guild.iconURL({ dynamic: true }))
+      .setColor(infoColors[Math.floor(Math.random() * infoColors.length)]);
 
     interaction.reply({ embeds: [embed] });
   }

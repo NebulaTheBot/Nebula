@@ -21,13 +21,12 @@ module.exports = {
       })
   )],
 
-  callback(interaction, client) {
+  callback(interaction) {
     let embed = new EmbedBuilder()
       .setTitle(`${interaction.member.nickname} invited you to play rock-paper-scissors!`)
       .setFooter({ text: "You have 30 seconds to accept or decline." })
       .setColor("Random");
 
-    const cross = client.emojis.cache.get("979649982183391293");
     const buttons = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId("accept")
@@ -35,8 +34,7 @@ module.exports = {
         .setStyle("Primary"),
       new ButtonBuilder()
         .setCustomId("decline")
-        .setEmoji(`${cross}`)
-        .setLabel("Decline")
+        .setLabel("❌ Decline")
         .setStyle("Danger")
     );
 
@@ -61,29 +59,30 @@ module.exports = {
             .setTitle("Choose one of the options below!")
             .setFooter({ text: "You have 30 seconds to choose an option." });
 
-          const list = new ActionRowBuilder().addComponents(new SelectMenuBuilder()
-            .setCustomId("list")
-            .setPlaceholder("Choose one of the options!")
-            .addOptions([
-              {
-                label: "Rock",
-                value: "rock",
-                description: "It's about drive, it's about power",
-                emoji: "🗿"
-              },
-              {
-                label: "Paper",
-                value: "paper",
-                description: "idk",
-                emoji: "📄"
-              },
-              {
-                label: "Scissors",
-                value: "scissors",
-                description: "idk",
-                emoji: "✂"
-              }
-            ])
+          const list = new ActionRowBuilder().addComponents(
+            new SelectMenuBuilder()
+              .setCustomId("list")
+              .setPlaceholder("Choose one of the options!")
+              .addOptions([
+                {
+                  label: "Rock",
+                  value: "rock",
+                  description: "It's about drive, it's about power",
+                  emoji: "🗿"
+                },
+                {
+                  label: "Paper",
+                  value: "paper",
+                  description: "idk",
+                  emoji: "📄"
+                },
+                {
+                  label: "Scissors",
+                  value: "scissors",
+                  description: "idk",
+                  emoji: "✂"
+                }
+              ])
           );
           click.reply({ embeds: [embed], components: [list], ephemeral: true });
     
@@ -92,7 +91,7 @@ module.exports = {
             const optionValue = interaction.options.getString("item");
             const value = collected.values[0];
               
-            let embed = new MessageEmbed()
+            let embed = new EmbedBuilder()
               .setTitle("You have chosen the option.")
               .setColor("Random");
 
@@ -105,7 +104,10 @@ module.exports = {
             if (
               optionValue === "rock" && value === "paper" ||
               optionValue === "paper" && value === "rock"
-            ) embed.setTitle("rock paper");
+            ) embed.setTitle([
+              "Rock vs. Paper, our battle will be legendar-",
+              "Oops, nvm, paper won."
+            ].join("\n"));
             else if (
               optionValue === "rock" && value === "scissors" ||
               optionValue === "scissors" && value === "rock"
