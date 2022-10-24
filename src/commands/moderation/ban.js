@@ -4,18 +4,18 @@ const { OWNER, ADMIN } = require("../../../config.json");
 module.exports = {
   options: [(
     new SlashCommandBuilder()
-      .setName("kick")
-      .setDescription("Kicks a user.")
+      .setName("ban")
+      .setDescription("Bans a user.")
       .addUserOption(user => {
         return user
           .setName("user")
-          .setDescription("The user you want to kick.")
+          .setDescription("The user you want to ban.")
           .setRequired(true)
       })
       .addStringOption(string => {
         return string
           .setName("reason")
-          .setDescription("The reason of kicking.")
+          .setDescription("The reason of banning.")
           .setRequired(false)
       })
   )],
@@ -28,11 +28,11 @@ module.exports = {
     const channel = client.channels.cache.get("979337971159420928");
 
     const embed = new EmbedBuilder()
-      .setTitle("Kicked successfully.")
+      .setTitle("Banned successfully.")
       .setColor("Green");
     
     const embed1 = new EmbedBuilder()
-      .setTitle(`Kicked ${user}`)
+      .setTitle(`Banned ${user}`)
       .addFields([
         { name: "Moderator", value: `${interaction.member.nickname}` },
       ])
@@ -41,7 +41,7 @@ module.exports = {
     
     if (reason) embed1.addFields([{ name: "Reason", value: `${reason}` }]);
 
-    user.kick();
+    user.ban();
     interaction.reply({ embeds: [embed], ephemeral: true });
     channel.send({ embeds: [embed1] });
   }

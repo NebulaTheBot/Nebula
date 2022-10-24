@@ -16,10 +16,9 @@ module.exports = {
 			"EA Sports, it will buy every EA Sports game with your cash!",
 			"EA Sports, it's not in the game!",
 		];
-		const title = messages[Math.floor(Math.random() * messages.length)];
 
 		const embed = new EmbedBuilder()
-			.setTitle(title)
+			.setTitle(messages[Math.floor(Math.random() * messages.length)])
 			.setColor("Random");
 		
 		interaction.reply({ embeds: [embed] });

@@ -12,10 +12,9 @@ module.exports = {
       "Did you try to make me say hello world? Fine... hello world",
       "hello world"
     ];
-    const title = messages[Math.floor(Math.random() * messages.length)];
 
     const embed = new EmbedBuilder()
-      .setTitle(title)
+      .setTitle(messages[Math.floor(Math.random() * messages.length)])
       .setColor("Random");
 
     interaction.reply({ embeds: [embed] });

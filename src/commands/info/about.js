@@ -1,4 +1,5 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { infoColors } = require("../../constants");
 
 module.exports = {
 	options: [(
@@ -15,7 +16,7 @@ module.exports = {
 				"**Working on**: The Grand Update",
 				"**State**: Alpha"
 			].join("\n"))
-			.setColor("Random");
+			.setColor(infoColors[Math.floor(Math.random() * infoColors.length)]);
 
     interaction.reply({ embeds: [embed] });
   }
