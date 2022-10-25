@@ -35,10 +35,10 @@ class Commands {
     if (remCmds) this.removeCommand(name);
 
     const findCommandFile = this.commandFiles.find(commandFile => commandFile === name);
-    const commandOptions = requireReload(findCommandFile)?.options[0];
-    if (!commandOptions) return;
+    const commandData = requireReload(findCommandFile)?.data[0];
+    if (!commandData) return;
 
-    this.commands.push(commandOptions);
+    this.commands.push(commandData);
   }
 
   removeCommands = async () => {
@@ -50,12 +50,12 @@ class Commands {
 
   removeCommand = async name => {
     const findCommandFile = this.commandFiles.find(commandFile => commandFile === name);
-    const commandOptions = requireReload(findCommandFile)?.options[0];
-    if (commandOptions == null) return false;
+    const commandData = requireReload(findCommandFile)?.data[0];
+    if (commandData == null) return false;
 
     for (const guildID of this.client.guilds.cache.keys()) {
       const guild = this.client.guilds.cache.get(guildID);
-      await guild.commands.delete(commandOptions).catch(() => {});
+      await guild.commands.delete(commandData).catch(() => {});
     };
     return true;
   }

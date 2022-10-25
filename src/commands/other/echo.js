@@ -1,7 +1,8 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { getColor } = require("../../utils/getColors");
 
 module.exports = {
-  options: [(
+  data: [(
     new SlashCommandBuilder()
       .setName("echo")
       .setDescription("Sends your message in a fancy embed or in a normal message.")
@@ -37,31 +38,21 @@ module.exports = {
 
   async callback(interaction) {
     const subcommand = interaction.options.getSubcommand();
+    const content = interaction.options.getString("content");
+    const title = interaction.options.getString("title");
+    const description = interaction.options.getString("description");
+    const embed1 = new EmbedBuilder()
+      .setTitle("You have sent a message.")
+      .setColor(getColor(100));
 
-    if (subcommand === "message") {
-      const content = interaction.options.getString("content");
-
-      const embed = new EmbedBuilder()
-        .setTitle("You have sent a message.")
-        .setColor("Green");
-
-      await interaction.channel.send(content);
-      await interaction.reply({ embeds: [embed], ephemeral: true });
-    } else if (subcommand === "embed") {  
-      const title = interaction.options.getString("title");
-      const description = interaction.options.getString("description");
-
+    await interaction.reply({ embeds: [embed1], ephemeral: true });
+    if (subcommand === "message") await interaction.channel.send(content);
+    else if (subcommand === "embed") {
       let embed = new EmbedBuilder()
-        .setTitle(`${title}`)
-        .setColor("Random");
+        .setTitle(title)
+        .setColor(getColor(270));
 
       if (description) embed.setDescription(description);
-      
-      const embed1 = new EmbedBuilder()
-        .setTitle("You have sent a message.")
-        .setColor("Green");
-      
-      await interaction.reply({ embeds: [embed1], ephemeral: true });
       await interaction.channel.send({ embeds: [embed] });
     }
   }

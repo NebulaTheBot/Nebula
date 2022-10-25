@@ -1,8 +1,8 @@
 const { EmbedBuilder, SlashCommandBuilder, PermissionsBitField } = require("discord.js");
-const { infoColors } = require("../../constants");
+const { getColor } = require("../../utils/getColors");
 
 module.exports = {
-  options: [(
+  data: [(
     new SlashCommandBuilder()
       .setName("serverinfo")
       .setDescription("Shows this server's info.")
@@ -16,6 +16,7 @@ module.exports = {
 
     const allMembers = await guild.members.fetch();
     const allChannels = await guild.channels.fetch();
+    const allRoles = await guild.roles.fetch();
 
     const viewChannel = PermissionsBitField.Flags.ViewChannel;
     const textChannels = allChannels.filter(c => c.type === 0, 15).size;
@@ -25,7 +26,7 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setTitle(`Showing info for ${guild.name}`)
-      .addFields([
+      .addFields(
         {
           name: "📃 | General",
           value: [
@@ -54,16 +55,17 @@ module.exports = {
         },
         {
           name: `🌟 | Boosts: ${guild.premiumSubscriptionCount}${boostTier === 0 ? "/2" : boostTier === 1 ? "/7" : boostTier === 2 ? "/14" : null}`,
-          value: [
-            `**Level**: ${boostTier +1}`,
-            `**Boosters**: ${allMembers.filter(m => m.premiumSince).size}`
-          ].join("\n"),
+          value: `**Level**: ${boostTier +1}\n**Boosters**: ${allMembers.filter(m => m.premiumSince).size}`,
           inline: true
+        },
+        {
+          name: `Roles: ${allRoles.size - 1}`,
+          value: `${allRoles.filter(r => r !== everyone).map(r => `${r}`).join(", ")}`,
         }
-      ])
+      )
       .setFooter({ text: `Server ID: ${guild.id}` })
       .setThumbnail(guild.iconURL({ dynamic: true }))
-      .setColor(infoColors[Math.floor(Math.random() * infoColors.length)]);
+      .setColor(getColor(200));
 
     interaction.reply({ embeds: [embed] });
   }

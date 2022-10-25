@@ -1,7 +1,8 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { getColor } = require("../../utils/getColors");
 
 module.exports = {
-  options: [(
+  data: [(
     new SlashCommandBuilder()
       .setName("warn")
       .setDescription("This command warns a person.")
@@ -22,7 +23,7 @@ module.exports = {
   callback(interaction) {
     const embed = new EmbedBuilder()
       .setTitle("lol this command doesn't do anything")
-      .setColor("Random");
+      .setColor(getColor(0));
 
     interaction.reply({ embeds: [embed] });
   }

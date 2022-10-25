@@ -1,7 +1,8 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { getColor } = require("../../utils/getColors");
 
 module.exports = {
-  options: [(
+  data: [(
     new SlashCommandBuilder()
       .setName("graph")
       .setDescription("Displays a graph of a function.")
@@ -10,7 +11,7 @@ module.exports = {
   callback(interaction) {
     const embed = new EmbedBuilder()
       .setTitle("soon:tm:")
-      .setColor("Random");
+      .setColor(getColor(200));
 
     interaction.reply({ embeds: [embed] });
   }

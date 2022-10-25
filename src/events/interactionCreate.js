@@ -6,10 +6,8 @@ const path = require("path");
 class interactionCreate {
   commands = [];
   events = [];
-  client = null;
 
-  constructor(client, commands, events) {
-    this.client = client;
+  constructor(commands, events) {
     this.commands = commands;
     this.events = events;
   }
@@ -25,7 +23,7 @@ class interactionCreate {
       const guildCmd = (await getBulk("commands").catch(() => {}))
         .find(cmd => cmd.name === interaction.commandName && cmd.guildID === interaction.guild.id);
 
-      if (guildCmd == null) return callback(interaction, this.client, this.commands, this.events);
+      if (guildCmd == null) return callback(interaction, interaction.client, this.commands, this.events);
 
       const noPermsEmbed = new EmbedBuilder()
         .setTitle("You don't have enough permissions")
@@ -89,7 +87,7 @@ class interactionCreate {
 
       if (!isAllowed) return interaction.reply({ embeds: [wrongChannelEmbed], ephemeral: true });
 
-      callback(interaction, this.client, this.events, this.commands);
+      callback(interaction, interaction.client, this.events, this.commands);
     } catch (error) {
       console.error(error);
     }

@@ -2,9 +2,10 @@ const {
   EmbedBuilder, ActionRowBuilder, ButtonBuilder,
   SelectMenuBuilder, SlashCommandBuilder
 } = require("discord.js");
+const { getColor } = require("../../utils/getColors");
 
 module.exports = {
-  options: [(
+  data: [(
     new SlashCommandBuilder()
       .setName("rps")
       .setDescription("A rock-paper-scissors mini-game.")
@@ -25,7 +26,7 @@ module.exports = {
     let embed = new EmbedBuilder()
       .setTitle(`${interaction.member.nickname} invited you to play rock-paper-scissors!`)
       .setFooter({ text: "You have 30 seconds to accept or decline." })
-      .setColor("Random");
+      .setColor(getColor(270));
 
     const buttons = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
@@ -51,7 +52,7 @@ module.exports = {
         if (collection.first().customId === "decline") {
           const embed = new EmbedBuilder()
             .setTitle(`${click.member.displayName} has declined the request to play.`)
-            .setColor("Red");
+            .setColor(getColor(0));
 
           message.channel.send({ embeds: [embed] });
         } else if (collection.first().customId === "accept") {
@@ -93,7 +94,7 @@ module.exports = {
               
             let embed = new EmbedBuilder()
               .setTitle("You have chosen the option.")
-              .setColor("Random");
+              .setColor(getColor(100));
 
             click.editReply({ embeds: [embed], components: [] });
 
