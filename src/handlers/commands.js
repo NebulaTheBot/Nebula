@@ -1,64 +1,69 @@
-const getFiles = require("../utils/getFiles");
-const { requireReload } = require("../constants");
+const { getFiles, requireReload } = require("../utils/misc");
 const path = require("path");
 const chalk = require("chalk");
 const AsciiTable = require("ascii-table");
 
-const table = new AsciiTable()
-  .setHeading("Commands", "State")
-  .setBorder("|", "-", "0", "0");
-
-class Commands {
-  commands = [];
-  client = null;
-  commandFiles = getFiles(path.join(process.cwd(), "src", "commands"), ".js");
-  
+module.exports = class Commands {
   constructor(client) {
     this.client = client;
-    this.reloadCommands(false);
-    for (const command of this.commands) table.addRow(command.name, "✅");
+    this.commands = [];
+    this.commandFiles = getFiles(path.join(process.cwd(), "src", "commands"), ".js");
+    this.table = new AsciiTable()
+      .setHeading("Commands", "State")
+      .setBorder("|", "-", "0", "0");
 
-    console.log(chalk.blue(table.toString()));
+    (async () => {
+      for (const command of this.commandFiles) this.loadCommand(command);
+      for (const guildID of this.client.guilds.cache.keys()) {
+        const guild = this.client.guilds.cache.get(guildID);
+        await guild.commands.set(this.commands).catch(() => {});
+      }
+    })();
+
+    console.log(chalk.blue(this.table.toString()));
     console.log(chalk.greenBright("Commands? Registered."));
   }
 
-  reloadCommands = async (remCmds = true) => {
-    for (const command of this.commandFiles) this.reloadCommand(command, remCmds);
+  async loadCommand(name) {
+    const findCommandFile = this.commandFiles.find(commandFile => commandFile === name);
+    const commandFile = requireReload(findCommandFile);
+    const command = new (commandFile)(this.client, this.commands, this).data;
 
-    for (const guildID of this.client.guilds.cache.keys()) {
-      const guild = this.client.guilds.cache.get(guildID);
-      await guild.commands.set(this.commands).catch(() => {});
-    };
+    this.commands.push(command);
+    this.table.addRow(command.name, "✅");
   }
 
-  reloadCommand = (name, remCmds = true) => {
-    if (remCmds) this.removeCommand(name);
+  async reloadCommands() {
+    await this.removeCommands();
+    for (const command of this.commandFiles) this.loadCommand(command);
+  }
+
+  reloadCommand(name) {
+    this.removeCommand(name);
 
     const findCommandFile = this.commandFiles.find(commandFile => commandFile === name);
-    const commandData = requireReload(findCommandFile)?.data[0];
-    if (!commandData) return;
-
-    this.commands.push(commandData);
+    const commandFile = requireReload(findCommandFile);
+    const command = new (commandFile)(this.client, this.commands, this).data;
+    
+    this.loadCommand(command);
   }
 
-  removeCommands = async () => {
+  async removeCommands() {
     for (const guildID of this.client.guilds.cache.keys()) {
       const guild = this.client.guilds.cache.get(guildID);
       await guild.commands.delete(this.commands).catch(() => {});
-    };
+    }
   }
 
-  removeCommand = async name => {
+  async removeCommand(name) {
     const findCommandFile = this.commandFiles.find(commandFile => commandFile === name);
-    const commandData = requireReload(findCommandFile)?.data[0];
-    if (commandData == null) return false;
+    const commandFile = requireReload(findCommandFile);
+    if (commandFile == null) return false;
 
     for (const guildID of this.client.guilds.cache.keys()) {
       const guild = this.client.guilds.cache.get(guildID);
-      await guild.commands.delete(commandData).catch(() => {});
-    };
+      await guild.commands.delete(commandFile).catch(() => {});
+    }
     return true;
   }
 }
-
-module.exports = Commands;

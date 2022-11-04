@@ -9,14 +9,4 @@ const r = new snoowrap({
   password: process.env.REDDIT_PASSWORD
 });
 
-function clearModule(moduleName) {
-  const mp = require.resolve(moduleName);
-  if (require.cache[mp]) delete require.cache[mp];
-}
-
-function requireReload(moduleName) {
-  clearModule(moduleName);
-  return require(moduleName);
-}
-
-module.exports = { r, requireReload };
+module.exports = { r };

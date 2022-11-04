@@ -1,45 +1,40 @@
-const getFiles = require("../utils/getFiles");
-const { requireReload } = require("../constants");
+const { getFiles, requireReload } = require("../utils/misc");
 const path = require("path");
 const chalk = require("chalk");
 const AsciiTable = require("ascii-table");
 
-const table = new AsciiTable()
-  .setHeading("Events", "State")
-  .setBorder("|", "-", "0", "0");
-
-class Events {
-  events = [];
-  commands = [];
-  client = null;
-  eventFiles = getFiles(path.join(process.cwd(), "src", "events"), ".js");
-
+module.exports = class Events {
   constructor(client, commands) {
     this.client = client;
     this.commands = commands;
-    this.reloadEvents();
-    for (const event of this.events) table.addRow(event.name, "✅");
+    this.events = [];
+    this.eventFiles = getFiles(path.join(process.cwd(), "src", "events"), ".js");
+    this.table = new AsciiTable()
+      .setHeading("Events", "State")
+      .setBorder("|", "-", "0", "0");
 
-    console.log(chalk.red(table.toString()));
+    this.reloadEvents(false);
+    console.log(chalk.red(this.table.toString()));
     console.log(chalk.greenBright("Events? Registered."));
   }
-  
-  reloadEvents = () => {
-    for (const event of this.eventFiles) this.reloadEvent(event);
+
+  reloadEvents() {
+    for (const event of this.eventFiles) this.reloadEvent(event, true);
   }
 
-  reloadEvent = name => {
-    this.removeEvent(name);
+  reloadEvent(name, remEvents) {
+    if (remEvents === true) this.removeEvent(name);
 
     const findEventFile = this.eventFiles.find(eventFile => eventFile === name);
     const eventFile = requireReload(findEventFile);
-    let event = new (eventFile.event)(this.client, this.commands, this);
-    let clientEvent = this.client.on(eventFile.name, event.run);
-    
+    const event = new (eventFile.event)(this.client, this.commands, this);
+    const clientEvent = this.client.on(eventFile.name, event.run);
+
     this.events.push({ name: eventFile.name, event: clientEvent });
+    this.table.addRow(eventFile.name, "✅");
   }
 
-  removeEvent = name => {
+  removeEvent(name) {
     const findEventFile = this.eventFiles.find(eventFile => eventFile === name);
     const eventFile = requireReload(findEventFile);
     if (eventFile == null) return false;
@@ -49,5 +44,3 @@ class Events {
     return true;
   }
 }
-
-module.exports = Events;

@@ -1,42 +1,37 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { getColor } = require("../../utils/getColors");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-  data: [(
-    new SlashCommandBuilder()
+module.exports = class Echo {
+  constructor() {
+    this.data = new SlashCommandBuilder()
       .setName("echo")
       .setDescription("Sends your message in a fancy embed or in a normal message.")
-      .addSubcommand(subcommand => {
-        return subcommand
-          .setName("message")
-          .setDescription("Sends your message as a normal message.")
-          .addStringOption(string => {
-            return string
-              .setName("content")
-              .setDescription("The content of the message.")
-              .setRequired(true)
-          })
-      })
-      .addSubcommand(subcommand => {
-        return subcommand
-          .setName("embed")
-          .setDescription("Sends your message as an embed.")
-          .addStringOption(string => {
-            return string
-              .setName("title")
-              .setDescription("The title of an embed.")
-              .setRequired(true)
-          })
-          .addStringOption(string => {
-            return string
-              .setName("description")
-              .setDescription("The description of an embed. (small text under the title)")
-              .setRequired(false)
-          })
-      })
-  )],
+      .addSubcommand(subcommand => subcommand
+        .setName("message")
+        .setDescription("Sends your message as a normal message.")
+        .addStringOption(string => string
+          .setName("content")
+          .setDescription("The content of the message.")
+          .setRequired(true)
+        )
+      )
+      .addSubcommand(subcommand => subcommand
+        .setName("embed")
+        .setDescription("Sends your message as an embed.")
+        .addStringOption(string => string
+          .setName("title")
+          .setDescription("The title of an embed.")
+          .setRequired(true)
+        )
+        .addStringOption(string => string
+          .setName("description")
+          .setDescription("The description of an embed. (small text under the title)")
+          .setRequired(false)
+        )
+      );
+  }
 
-  async callback(interaction) {
+  async run(interaction) {
     const subcommand = interaction.options.getSubcommand();
     const content = interaction.options.getString("content");
     const title = interaction.options.getString("title");

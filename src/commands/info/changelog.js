@@ -1,14 +1,14 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { getColor } = require("../../utils/getColors");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-  data: [(
-    new SlashCommandBuilder()
+module.exports = class Changelog {
+  constructor() {
+    this.data = new SlashCommandBuilder()
       .setName("changelog")
-      .setDescription("Shows the changelog for the latest update.")
-  )],
+      .setDescription("Shows the changelog for the latest update.");
+  }
 
-  callback(interaction) {
+  run(interaction) {
     const embed = new EmbedBuilder()
       .setTitle("Changelog for v0.1")
       .addFields(

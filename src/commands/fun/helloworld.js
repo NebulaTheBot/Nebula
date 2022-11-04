@@ -1,14 +1,14 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { getColor } = require("../../utils/getColors");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-	data: [(
-		new SlashCommandBuilder()
+module.exports = class Helloworld {
+  constructor() {
+		this.data = new SlashCommandBuilder()
 			.setName("helloworld")
-			.setDescription("Self explanatory.")
-	)],
+			.setDescription("Self explanatory.");
+  }
 
-  callback(interaction) {
+  run(interaction) {
     const messages = [
       "Did you try to make me say hello world? Fine... hello world",
       "hello world"

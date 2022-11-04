@@ -1,9 +1,9 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { getColor } = require("../../utils/getColors");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-  data: [(
-    new SlashCommandBuilder()
+module.exports = class Userinfo {
+  constructor() {
+    this.data = new SlashCommandBuilder()
       .setName("userinfo")
       .setDescription("Shows your (or someone else's) info.")
       .addUserOption(user => {
@@ -11,8 +11,8 @@ module.exports = {
           .setName("user")
           .setDescription("Select the user that you want to see.")
           .setRequired(false)
-      })
-  )],
+      });
+  }
 
   async callback(interaction) {
     const member = interaction.member;

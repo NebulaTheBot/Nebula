@@ -1,14 +1,18 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { getColor } = require("../../utils/getColors");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-  data: [(
-    new SlashCommandBuilder()
+module.exports = class Help {
+  constructor() {
+    this.data = new SlashCommandBuilder()
       .setName("help")
-      .setDescription("Gives information about commands.")
-  )],
+      .setDescription("Gives information about commands.");
+  }
 
-  callback(interaction) {
-    interaction.reply("lazy to rewrite this command fully by myself");
+  run(interaction) {
+    const embed = new EmbedBuilder()
+      .setTitle("lazy to rewrite this command fully by myself")
+      .setColor(getColor(200));
+
+    interaction.reply({ embeds: [embed] });
   }
 }

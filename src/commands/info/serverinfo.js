@@ -1,14 +1,14 @@
 const { EmbedBuilder, SlashCommandBuilder, PermissionsBitField } = require("discord.js");
-const { getColor } = require("../../utils/getColors");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-  data: [(
-    new SlashCommandBuilder()
+module.exports = class Serverinfo {
+  constructor() {
+    this.data = new SlashCommandBuilder()
       .setName("serverinfo")
-      .setDescription("Shows this server's info.")
-  )],
+      .setDescription("Shows this server's info.");
+  }
 
-  async callback(interaction) {
+  async run(interaction) {
     const guild = interaction.member.guild;
     const level = guild.verificationLevel;
     const boostTier = guild.premiumTier;
@@ -24,17 +24,22 @@ module.exports = {
     const hiddenTextChannels = allChannels.filter(c => !c.permissionsFor(everyone).has(viewChannel) && c.type === 0, 15).size;
     const hiddenVoiceChannels = allChannels.filter(c => !c.permissionsFor(everyone).has(viewChannel) && c.type === 2).size;
 
+    const roles = allRoles.filter(r => r !== everyone && !r.managed && !r.name.toLowerCase().includes("bot"));
+    const botRoles = allRoles.filter(r => r !== everyone && r.managed || !r.managed && r.name.toLowerCase().includes("bot"));
+    const test = roles.map(r => r.rawPosition.sort(function(a, b) { return a - b }));
+    console.log(test);
+
     const embed = new EmbedBuilder()
       .setTitle(`Showing info for ${guild.name}`)
       .addFields(
         {
           name: "📃 | General",
           value: [
-            guild.features.includes("COMMUNITY") ? `**Description**: ${guild.description == null ? "None" : guild.description}` : null,
             `**Owner**: <@${guild.ownerId}>`,
             `**Created at**: <t:${parseInt(guild.createdTimestamp / 1000)}:d>`,
             `**Security level**: ${level === 0 ? "None" : level === 1 ? "Low" : level === 2 ? "Medium" : level === 3 ? "High" : "Highest"}`,
-            `**Community**: ${guild.features.includes("COMMUNITY") ? "Enabled" : "Disabled"}`
+            `**Community**: ${guild.features.includes("COMMUNITY") ? "Enabled" : "Disabled"}`,
+            guild.features.includes("COMMUNITY") ? `**Description**: ${guild.description == null ? "None" : guild.description}` : null
           ].join("\n")
         },
         {
@@ -59,8 +64,11 @@ module.exports = {
           inline: true
         },
         {
-          name: `Roles: ${allRoles.size - 1}`,
-          value: `${allRoles.filter(r => r !== everyone).map(r => `${r}`).join(", ")}`,
+          name: `Roles: ${roles.size + botRoles.size}`,
+          value: [
+            `**User roles**: ${roles.map(r => `${r}`).join(", ")} and **insert number here** more`,
+            `**Bot roles**: ${botRoles.map(r => `${r}`).join(", ")} and **insert number here** more`
+          ].join("\n")
         }
       )
       .setFooter({ text: `Server ID: ${guild.id}` })

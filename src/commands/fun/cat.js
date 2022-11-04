@@ -1,16 +1,17 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const { r } = require("../../constants");
-const { getColor } = require("../../utils/getColors");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-  data: [(
-    new SlashCommandBuilder()
+module.exports = class Cat {
+  constructor() {
+    this.data = new SlashCommandBuilder()
       .setName("cat")
-      .setDescription("Sends a random post of r/cats into the chat.")
-  )],
-    
-  callback(interaction) {
-    r.getSubreddit("Cats")
+      .setDescription("Sends a random post of r/cats into the chat.");
+  }
+
+  run(interaction) {
+    r
+      .getSubreddit("Cats")
       .getRandomSubmission({ time: "all" })
       .then(submission => {
         const thumbnail = submission.url;

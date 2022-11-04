@@ -1,28 +1,26 @@
 const { EmbedBuilder, ChannelType, SlashCommandBuilder } = require("discord.js");
 const { OWNER, ADMIN } = require("../../../config.json");
-const { getColor } = require("../../utils/getColors");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-  data: [(
-    new SlashCommandBuilder()
+module.exports = class Clear {
+  constructor() {
+    this.data = new SlashCommandBuilder()
       .setName("clear")
       .setDescription("Clears messages.")
-      .addNumberOption(number => {
-        return number
-          .setName("amount")
-          .setDescription("The amount of the messages that you want to clear.")
-          .setRequired(true)
-      })
-      .addChannelOption(channel => {
-        return channel
-          .setName("channel")
-          .setDescription("The channel that contains the messages that you want to clear.")
-          .setRequired(false)
-          .addChannelTypes(ChannelType.GuildText)
-      })
-  )],
+      .addNumberOption(number => number
+        .setName("amount")
+        .setDescription("The amount of the messages that you want to clear.")
+        .setRequired(true)
+      )
+      .addChannelOption(channel => channel
+        .setName("channel")
+        .setDescription("The channel that contains the messages that you want to clear.")
+        .setRequired(false)
+        .addChannelTypes(ChannelType.GuildText)
+      );
+  }
 
-  callback(interaction) {
+  run(interaction) {
     if (interaction.user.id !== OWNER && !ADMIN.includes(interaction.user.id)) return;
 
     const client = interaction.client;

@@ -1,16 +1,17 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const { r } = require("../../constants");
-const { getColor } = require("../../utils/getColors");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-  data: [(
-    new SlashCommandBuilder()
+module.exports = class Meme {
+  constructor() {
+    this.data = new SlashCommandBuilder()
       .setName("meme")
-      .setDescription("Sends a random and unfunny meme.")
-  )],
+      .setDescription("Sends a random and unfunny meme.");
+  }
 
-  callback(interaction) {
-    r.getSubreddit("cleanmemes")
+  run(interaction) {
+    r
+      .getSubreddit("cleanmemes")
       .getRandomSubmission({ time: "all" })
       .then(submission => {
         const thumbnail = submission.url;

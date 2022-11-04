@@ -1,27 +1,25 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const { OWNER, ADMIN } = require("../../../config.json");
-const { getColor } = require("../../utils/getColors");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-  data: [(
-    new SlashCommandBuilder()
+module.exports = class Ban {
+  constructor() {
+    this.data = new SlashCommandBuilder()
       .setName("ban")
       .setDescription("Bans a user.")
-      .addUserOption(user => {
-        return user
-          .setName("user")
-          .setDescription("The user you want to ban.")
-          .setRequired(true)
-      })
-      .addStringOption(string => {
-        return string
-          .setName("reason")
-          .setDescription("The reason of banning.")
-          .setRequired(false)
-      })
-  )],
+      .addUserOption(user => user
+        .setName("user")
+        .setDescription("The user you want to ban.")
+        .setRequired(true)
+      )
+      .addStringOption(string => string
+        .setName("reason")
+        .setDescription("The reason of banning.")
+        .setRequired(false)
+      );
+  }
   
-  callback(interaction) {
+  run(interaction) {
     if (interaction.user.id !== OWNER && !ADMIN.includes(interaction.user.id)) return;
 
     const client = interaction.client;

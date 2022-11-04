@@ -2,27 +2,26 @@ const {
   EmbedBuilder, ActionRowBuilder, ButtonBuilder,
   SelectMenuBuilder, SlashCommandBuilder
 } = require("discord.js");
-const { getColor } = require("../../utils/getColors");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-  data: [(
-    new SlashCommandBuilder()
+module.exports = class Rps {
+  constructor() {
+    this.data = new SlashCommandBuilder()
       .setName("rps")
       .setDescription("A rock-paper-scissors mini-game.")
-      .addStringOption(string => {
-        return string
-          .setName("item")
-          .setDescription("Select an item.")
-          .setRequired(true)
-          .addChoices(
-            { name: "rock", value: "rock" },
-            { name: "paper", value: "paper" },
-            { name: "scissors", value: "scissors" }
-          )
-      })
-  )],
+      .addStringOption(string => string
+        .setName("item")
+        .setDescription("Select an item.")
+        .setRequired(true)
+        .addChoices(
+          { name: "rock", value: "rock" },
+          { name: "paper", value: "paper" },
+          { name: "scissors", value: "scissors" }
+        )
+      );
+  }
 
-  callback(interaction) {
+  run(interaction) {
     let embed = new EmbedBuilder()
       .setTitle(`${interaction.member.nickname} invited you to play rock-paper-scissors!`)
       .setFooter({ text: "You have 30 seconds to accept or decline." })

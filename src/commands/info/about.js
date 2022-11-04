@@ -1,14 +1,14 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { getColor } = require("../../utils/getColors");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-	data: [(
-		new SlashCommandBuilder()
+module.exports = class About {
+	constructor() {
+		this.data = new SlashCommandBuilder()
 			.setName("about")
-			.setDescription("Shows information about the bot.")
-	)],
-		
-  callback(interaction) {
+			.setDescription("Shows information about the bot.");
+	}
+
+  run(interaction) {
     const embed = new EmbedBuilder()
 			.setTitle("About")
 			.setDescription([

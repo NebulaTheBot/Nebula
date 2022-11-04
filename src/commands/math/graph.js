@@ -1,14 +1,14 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { getColor } = require("../../utils/getColors");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-  data: [(
-    new SlashCommandBuilder()
+module.exports = class Graph {
+  constructor() {
+    this.data = new SlashCommandBuilder()
       .setName("graph")
-      .setDescription("Displays a graph of a function.")
-  )],
+      .setDescription("Displays a graph of a function.");
+  }
 
-  callback(interaction) {
+  run(interaction) {
     const embed = new EmbedBuilder()
       .setTitle("soon:tm:")
       .setColor(getColor(200));
