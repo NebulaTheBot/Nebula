@@ -10,26 +10,24 @@ module.exports = class Cat {
   }
 
   run(interaction) {
-    r
-      .getSubreddit("Cats")
-      .getRandomSubmission({ time: "all" })
-      .then(submission => {
-        const thumbnail = submission.url;
-        const upvotes = submission.ups;
+    r.getSubreddit("Cats").getRandomSubmission({ time: "all" }).then(submission => {
+      console.log(submission);
+      const media = submission.media;
+      const upvotes = submission.ups;
+      const URL = submission.url;
 
-        let embed = new EmbedBuilder()
-          .setTitle(`${submission.title}`)
-          .setFooter({ text: `Powered by snoowrap. | Upvotes: ${upvotes}` })
-          .setColor(getColor(270));
+      let embed = new EmbedBuilder()
+        .setTitle(submission.title)
+        .setURL(`https://reddit.com${submission.permalink}`)
+        .setFooter({ text: `Powered by snoowrap. | Upvotes: ${upvotes}` })
+        .setColor(getColor(270));
 
-        if (upvotes === null) embed.setFooter({ text: "Powered by snoowrap. | Upvotes: 0" });
+      if (upvotes == null) embed.setFooter({ text: "Powered by snoowrap. | Upvotes: 0" });
+      if (URL === "self") embed.setDescription("Sorry, there was no image.").setColor(getColor(0));
+      if (URL !== "self" && media != null) embed.setImage(`${media.reddit_video.fallback_url}`); 
+      if (URL !== "self" && media == null) embed.setImage(`${URL}`);
 
-        if (thumbnail === "self") embed
-          .setDescription("The post had no image, sorry.")
-          .setColor(getColor(0));
-
-        if (thumbnail !== "self") embed.setImage(`${thumbnail}`);
-        interaction.reply({ embeds: [embed] });
-      })
+      interaction.reply({ embeds: [embed] });
+    })
   }
 }

@@ -10,7 +10,7 @@ module.exports = class Changelog {
 
   run(interaction) {
     const embed = new EmbedBuilder()
-      .setTitle("Changelog for v0.1")
+      .setTitle("Changelog for v0.1.0-beta")
       .addFields(
         { name: "Added:", value: "**Commands**: /changelog, /credits, /echo, /serverinfo" },
         { name: "Work in progress:", value: "**Commands**: /graph, /userinfo, /rps, /clear, /kick, /warn, /ban, /cat, /dog, /meme, /help" },
@@ -18,7 +18,7 @@ module.exports = class Changelog {
           name: "Changed:",
           value: [
             "**Commands**: /about",
-            "**Version number**: Rounded to 0.1",
+            "**Version number**: Rounded to 0.1.0 (previously - 0.0000000001)",
             "**Embed color**: Fixed, slightly random."
           ].join("\n")
         },

@@ -12,9 +12,8 @@ module.exports = class About {
     const embed = new EmbedBuilder()
 			.setTitle("About")
 			.setDescription([
-				"**Version**: 0.1",
-				"**Working on**: The Grand Update",
-				"**State**: Alpha"
+				"**Version**: 0.1.0-beta",
+				"**Working on**: The Grand Update"
 			].join("\n"))
 			.setColor(getColor(200));
 

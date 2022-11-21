@@ -6,12 +6,11 @@ module.exports = class Userinfo {
     this.data = new SlashCommandBuilder()
       .setName("userinfo")
       .setDescription("Shows your (or someone else's) info.")
-      .addUserOption(user => {
-        return user
-          .setName("user")
-          .setDescription("Select the user that you want to see.")
-          .setRequired(false)
-      });
+      .addUserOption(user => user
+        .setName("user")
+        .setDescription("Select the user that you want to see.")
+        .setRequired(false)
+      );
   }
 
   async callback(interaction) {

@@ -9,6 +9,8 @@ module.exports = class Credits {
   }
 
   run(interaction) {
+    const hearts = ["💖", "💝", "💓", "💗"];
+
     const embed = new EmbedBuilder()
       .setTitle("Entities involved")
 			.setDescription([
@@ -20,7 +22,7 @@ module.exports = class Credits {
         "**Developers who worked in the past**: TechStudent10",
         "\n**Sponsors**: [FyreBlitz Hosting](https://fyreblitz.com)"
       ].join("\n"))
-			.setFooter({ text: "Made by the Entity team with 💖" })
+			.setFooter({ text: `Made by the Entity team with ${hearts[Math.floor(Math.random() * hearts.length)]}` })
 			.setColor(getColor(200));
     
     interaction.reply({ embeds: [embed] });

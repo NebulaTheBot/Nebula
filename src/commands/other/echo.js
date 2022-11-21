@@ -41,6 +41,7 @@ module.exports = class Echo {
       .setColor(getColor(100));
 
     await interaction.reply({ embeds: [embed1], ephemeral: true });
+
     if (subcommand === "message") await interaction.channel.send(content);
     else if (subcommand === "embed") {
       let embed = new EmbedBuilder()
