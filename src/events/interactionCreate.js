@@ -1,31 +1,28 @@
 const { EmbedBuilder } = require("discord.js");
 const { getBulk } = require("../utils/db");
-const getFiles = require("../utils/getFiles");
+const { getFiles, requireReload } = require("../utils/misc");
 const path = require("path");
 
-class interactionCreate {
-  commands = [];
-  events = [];
-  client = null;
+module.exports = {
+  name: "interactionCreate",
+  event: class InteractionCreate {
+    constructor(commands, events) {
+      this.commands = commands;
+      this.events = events;
+    }
 
-  constructor(client, commands, events) {
-    this.client = client;
-    this.commands = commands;
-    this.events = events;
-  }
+    async run(interaction) {
+      if (!interaction.isChatInputCommand()) return;
 
-  run = async interaction => {
-    if (!interaction.isChatInputCommand()) return;
-
-    try {
       const commandFiles = getFiles(path.join(process.cwd(), "src", "commands"), ".js");
-      const command = commandFiles.find(file => file.indexOf(interaction.commandName + ".js") !== -1);
-      const callback = require(command)?.callback;
+      const findCommandFile = commandFiles.find(file => file.indexOf(`${interaction.commandName}.js`) !== -1);
+      const commandFile = requireReload(findCommandFile);
+      const command = new (commandFile)(this.client, this.commands, this);
 
       const guildCmd = (await getBulk("commands").catch(() => {}))
         .find(cmd => cmd.name === interaction.commandName && cmd.guildID === interaction.guild.id);
 
-      if (guildCmd == null) return callback(interaction, this.client, this.commands, this.events);
+      if (guildCmd == null) return command.run(interaction);
 
       const noPermsEmbed = new EmbedBuilder()
         .setTitle("You don't have enough permissions")
@@ -49,8 +46,7 @@ class interactionCreate {
         return interaction.reply({ embeds: [embed], ephemeral: true });
       }
 
-      if (guildCmd.moderation && !interaction.member.moderatable)
-        return interaction.reply({ embeds: [noPermsEmbed], ephemeral: true });
+      if (guildCmd.moderation && !interaction.member.moderatable) return interaction.reply({ embeds: [noPermsEmbed], ephemeral: true });
 
       const permissionsNeeded = JSON.parse(guildCmd.permissionsNeeded);
       if (permissionsNeeded) for (let i = 0; i < permissionsNeeded.length; i++) {
@@ -88,12 +84,7 @@ class interactionCreate {
       }
 
       if (!isAllowed) return interaction.reply({ embeds: [wrongChannelEmbed], ephemeral: true });
-
-      callback(interaction, this.client, this.events, this.commands);
-    } catch (error) {
-      console.error(error);
+      command.run(interaction);
     }
   }
 }
-
-module.exports = { name: "interactionCreate", event: interactionCreate };

@@ -1,4 +1,3 @@
-const { Colors } = require("discord.js");
 const snoowrap = require("snoowrap");
 require("dotenv").config();
 
@@ -10,20 +9,4 @@ const r = new snoowrap({
   password: process.env.REDDIT_PASSWORD
 });
 
-const infoColors = [
-  Colors.Blue,
-  Colors.DarkBlue,
-  Colors.Blurple
-];
-
-function clearModule(moduleName) {
-  let mp = require.resolve(moduleName);
-  if (require.cache[mp]) delete require.cache[mp];
-}
-
-function requireReload(moduleName) {
-  clearModule(moduleName);
-  return require(moduleName);
-}
-
-module.exports = { r, infoColors, requireReload };
+module.exports = { r };

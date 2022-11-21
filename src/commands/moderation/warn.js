@@ -1,28 +1,27 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-  options: [(
-    new SlashCommandBuilder()
+module.exports = class Warn {
+  constructor() {
+    this.data = new SlashCommandBuilder()
       .setName("warn")
       .setDescription("This command warns a person.")
-      .addUserOption(user => {
-        return user
-          .setName("user")
-          .setDescription("The user who is being warned.")
-          .setRequired(true)
-      })
-      .addStringOption(string => {
-        return string
-          .setName("reason")
-          .setDescription("Reason for the warn.")
-          .setRequired(false)
-      })
-  )],
+      .addUserOption(user => user
+        .setName("user")
+        .setDescription("The user who is being warned.")
+        .setRequired(true)
+      )
+      .addStringOption(string => string
+        .setName("reason")
+        .setDescription("Reason for the warn.")
+        .setRequired(false)
+      );
+  }
 
-  callback(interaction) {
+  run(interaction) {
     const embed = new EmbedBuilder()
       .setTitle("lol this command doesn't do anything")
-      .setColor("Random");
+      .setColor(getColor(0));
 
     interaction.reply({ embeds: [embed] });
   }

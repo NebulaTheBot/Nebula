@@ -1,22 +1,21 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { infoColors } = require("../../constants");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-	options: [(
-		new SlashCommandBuilder()
+module.exports = class About {
+	constructor() {
+		this.data = new SlashCommandBuilder()
 			.setName("about")
-			.setDescription("Shows information about the bot.")
-	)],
-		
-  callback(interaction) {
+			.setDescription("Shows information about the bot.");
+	}
+
+  run(interaction) {
     const embed = new EmbedBuilder()
 			.setTitle("About")
 			.setDescription([
-				"**Version**: 0.1.0",
-				"**Working on**: The Grand Update",
-				"**State**: Alpha"
+				"**Version**: 0.1.0-beta",
+				"**Working on**: The Grand Update"
 			].join("\n"))
-			.setColor(infoColors[Math.floor(Math.random() * infoColors.length)]);
+			.setColor(getColor(200));
 
     interaction.reply({ embeds: [embed] });
   }

@@ -1,13 +1,14 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-	options: [(
-		new SlashCommandBuilder()
+module.exports = class Ea {
+	constructor() {
+		this.data = new SlashCommandBuilder()
 			.setName("ea")
-			.setDescription("Tells a joke about EA being money hungry.")
-	)],
+			.setDescription("Tells a joke about EA being money hungry.");
+	}
 
-  callback(interaction) {
+  run(interaction) {
     const messages = [
 			"EA Sports, it's in your wallet!", 
 			"EA Sports, it's in your lack of cash!", 
@@ -19,7 +20,7 @@ module.exports = {
 
 		const embed = new EmbedBuilder()
 			.setTitle(messages[Math.floor(Math.random() * messages.length)])
-			.setColor("Random");
+			.setColor(getColor(0));
 		
 		interaction.reply({ embeds: [embed] });
   }

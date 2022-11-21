@@ -1,13 +1,14 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-	options: [(
-		new SlashCommandBuilder()
+module.exports = class Helloworld {
+  constructor() {
+		this.data = new SlashCommandBuilder()
 			.setName("helloworld")
-			.setDescription("Self explanatory.")
-	)],
+			.setDescription("Self explanatory.");
+  }
 
-  callback(interaction) {
+  run(interaction) {
     const messages = [
       "Did you try to make me say hello world? Fine... hello world",
       "hello world"
@@ -15,7 +16,7 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setTitle(messages[Math.floor(Math.random() * messages.length)])
-      .setColor("Random");
+      .setColor(getColor(270));
 
     interaction.reply({ embeds: [embed] });
   }

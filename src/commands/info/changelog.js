@@ -1,27 +1,31 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { infoColors } = require("../../constants");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-  options: [(
-    new SlashCommandBuilder()
+module.exports = class Changelog {
+  constructor() {
+    this.data = new SlashCommandBuilder()
       .setName("changelog")
-      .setDescription("Shows the changelog for the latest update.")
-  )],
+      .setDescription("Shows the changelog for the latest update.");
+  }
 
-  callback(interaction) {
+  run(interaction) {
     const embed = new EmbedBuilder()
-      .setTitle("Changelog for v0.1.0")
-      .setDescription([
-        "**Added**: /changelog, /credits, /echo (replacement for /embed), /serverinfo",
-        "**Work in progress**: /graph, /userinfo, /rps, /clear, /kick, /warn, /ban, /cat, /dog, /meme",
-        "**Changed**: /about",
-        "**Deciding the fate**: /help",
-        "**Removed**: /kill, /idiot, /motivate, /embed",
-        "**Dem ideas**: make commands have a slightly random but fixed color of embed",
-        "\n**Note**:",
-        "This update marks the removal of normal commands. The version number got rounded to 0.1.0."
-      ].join("\n"))
-      .setColor(infoColors[Math.floor(Math.random() * infoColors.length)]);
+      .setTitle("Changelog for v0.1.0-beta")
+      .addFields(
+        { name: "Added:", value: "**Commands**: /changelog, /credits, /echo, /serverinfo" },
+        { name: "Work in progress:", value: "**Commands**: /graph, /userinfo, /rps, /clear, /kick, /warn, /ban, /cat, /dog, /meme, /help" },
+        {
+          name: "Changed:",
+          value: [
+            "**Commands**: /about",
+            "**Version number**: Rounded to 0.1.0 (previously - 0.0000000001)",
+            "**Embed color**: Fixed, slightly random."
+          ].join("\n")
+        },
+        { name: "Removed:", value: "**Commands**: /embed, /idiot, /kill, /motivate" },
+        { name: "Note:", value: "Normal commands are now removed." }
+      )
+      .setColor(getColor(200));
 
     interaction.reply({ embeds: [embed] });
   }

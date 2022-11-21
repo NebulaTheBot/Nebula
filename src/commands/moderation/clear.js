@@ -1,29 +1,29 @@
 const { EmbedBuilder, ChannelType, SlashCommandBuilder } = require("discord.js");
 const { OWNER, ADMIN } = require("../../../config.json");
+const { getColor } = require("../../utils/misc");
 
-module.exports = {
-  options: [(
-    new SlashCommandBuilder()
+module.exports = class Clear {
+  constructor() {
+    this.data = new SlashCommandBuilder()
       .setName("clear")
       .setDescription("Clears messages.")
-      .addNumberOption(number => {
-        return number
-          .setName("amount")
-          .setDescription("The amount of the messages that you want to clear.")
-          .setRequired(true)
-      })
-      .addChannelOption(channel => {
-        return channel
-          .setName("channel")
-          .setDescription("The channel that contains the messages that you want to clear.")
-          .setRequired(false)
-          .addChannelTypes(ChannelType.GuildText)
-      })
-  )],
+      .addNumberOption(number => number
+        .setName("amount")
+        .setDescription("The amount of the messages that you want to clear.")
+        .setRequired(true)
+      )
+      .addChannelOption(channel => channel
+        .setName("channel")
+        .setDescription("The channel that contains the messages that you want to clear.")
+        .setRequired(false)
+        .addChannelTypes(ChannelType.GuildText)
+      );
+  }
 
-  callback(interaction, client) {
+  run(interaction) {
     if (interaction.user.id !== OWNER && !ADMIN.includes(interaction.user.id)) return;
 
+    const client = interaction.client;
     const amount = interaction.options.getNumber("amount");
     const channel = interaction.options.getChannel("channel");
     const channel1 = client.channels.cache.get("979337971159420928");
@@ -31,22 +31,22 @@ module.exports = {
     if (amount > 100) {
       const embed = new EmbedBuilder()
         .setTitle("Too many messages provided.")
-        .setColor("Red");
+        .setColor(getColor(0));
 
       return interaction.reply({ embeds: [embed], ephemeral: true });
     }
 
     let embed = new EmbedBuilder()
       .setTitle(`Deleted ${amount} messages!`)
-      .setColor("Green");
+      .setColor(getColor(100));
     
     let embed1 = new EmbedBuilder()
       .setTitle(`Cleared at ${interaction.channel.name}`)
-      .addFields([
+      .addFields(
         { name: "Amount", value: `${amount}` },
         { name: "Moderator", value: `${interaction.member.nickname}` }
-      ])
-      .setColor("Green");
+      )
+      .setColor(getColor(100));
 
     interaction.reply({ embeds: [embed], ephemeral: true });
 

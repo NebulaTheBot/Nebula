@@ -2,15 +2,15 @@ const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const { r } = require("../../constants");
 const { getColor } = require("../../utils/misc");
 
-module.exports = class Meme {
+module.exports = class Dog {
   constructor() {
     this.data = new SlashCommandBuilder()
-      .setName("meme")
-      .setDescription("Sends a random and unfunny meme.");
+      .setName("dog")
+      .setDescription("Sends a random post of r/lookatmydog into the chat.");
   }
-
+    
   run(interaction) {
-    r.getSubreddit("cleanmemes").getRandomSubmission({ time: "all" }).then(submission => {
+    r.getSubreddit("lookatmydog").getRandomSubmission({ time: "all" }).then(submission => {
       const thumbnail = submission.url;
       const upvotes = submission.ups;
 
@@ -25,7 +25,7 @@ module.exports = class Meme {
         .setDescription("The post had no image, sorry.")
         .setColor(getColor(0));
 
-      if (thumbnail !== "self") embed.setImage(`${thumbnail}`);
+      if (thumbnail !== "self") embed.setImage(`${thumbnail}`);      
       interaction.reply({ embeds: [embed] });
     })
   }
