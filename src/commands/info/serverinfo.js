@@ -24,10 +24,12 @@ module.exports = class Serverinfo {
     const hiddenTextChannels = allChannels.filter(c => !c.permissionsFor(everyone).has(viewChannel) && c.type === 0, 15).size;
     const hiddenVoiceChannels = allChannels.filter(c => !c.permissionsFor(everyone).has(viewChannel) && c.type === 2).size;
 
-    const roles = allRoles.filter(r => r !== everyone && !r.managed && !r.name.toLowerCase().includes("bot"));
-    const botRoles = allRoles.filter(r => r !== everyone && r.managed || !r.managed && r.name.toLowerCase().includes("bot"));
-    const test = roles.map(r => r.rawPosition.sort(function(a, b) { return a - b }));
-    console.log(test);
+    const roles = [...(allRoles.filter(r => r !== everyone && !r.managed && !r.name.toLowerCase().includes("bot")))]
+      .sort((a, b) => String(a[1].name).localeCompare(b[1].name));
+    const botRoles = [...(allRoles.filter(r => r !== everyone && r.managed || !r.managed && r.name.toLowerCase().includes("bot")))]
+      .sort((a, b) => String(a[1].name).localeCompare(b[1].name));
+
+    const roleDisplayLimit = 10;
 
     const embed = new EmbedBuilder()
       .setTitle(`Showing info for ${guild.name}`)
@@ -64,10 +66,10 @@ module.exports = class Serverinfo {
           inline: true
         },
         {
-          name: `Roles: ${roles.size + botRoles.size}`,
+          name: `Roles: ${roles.length + botRoles.length}`,
           value: [
-            `**User roles**: ${roles.map(r => `${r}`).join(", ")} and **insert number here** more`,
-            `**Bot roles**: ${botRoles.map(r => `${r}`).join(", ")} and **insert number here** more`
+            `**User roles**: ${roles.slice(0, roleDisplayLimit).map(r => `${r[1]}`).join(", ")} `+((roles.length > roleDisplayLimit) ? `and ${roles.length - roleDisplayLimit} more` : ''),
+            `**Bot roles**: ${botRoles.slice(0, roleDisplayLimit).map(r => `${r[1]}`).join(", ")} `+((botRoles.length > roleDisplayLimit) ? `and ${botRoles.length - roleDisplayLimit} more` : '')
           ].join("\n")
         }
       )
@@ -75,6 +77,6 @@ module.exports = class Serverinfo {
       .setThumbnail(guild.iconURL({ dynamic: true }))
       .setColor(getColor(200));
 
-    interaction.reply({ embeds: [embed] });
+    interaction.editReply({ embeds: [embed] });
   }
 }

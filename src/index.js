@@ -23,4 +23,4 @@ client.on("ready", () => {
   console.log(chalk.green("Start completed. Bot has been alive'd."));
 });
 
-client.login(process.env.ENTITY_CANARY);
+client.login(process.env.TOKEN);

@@ -14,6 +14,8 @@ module.exports = {
     async run(interaction) {
       if (!interaction.isChatInputCommand()) return;
 
+      await interaction.deferReply();
+
       const commandFiles = getFiles(path.join(process.cwd(), "src", "commands"), ".js");
       const findCommandFile = commandFiles.find(file => file.indexOf(`${interaction.commandName}.js`) !== -1);
       const commandFile = requireReload(findCommandFile);
