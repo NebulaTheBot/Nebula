@@ -38,7 +38,7 @@ module.exports = class Rps {
         .setStyle("Danger")
     );
 
-    interaction.reply({ embeds: [embed], components: [buttons] });
+    interaction.editReply({ embeds: [embed], components: [buttons] });
 
     const filter = ButtonInteraction => {
       return interaction.user.id != ButtonInteraction.user.id || interaction.user.id == ButtonInteraction.user.id;

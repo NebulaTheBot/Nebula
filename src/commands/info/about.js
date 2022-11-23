@@ -17,6 +17,6 @@ module.exports = class About {
 			].join("\n"))
 			.setColor(getColor(200));
 
-    interaction.reply({ embeds: [embed] });
+    interaction.editReply({ embeds: [embed] });
   }
 }

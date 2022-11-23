@@ -23,6 +23,6 @@ module.exports = class Warn {
       .setTitle("lol this command doesn't do anything")
       .setColor(getColor(0));
 
-    interaction.reply({ embeds: [embed] });
+    interaction.editReply({ embeds: [embed] });
   }
 }

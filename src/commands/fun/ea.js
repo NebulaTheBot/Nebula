@@ -1,5 +1,5 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { getColor } = require("../../utils/misc");
+const { getColor, randomise } = require("../../utils/misc");
 
 module.exports = class Ea {
 	constructor() {
@@ -19,9 +19,9 @@ module.exports = class Ea {
 		];
 
 		const embed = new EmbedBuilder()
-			.setTitle(messages[Math.floor(Math.random() * messages.length)])
-			.setColor(getColor(0));
+			.setTitle(randomise(messages))
+			.setColor(getColor(270));
 		
-		interaction.reply({ embeds: [embed] });
+		interaction.editReply({ embeds: [embed] });
   }
 }

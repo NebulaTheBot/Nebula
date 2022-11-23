@@ -40,7 +40,7 @@ module.exports = class Echo {
       .setTitle("You have sent a message.")
       .setColor(getColor(100));
 
-    await interaction.reply({ embeds: [embed1], ephemeral: true });
+    await interaction.editReply({ embeds: [embed1], ephemeral: true });
 
     if (subcommand === "message") await interaction.channel.send(content);
     else if (subcommand === "embed") {

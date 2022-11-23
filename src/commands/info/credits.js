@@ -1,5 +1,5 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { getColor } = require("../../utils/misc");
+const { getColor, randomise } = require("../../utils/misc");
 
 module.exports = class Credits {
   constructor() {
@@ -22,9 +22,9 @@ module.exports = class Credits {
         "**Developers who worked in the past**: TechStudent10",
         "\n**Sponsors**: [FyreBlitz Hosting](https://fyreblitz.com)"
       ].join("\n"))
-			.setFooter({ text: `Made by the Entity team with ${hearts[Math.floor(Math.random() * hearts.length)]}` })
+			.setFooter({ text: `Made by the Entity team with ${randomise(hearts)}` })
 			.setColor(getColor(200));
     
-    interaction.reply({ embeds: [embed] });
+    interaction.editReply({ embeds: [embed] });
   }
 }
