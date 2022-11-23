@@ -18,6 +18,6 @@ module.exports = class Helloworld {
       .setTitle(messages[Math.floor(Math.random() * messages.length)])
       .setColor(getColor(270));
 
-    interaction.reply({ embeds: [embed] });
+    interaction.editReply({ embeds: [embed] });
   }
 };

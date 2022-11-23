@@ -27,6 +27,6 @@ module.exports = class Changelog {
       )
       .setColor(getColor(200));
 
-    interaction.reply({ embeds: [embed] });
+    interaction.editReply({ embeds: [embed] });
   }
 }

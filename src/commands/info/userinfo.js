@@ -46,6 +46,6 @@ module.exports = class Userinfo {
       .setThumbnail(member.displayAvatarURL())
       .setColor(getColor(200));
 
-    interaction.reply({ embeds: [embed] });
+    interaction.editReply({ embeds: [embed] });
   }
 }

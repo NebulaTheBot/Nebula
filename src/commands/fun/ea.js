@@ -22,6 +22,6 @@ module.exports = class Ea {
 			.setTitle(messages[Math.floor(Math.random() * messages.length)])
 			.setColor(getColor(0));
 		
-		interaction.reply({ embeds: [embed] });
+		interaction.editReply({ embeds: [embed] });
   }
 }

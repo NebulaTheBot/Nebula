@@ -13,6 +13,6 @@ module.exports = class Help {
       .setTitle("lazy to rewrite this command fully by myself")
       .setColor(getColor(200));
 
-    interaction.reply({ embeds: [embed] });
+    interaction.editReply({ embeds: [embed] });
   }
 }

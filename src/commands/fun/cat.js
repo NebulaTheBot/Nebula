@@ -27,7 +27,7 @@ module.exports = class Cat {
       if (URL !== "self" && media != null) embed.setImage(`${media.reddit_video.fallback_url}`); 
       if (URL !== "self" && media == null) embed.setImage(`${URL}`);
 
-      interaction.reply({ embeds: [embed] });
+      interaction.editReply({ embeds: [embed] });
     })
   }
 }

@@ -45,33 +45,33 @@ module.exports = {
           .setDescription("The command has been disabled by the server admins.")
           .setColor("Red");
 
-        return interaction.reply({ embeds: [embed], ephemeral: true });
+        return interaction.editReply({ embeds: [embed], ephemeral: true });
       }
 
-      if (guildCmd.moderation && !interaction.member.moderatable) return interaction.reply({ embeds: [noPermsEmbed], ephemeral: true });
+      if (guildCmd.moderation && !interaction.member.moderatable) return interaction.editReply({ embeds: [noPermsEmbed], ephemeral: true });
 
       const permissionsNeeded = JSON.parse(guildCmd.permissionsNeeded);
       if (permissionsNeeded) for (let i = 0; i < permissionsNeeded.length; i++) {
         const permission = permissionsNeeded[i];
-        if (!interaction.memberPermissions.has(permission, true)) return interaction.reply({ embeds: [noPermsEmbed], ephemeral: true });
+        if (!interaction.memberPermissions.has(permission, true)) return interaction.editReply({ embeds: [noPermsEmbed], ephemeral: true });
       }
           
       const rolesNeeded = JSON.parse(guildCmd.rolesNeeded);
       if (rolesNeeded) for (let i = 0; i < rolesNeeded.length; i++) {
         const role = rolesNeeded[i];
-        if (!interaction.member.roles.includes(role)) return interaction.reply({ embeds: [noPermsEmbed], ephemeral: true });
+        if (!interaction.member.roles.includes(role)) return interaction.editReply({ embeds: [noPermsEmbed], ephemeral: true });
       }
       
       const rolesBanned = JSON.parse(guildCmd.rolesBanned);
       if (rolesBanned) for (let i = 0; i < rolesBanned.length; i++) {
         const role = rolesBanned[i];
-        if (interaction.member.roles.includes(role)) return interaction.reply({ embeds: [noPermsEmbed], ephemeral: true });
+        if (interaction.member.roles.includes(role)) return interaction.editReply({ embeds: [noPermsEmbed], ephemeral: true });
       }
 
       const bannedChannels = JSON.parse(guildCmd.bannedChannels);
       if (bannedChannels) for (let i = 0; i < bannedChannels.length; i++) {
         // const channel = bannedChannels[i];
-        if (bannedChannels.includes(interaction.channelId)) return interaction.reply({ embeds: [wrongChannelEmbed], ephemeral: true });
+        if (bannedChannels.includes(interaction.channelId)) return interaction.editReply({ embeds: [wrongChannelEmbed], ephemeral: true });
       }
 
       const allowedChannels = JSON.parse(guildCmd.allowedChannels);
@@ -85,7 +85,7 @@ module.exports = {
         }
       }
 
-      if (!isAllowed) return interaction.reply({ embeds: [wrongChannelEmbed], ephemeral: true });
+      if (!isAllowed) return interaction.editReply({ embeds: [wrongChannelEmbed], ephemeral: true });
       command.run(interaction);
     }
   }

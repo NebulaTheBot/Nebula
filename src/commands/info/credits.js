@@ -25,6 +25,6 @@ module.exports = class Credits {
 			.setFooter({ text: `Made by the Entity team with ${hearts[Math.floor(Math.random() * hearts.length)]}` })
 			.setColor(getColor(200));
     
-    interaction.reply({ embeds: [embed] });
+    interaction.editReply({ embeds: [embed] });
   }
 }

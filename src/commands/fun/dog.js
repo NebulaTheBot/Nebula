@@ -26,7 +26,7 @@ module.exports = class Dog {
         .setColor(getColor(0));
 
       if (thumbnail !== "self") embed.setImage(`${thumbnail}`);      
-      interaction.reply({ embeds: [embed] });
+      interaction.editReply({ embeds: [embed] });
     })
   }
 }

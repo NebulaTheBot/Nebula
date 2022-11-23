@@ -25,9 +25,9 @@ module.exports = class Serverinfo {
     const hiddenVoiceChannels = allChannels.filter(c => !c.permissionsFor(everyone).has(viewChannel) && c.type === 2).size;
 
     const roles = [...(allRoles.filter(r => r !== everyone && !r.managed && !r.name.toLowerCase().includes("bot")))]
-      .sort((a, b) => String(a[1].name).localeCompare(b[1].name));
+      .sort((a, b) => b[1].rawPosition - a[1].rawPosition);
     const botRoles = [...(allRoles.filter(r => r !== everyone && r.managed || !r.managed && r.name.toLowerCase().includes("bot")))]
-      .sort((a, b) => String(a[1].name).localeCompare(b[1].name));
+      .sort((a, b) => b[1].rawPosition - a[1].rawPosition);
 
     const roleDisplayLimit = 10;
 

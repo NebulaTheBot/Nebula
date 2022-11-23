@@ -13,6 +13,6 @@ module.exports = class Graph {
       .setTitle("soon:tm:")
       .setColor(getColor(200));
 
-    interaction.reply({ embeds: [embed] });
+    interaction.editReply({ embeds: [embed] });
   }
 }

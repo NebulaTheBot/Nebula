@@ -42,7 +42,7 @@ module.exports = class Kick {
     if (reason) embed1.addFields({ name: "Reason", value: `${reason}` });
 
     user.kick();
-    interaction.reply({ embeds: [embed], ephemeral: true });
+    interaction.editReply({ embeds: [embed], ephemeral: true });
     channel.send({ embeds: [embed1] });
   }
 }

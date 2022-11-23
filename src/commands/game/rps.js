@@ -38,7 +38,7 @@ module.exports = class Rps {
         .setStyle("Danger")
     );
 
-    interaction.reply({ embeds: [embed], components: [buttons] });
+    interaction.editReply({ embeds: [embed], components: [buttons] });
 
     const filter = ButtonInteraction => {
       return interaction.user.id != ButtonInteraction.user.id || interaction.user.id == ButtonInteraction.user.id;
@@ -53,7 +53,7 @@ module.exports = class Rps {
             .setTitle(`${click.member.displayName} has declined the request to play.`)
             .setColor(getColor(0));
 
-          message.channel.send({ embeds: [embed] });
+          interaction.channel.send({ embeds: [embed] });
         } else if (collection.first().customId === "accept") {
           embed
             .setTitle("Choose one of the options below!")
