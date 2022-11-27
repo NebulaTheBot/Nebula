@@ -9,14 +9,35 @@ module.exports = class About {
 	}
 
   run(interaction) {
-    const embed = new EmbedBuilder()
-			.setTitle("About")
-			.setDescription([
-				"**Version**: 0.1.0-beta",
-				"**Working on**: The Grand Update"
-			].join("\n"))
-			.setColor(getColor(200));
+    const client = interaction.client;
+    const promises = [
+	    client.shard.fetchClientValues("guilds.cache.size"),
+	    client.shard.broadcastEval(c => c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0)),
+    ];
 
-    interaction.editReply({ embeds: [embed] });
+    Promise.all(promises).then(results => {
+    	const totalGuilds = results[0].reduce((acc, guildCount) => acc + guildCount, 0);
+    	const totalMembers = results[1].reduce((acc, memberCount) => acc + memberCount, 0);
+
+      const embed = new EmbedBuilder()
+        .setTitle("About")
+        .setDescription([
+          "**Version**: 0.1.0-beta",
+          "**Working on**: The Grand Update"
+        ].join("\n"))
+        .addFields(
+          {
+            name: `Guild count: ${totalGuilds}`,
+            value: `**Shard ${client.shard}**: idfk how to do this calculation help`
+          },
+          {
+            name: `Member count: ${totalMembers}`,
+            value: `test2`
+          }
+        )
+        .setColor(getColor(200));
+
+      return interaction.editReply({ embeds: [embed] });
+    }).catch(console.error);
   }
 }

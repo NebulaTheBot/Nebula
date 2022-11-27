@@ -41,11 +41,11 @@ module.exports = class Rps {
     interaction.editReply({ embeds: [embed], components: [buttons] });
 
     const filter = ButtonInteraction => {
-      return interaction.user.id != ButtonInteraction.user.id || interaction.user.id == ButtonInteraction.user.id;
+      return interaction.user.id !== ButtonInteraction.user.id || interaction.user.id === ButtonInteraction.user.id;
     }
     const collector = interaction.channel.createMessageComponentCollector({ filter, max: 1, time: 30000 });
 
-    collector.on("end", collection => {
+    collector.on("collect", collection => {
       interaction.channel.bulkDelete(1, true);
       collection.forEach(click => {
         if (collection.first().customId === "decline") {
@@ -86,8 +86,7 @@ module.exports = class Rps {
           );
           click.reply({ embeds: [embed], components: [list], ephemeral: true });
     
-          const collector = interaction.channel.createMessageComponentCollector({ filter, max: 1, time: 30000 });
-          collector.on("collect", collected => {
+          collector.on("end", collected => {
             const optionValue = interaction.options.getString("item");
             const value = collected.values[0];
               
