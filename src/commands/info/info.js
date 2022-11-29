@@ -29,6 +29,7 @@ module.exports = class Info {
     let embed = new EmbedBuilder();
 
     const level = guild.verificationLevel;
+    const nsfwLevel = guild.explicitContentFilter;
     const boostTier = guild.premiumTier;
     const everyone = guild.roles.everyone;
     const allMembers = await guild.members.fetch();
@@ -54,11 +55,23 @@ module.exports = class Info {
           name: "📃 | General",
           value: [
             `**Owner**: <@${guild.ownerId}>`,
-            `**Created at**: <t:${parseInt(guild.createdTimestamp / 1000)}:d>`,
-            `**Security level**: ${level === 0 ? "None" : level === 1 ? "Low" : level === 2 ? "Medium" : level === 3 ? "High" : "Highest"}`,
+            `**Created on**: <t:${parseInt(guild.createdTimestamp / 1000)}:d>`,
             `**Community**: ${guild.features.includes("COMMUNITY") ? "Enabled" : "Disabled"}`,
-            `**Description**: ${guild.description == null ? "*None*" : guild.description}`
-          ].join("\n")
+          ].join("\n"),
+          inline: true
+        },
+        {
+          name: "🛡 | Security",
+          value: [
+            `**Security level**: ${level === 0 ? "None" : level === 1 ? "Low" : level === 2 ? "Medium" : level === 3 ? "High" : "Highest"}`,
+            `**NSFW level**: ${nsfwLevel === 0 ? "None" : nsfwLevel === 1 ? "Medium" : "High"}`,
+            `**Moderator 2FA**: ${guild.mfaLevel === 0 ? "Disabled" : "Enabled"}`
+          ].join("\n"),
+          inline: true
+        },
+        {
+          name: `🎭 | Roles: ${allRoles.filter(r => r !== everyone).size}`,
+          value: `${roles.slice(0, roleDisplayLimit).map(r => `${r[1]}`).join(", ")}${roles.length > roleDisplayLimit ? ` **and ${roles.length - roleDisplayLimit} more**` : ""}`
         },
         {
           name: `👥 | Members: ${guild.memberCount}`,
@@ -83,10 +96,6 @@ module.exports = class Info {
             `**Boosters**: ${allMembers.filter(m => m.premiumSince).size}`
           ].join("\n"),
           inline: true
-        },
-        {
-          name: `🎭 | Roles: ${allRoles.filter(r => r !== everyone).size}`,
-          value: `${roles.slice(0, roleDisplayLimit).map(r => `${r[1]}`).join(", ")}${roles.length > roleDisplayLimit ? ` **and ${roles.length - roleDisplayLimit} more**` : ""}`
         }
       )
       .setFooter({ text: `Server ID: ${guild.id}` })
@@ -100,7 +109,7 @@ module.exports = class Info {
           name: "👤 | User info",
           value: [
             `**Username**: ${selectedMember.user.username}`,
-            `**Created at**: <t:${new Date(selectedMember.user.createdAt / 1000).valueOf()}:d>`
+            `**Created on**: <t:${new Date(selectedMember.user.createdAt / 1000).valueOf()}:d>`
           ].join("\n"),
           inline: true
         },
@@ -108,7 +117,7 @@ module.exports = class Info {
           name: "👥 | Member info",
           value: [
             `**Server nickname**: ${selectedMember.nickname == null ? "*None*" : selectedMember.nickname}`,
-            `**Joined at**: <t:${parseInt(selectedMember.joinedTimestamp / 1000)}:d>`
+            `**Joined on**: <t:${parseInt(selectedMember.joinedTimestamp / 1000)}:d>`
           ].join("\n"),
           inline: true
         },

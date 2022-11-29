@@ -12,7 +12,7 @@ module.exports = class Changelog {
     const embed = new EmbedBuilder()
       .setTitle("Changelog for v0.1.0-beta")
       .addFields(
-        { name: "Added", value: "**Commands**: /changelog, /credits, /echo, /info" },
+        { name: "Added", value: "**Commands**: /changelog, /echo, /info" },
         { name: "Work in progress", value: "**Commands**: /ban, /cat, /clear, /dog, /graph, /help, /kick, /rps, /meme, /warn" },
         {
           name: "Changed",

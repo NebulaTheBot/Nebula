@@ -4,15 +4,11 @@
   "author": "Serge",
   "license": "MIT",
   "main": "src/index.js",
-  "scripts": {
-    "dev": "nodemon"
-  },
   "dependencies": {
     "ascii-table": "^0.0.9",
-    "chalk": "^4.1.2",
-    "discord.js": "^14.6.0",
+    "chalk": "^5.1.2",
+    "discord.js": "^14.7.0",
     "dotenv": "^16.0.3",
-    "nodemon": "^2.0.20",
     "promise-mysql": "^5.2.0",
     "snoowrap": "^1.23.0"
   }
