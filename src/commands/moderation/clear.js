@@ -33,7 +33,7 @@ module.exports = class Clear {
         .setTitle("Too many messages provided.")
         .setColor(getColor(0));
 
-      return interaction.reply({ embeds: [embed], ephemeral: true });
+      return interaction.editReply({ embeds: [embed], ephemeral: true });
     }
 
     let embed = new EmbedBuilder()
@@ -48,7 +48,7 @@ module.exports = class Clear {
       )
       .setColor(getColor(100));
 
-    interaction.reply({ embeds: [embed], ephemeral: true });
+    interaction.editReply({ embeds: [embed], ephemeral: true });
 
     if (channel) {
       embed.setTitle(`Cleared at ${channel.name}`);

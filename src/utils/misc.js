@@ -30,6 +30,10 @@ function getColor(hue) {
   return [Math.round(255 * f(0)), Math.round(255 * f(8)), Math.round(255 * f(4))];
 }
 
+function randomise(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
 function clearModule(moduleName) {
   const mp = require.resolve(moduleName);
   if (require.cache[mp]) delete require.cache[mp];
@@ -40,4 +44,9 @@ function requireReload(moduleName) {
   return require(moduleName);
 }
 
-module.exports = { getFiles, getColor, requireReload };
+module.exports = {
+  getFiles,
+  getColor,
+  randomise,
+  requireReload
+};

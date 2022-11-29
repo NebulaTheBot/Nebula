@@ -12,21 +12,21 @@ module.exports = class Changelog {
     const embed = new EmbedBuilder()
       .setTitle("Changelog for v0.1.0-beta")
       .addFields(
-        { name: "Added:", value: "**Commands**: /changelog, /credits, /echo, /serverinfo" },
-        { name: "Work in progress:", value: "**Commands**: /graph, /userinfo, /rps, /clear, /kick, /warn, /ban, /cat, /dog, /meme, /help" },
+        { name: "Added", value: "**Commands**: /changelog, /echo, /info" },
+        { name: "Work in progress", value: "**Commands**: /ban, /cat, /clear, /dog, /graph, /help, /kick, /rps, /meme, /warn" },
         {
-          name: "Changed:",
+          name: "Changed",
           value: [
             "**Commands**: /about",
             "**Version number**: Rounded to 0.1.0 (previously - 0.0000000001)",
             "**Embed color**: Fixed, slightly random."
           ].join("\n")
         },
-        { name: "Removed:", value: "**Commands**: /embed, /idiot, /kill, /motivate" },
-        { name: "Note:", value: "Normal commands are now removed." }
+        { name: "Removed", value: "**Commands**: /embed, /idiot, /kill, /motivate" },
+        { name: "Note", value: "Normal commands are now removed." }
       )
       .setColor(getColor(200));
 
-    interaction.reply({ embeds: [embed] });
+    interaction.editReply({ embeds: [embed] });
   }
 }

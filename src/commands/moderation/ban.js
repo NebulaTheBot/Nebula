@@ -42,7 +42,7 @@ module.exports = class Ban {
     if (reason) embed1.addFields({ name: "Reason", value: `${reason}` });
 
     user.ban();
-    interaction.reply({ embeds: [embed], ephemeral: true });
+    interaction.editReply({ embeds: [embed], ephemeral: true });
     channel.send({ embeds: [embed1] });
   }
 }
