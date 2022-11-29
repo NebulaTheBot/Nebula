@@ -25,11 +25,11 @@ module.exports = class About {
         .addFields({
           name: "Entities involved",
           value: [
-            "**Head developer**: Serge",
-            "**Bot developers**: itsakuro, CodingFox, Golem64, ThyTonyStank",
-            "**Web developers**: Pigpot, ThyTonyStank",
-            "**Helper**: flojo",
-            "**Testers**: astolfo, flojo",
+            "**Head developer**: <@725985503177867295>",
+            "**Bot developers**: <@620111346129829919>, <@598009398865952768>, <@396374841474809866>, <@349005764247158785>",
+            "**Web developers**: <@715602019166978139>, <@349005764247158785>",
+            "**Helper**: <@492653578423369740>",
+            "**Testers**: <@367638567402340363>, <@492653578423369740>",
             "\n**Sponsors**: [FyreBlitz Hosting](https://fyreblitz.com)"
           ].join("\n")
         })
