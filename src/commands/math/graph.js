@@ -13,19 +13,16 @@ module.exports = class Graph {
         .setName("type")
         .setDescription("Select the type of the graph.")
         .addChoices(
-          { name: "y = m*x + b", value: "linear1" },
-          { name: "y = m*x", value: "linear2" },
-          { name: "y = x + b", value: "linear3" },
-          { name: "y = a*x^2", value: "parabola" },
-          { name: "y = a*x^3", value: "cubicParabola" },
-          { name: "y = k/x", value: "hyperbola" }
+          { name: "Linear", value: "linear" },
+          { name: "Parabola", value: "parabola" },
+          { name: "Cubic parabola", value: "cubicParabola" },
+          { name: "Hyperbola", value: "hyperbola" }
         )
         .setRequired(true)
       );
   }
 
   async run(interaction) {
-    const type = interaction.options.getString("type");
     let modal = new ModalBuilder()
       .setTitle("Input numbers")
       .setCustomId("modal");
@@ -33,12 +30,11 @@ module.exports = class Graph {
     let embed = new EmbedBuilder()
       .setColor(getColor(200));
 
-    if (type === "linear1") {
+    if (type === "linear") {        
       const inputM = new TextInputBuilder()
         .setLabel("Input m")
         .setStyle("Short")
         .setCustomId("m")
-        .setValue("2")
         .setRequired(true);
 
       const actionRow = new ActionRowBuilder().addComponents(inputM);
