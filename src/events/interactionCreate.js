@@ -6,8 +6,9 @@ const path = require("path");
 module.exports = {
   name: "interactionCreate",
   event: class InteractionCreate {
-    constructor(commands, events) {
+    constructor(commands, subcommands, events) {
       this.commands = commands;
+      this.subcommands = subcommands;
       this.events = events;
     }
 
@@ -19,6 +20,11 @@ module.exports = {
       const findCommandFile = commandFiles.find(file => file.indexOf(`${interaction.commandName}.js`) !== -1);
       const commandFile = requireReload(findCommandFile);
       const command = new (commandFile)(this.client, this.commands, this);
+
+      const subcommandFiles = getFiles(path.join(process.cwd(), "src", "subcommands"), ".js");
+      const findSubcommandFile = subcommandFiles.find(subcommandFile => subcommandFile === name);
+      const subcommandFile = requireReload(findSubcommandFile);
+      const subcommand = new (subcommandFile)(this.client, this.subcommands, this);
 
       const guildCmd = (await getBulk("commands").catch(() => {}))
         .find(cmd => cmd.name === interaction.commandName && cmd.guildID === interaction.guild.id);

@@ -1,5 +1,5 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { getColor } = require("../../utils/misc");
+const { getColor, randomise } = require("../../utils/misc");
 
 module.exports = class Changelog {
   constructor() {
@@ -9,11 +9,12 @@ module.exports = class Changelog {
   }
 
   run(interaction) {
+    console.log(randomise(["/ban", "/clear", "/graph", "/help", "/kick", "/rps", "/warn"]))
     const embed = new EmbedBuilder()
       .setTitle("Changelog for v0.1.0-beta")
       .addFields(
-        { name: "Added", value: "**Commands**: /changelog, /echo, /info" },
-        { name: "Work in progress", value: "**Commands**: /ban, /cat, /clear, /dog, /graph, /help, /kick, /rps, /meme, /warn" },
+        { name: "Added", value: "**Commands**: /changelog, /echo, /serverinfo, /userinfo" },
+        { name: "Work in progress", value: "**Commands**: /ban, /clear, /graph, /help, /kick, /rps, /warn" },
         {
           name: "Changed",
           value: [
@@ -22,8 +23,8 @@ module.exports = class Changelog {
             "**Embed color**: Fixed, slightly random."
           ].join("\n")
         },
-        { name: "Removed", value: "**Commands**: /embed, /idiot, /kill, /motivate" },
-        { name: "Note", value: "Normal commands are now removed." }
+        { name: "Removed", value: "**Commands**: /cat, /dog, /embed, /idiot, /kill, /meme, /motivate" },
+        { name: "Note", value: "Normal commands are now removed and replaced with slash commands." }
       )
       .setColor(getColor(200));
 
