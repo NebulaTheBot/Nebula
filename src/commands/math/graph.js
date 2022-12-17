@@ -30,7 +30,7 @@ module.exports = class Graph {
     let embed = new EmbedBuilder()
       .setColor(getColor(200));
 
-    if (type === "linear") {        
+    if (type === "linear") {
       const inputM = new TextInputBuilder()
         .setLabel("Input m")
         .setStyle("Short")

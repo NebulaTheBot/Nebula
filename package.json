@@ -9,7 +9,6 @@
     "chalk": "4.1.2",
     "discord.js": "^14.7.0",
     "dotenv": "^16.0.3",
-    "promise-mysql": "^5.2.0",
-    "snoowrap": "^1.23.0"
+    "promise-mysql": "^5.2.0"
   }
 }

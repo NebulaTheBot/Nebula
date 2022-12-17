@@ -44,7 +44,7 @@ module.exports = class Commands {
     const findCommandFile = this.commandFiles.find(commandFile => commandFile === name);
     const commandFile = requireReload(findCommandFile);
     const command = new (commandFile)(this.client, this.commands, this).data;
-    
+
     this.loadCommand(command);
   }
 
