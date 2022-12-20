@@ -14,10 +14,7 @@ module.exports = class Commands {
 
     (async () => {
       for (const command of this.commandFiles) this.loadCommand(command);
-      for (const guildID of this.client.guilds.cache.keys()) {
-        const guild = this.client.guilds.cache.get(guildID);
-        await guild.commands.set(this.commands).catch(() => {});
-      }
+      await this.client.commands.set(this.commands);
     })();
 
     console.log(chalk.blue(this.table.toString()));
@@ -49,10 +46,7 @@ module.exports = class Commands {
   }
 
   async removeCommands() {
-    for (const guildID of this.client.guilds.cache.keys()) {
-      const guild = this.client.guilds.cache.get(guildID);
-      await guild.commands.delete(this.commands).catch(() => {});
-    }
+    await this.client.commands.delete(this.commands);
   }
 
   async removeCommand(name) {
@@ -60,10 +54,7 @@ module.exports = class Commands {
     const commandFile = requireReload(findCommandFile);
     if (commandFile == null) return false;
 
-    for (const guildID of this.client.guilds.cache.keys()) {
-      const guild = this.client.guilds.cache.get(guildID);
-      await guild.commands.delete(commandFile).catch(() => {});
-    }
+    await this.client.commands.delete(commandFile).catch(() => {});
     return true;
   }
 }

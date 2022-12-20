@@ -1,4 +1,4 @@
-const { Client, ActivityType } = require("discord.js");
+const { Client, ActivityType, Collection } = require("discord.js");
 const Events = require("./handlers/events");
 const Commands = require("./handlers/commands");
 const Subcommands = require("./handlers/subcommands");
@@ -17,10 +17,11 @@ const client = new Client({
   ]
 });
 
+client.commands = new Collection();
+client.subcommands = new Collection();
 client.on("ready", () => {
   const commands = new Commands(client);
-  const subcommands = new Subcommands(client);
-  new Events(client, commands, subcommands);
+  new Events(client, commands);
   
   console.log(chalk.green("Start completed. Bot has been alive'd."));
 });
