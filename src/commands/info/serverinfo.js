@@ -43,7 +43,7 @@ module.exports = class Serverinfo {
           name: "🛡 • Security",
           value: [
             `**Security level**: ${level === 0 ? "None" : level === 1 ? "Low" : level === 2 ? "Medium" : level === 3 ? "High" : "Highest"}`,
-            `**NSFW level**: ${nsfwLevel === 0 ? "None" : nsfwLevel === 1 ? "Medium" : "High"}`,
+            `**NSFW protection**: ${nsfwLevel === 0 ? "None" : nsfwLevel === 1 ? "Medium" : "High"}`,
             `**Moderator 2FA**: ${guild.mfaLevel === 0 ? "Disabled" : "Enabled"}`
           ].join("\n"),
           inline: true

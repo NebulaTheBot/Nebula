@@ -14,10 +14,7 @@ module.exports = class Subcommands {
 
     (async () => {
       for (const subcommand of this.subcommandFiles) this.loadSubcommand(subcommand);
-      for (const guildID of this.client.guilds.cache.keys()) {
-        const guild = this.client.guilds.cache.get(guildID);
-        await guild.subCommands.set(this.subcommands).catch(() => {});
-      }
+      await this.client.subcommands.set(this.subcommands);
     })();
 
     console.log(chalk.cyan(this.table.toString()));
@@ -27,7 +24,6 @@ module.exports = class Subcommands {
   async loadSubcommand(name) {
     const findSubcommandFile = this.subcommandFiles.find(subcommandFile => subcommandFile === name);
     const subcommandFile = requireReload(findSubcommandFile);
-    console.log(subcommandFile)
     const subcommand = new (subcommandFile)(this.client, this.subcommands, this);
     console.log(subcommand);
 
@@ -46,10 +42,7 @@ module.exports = class Subcommands {
   }
 
   async removeSubcommands() {
-    for (const guildID of this.client.guilds.cache.keys()) {
-      const guild = this.client.guilds.cache.get(guildID);
-      await guild.subCommands.delete(this.subcommands).catch(() => {});
-    }
+    await this.client.subcommands.delete(this.subcommands);
   }
 
   async removeSubcommand(name) {
@@ -57,10 +50,7 @@ module.exports = class Subcommands {
     const subcommandFile = requireReload(findSubcommandFile);
     if (subcommandFile == null) return false;
 
-    for (const guildID of this.client.guilds.cache.keys()) {
-      const guild = this.client.guilds.cache.get(guildID);
-      await guild.subCommands.delete(subcommandFile).catch(() => {});
-    }
+    await this.client.subcommands.delete(subcommandFile);
     return true;
   }
 }

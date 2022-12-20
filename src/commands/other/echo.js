@@ -1,9 +1,8 @@
-const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { getColor } = require("../../utils/misc");
-
+const { SlashCommandSubcommandGroupBuilder } = require("discord.js");
+// this becomes a subcommand group while other becomes a command and remains in commands
 module.exports = class Echo {
   constructor() {
-    this.data = new SlashCommandBuilder()
+    this.data = new SlashCommandSubcommandGroupBuilder()
       .setName("echo")
       .setDescription("Sends your message in a fancy embed or in a normal message.")
       .addSubcommand(subcommand => subcommand
@@ -29,27 +28,5 @@ module.exports = class Echo {
           .setRequired(false)
         )
       );
-  }
-
-  async run(interaction) {
-    const subcommand = interaction.options.getSubcommand();
-    const content = interaction.options.getString("content");
-    const title = interaction.options.getString("title");
-    const description = interaction.options.getString("description");
-    const embed1 = new EmbedBuilder()
-      .setTitle("You have sent a message.")
-      .setColor(getColor(100));
-
-    await interaction.editReply({ embeds: [embed1], ephemeral: true });
-
-    if (subcommand === "message") await interaction.channel.send(content);
-    else if (subcommand === "embed") {
-      let embed = new EmbedBuilder()
-        .setTitle(title)
-        .setColor(getColor(270));
-
-      if (description) embed.setDescription(description);
-      await interaction.channel.send({ embeds: [embed] });
-    }
   }
 }
