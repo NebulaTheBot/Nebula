@@ -13,8 +13,16 @@ module.exports = class Commands {
       .setBorder("|", "-", "0", "0");
 
     (async () => {
-      for (const command of this.commandFiles) this.loadCommand(command);
-      await this.client.commands.set(this.commands);
+      try {
+        for (const command of this.commandFiles) this.loadCommand(command);
+        await this.client.commands.set(this.commands).catch(() => {});
+      } catch (error) {
+        if (error instanceof TypeError) {
+          console.error(`An error occurred while setting the commands: ${error.message}`);
+        } else {
+          throw error;
+        }
+      }
     })();
 
     console.log(chalk.blue(this.table.toString()));

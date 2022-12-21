@@ -21,7 +21,8 @@ client.commands = new Collection();
 client.subcommands = new Collection();
 client.on("ready", () => {
   const commands = new Commands(client);
-  new Events(client, commands);
+  const subcommands = new Subcommands(client)
+  new Events(client, commands, subcommands);
   
   console.log(chalk.green("Start completed. Bot has been alive'd."));
 });

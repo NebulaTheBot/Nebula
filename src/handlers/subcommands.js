@@ -2,20 +2,29 @@ const { getFiles, requireReload } = require("../utils/misc");
 const path = require("path");
 const chalk = require("chalk");
 const AsciiTable = require("ascii-table");
+const { Collection } = require("discord.js")
 
 module.exports = class Subcommands { 
   constructor(client) {
     this.client = client;
-    this.subcommands = [];
-    this.subcommandFiles = getFiles(path.join(process.cwd(), "src", "subcommands"), ".js");
+    this.subcommands = [];                                         //vvvvvvvv this is only a placeholder for testing things
+    this.subcommandFiles = getFiles(path.join(process.cwd(), "src", "commands"), ".js");
     this.table = new AsciiTable()
       .setHeading("Subcommands", "State")
       .setBorder("|", "-", "0", "0");
 
     (async () => {
-      for (const subcommand of this.subcommandFiles) this.loadSubcommand(subcommand);
-      await this.client.subcommands.set(this.subcommands);
-    })();
+        try {
+          for (const subcommand of this.subcommandFiles) this.loadSubcommand(subcommand);
+          await this.client.subcommands.set(this.subcommands).catch(() => {});
+        } catch (error) {
+          if (error instanceof TypeError) {
+            console.error(`An error occurred while setting the subcommands: ${error.message}`);
+          } else {
+            throw error;
+          }
+        }
+      })();
 
     console.log(chalk.cyan(this.table.toString()));
     console.log(chalk.greenBright("Subcommands? Registered."));
