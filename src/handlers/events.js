@@ -12,7 +12,6 @@ module.exports = class Events {
     this.table = new AsciiTable()
       .setHeading("Events", "State")
       .setBorder("|", "-", "0", "0");
-
     this.reloadEvents(false);
     console.log(chalk.red(this.table.toString()));
     console.log(chalk.greenBright("Events? Registered."));
