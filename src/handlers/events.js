@@ -1,7 +1,6 @@
 const { getFiles, requireReload } = require("../utils/misc");
-const path = require("path");
 const chalk = require("chalk");
-const AsciiTable = require("ascii-table");
+const path = require("path");
 
 module.exports = class Events {
   constructor(client, commands) {
@@ -9,11 +8,8 @@ module.exports = class Events {
     this.commands = commands;
     this.events = [];
     this.eventFiles = getFiles(path.join(process.cwd(), "src", "events"), ".js");
-    this.table = new AsciiTable()
-      .setHeading("Events", "State")
-      .setBorder("|", "-", "0", "0");
     this.reloadEvents(false);
-    console.log(chalk.red(this.table.toString()));
+
     console.log(chalk.greenBright("Events? Registered."));
   }
 
@@ -30,7 +26,6 @@ module.exports = class Events {
     const clientEvent = this.client.on(eventFile.name, event.run);
 
     this.events.push({ name: eventFile.name, event: clientEvent });
-    this.table.addRow(eventFile.name, "✅");
   }
 
   removeEvent(name) {

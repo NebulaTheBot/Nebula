@@ -1,31 +1,23 @@
 const { getFiles, requireReload } = require("../utils/misc");
 const path = require("path");
 const chalk = require("chalk");
-const AsciiTable = require("ascii-table");
 
 module.exports = class Commands {
   constructor(client) {
     this.client = client;
     this.commands = [];
     this.commandFiles = getFiles(path.join(process.cwd(), "src", "commands"), ".js");
-    this.table = new AsciiTable()
-      .setHeading("Commands", "State")
-      .setBorder("|", "-", "0", "0");
 
     (async () => {
       try {
         for (const command of this.commandFiles) this.loadCommand(command);
-        await this.client.commands.set(this.commands).catch(() => {});
+        await this.client.commands.set(this.commands);
       } catch (error) {
-        if (error instanceof TypeError) {
-          console.error(`An error occurred while setting the commands: ${error.message}`);
-        } else {
-          throw error;
-        }
+        if (error instanceof TypeError) console.error(`An error occurred while setting the commands: ${error.message}`);
+        else throw error;
       }
     })();
 
-    console.log(chalk.blue(this.table.toString()));
     console.log(chalk.greenBright("Commands? Registered."));
   }
 
@@ -35,7 +27,6 @@ module.exports = class Commands {
     const command = new (commandFile)(this.client, this.commands, this).data;
 
     this.commands.push(command);
-    this.table.addRow(command.name, "✅");
   }
 
   async reloadCommands() {
