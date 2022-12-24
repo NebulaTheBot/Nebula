@@ -1,10 +1,10 @@
-const { EmbedBuilder, ChannelType, SlashCommandBuilder } = require("discord.js");
+const { EmbedBuilder, ChannelType, SlashCommandSubcommandBuilder } = require("discord.js");
 const { OWNER, ADMIN } = require("../../../config.json");
 const { getColor } = require("../../utils/misc");
 
 module.exports = class Clear {
   constructor() {
-    this.data = new SlashCommandBuilder()
+    this.data = new SlashCommandSubcommandBuilder()
       .setName("clear")
       .setDescription("Clears messages.")
       .addNumberOption(number => number

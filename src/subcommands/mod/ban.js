@@ -1,20 +1,20 @@
-const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandSubcommandBuilder } = require("discord.js");
 const { OWNER, ADMIN } = require("../../../config.json");
 const { getColor } = require("../../utils/misc");
 
-module.exports = class Kick {
+module.exports = class Ban {
   constructor() {
-    this.data = new SlashCommandBuilder()
-      .setName("kick")
-      .setDescription("Kicks a user.")
+    this.data = new SlashCommandSubcommandBuilder()
+      .setName("ban")
+      .setDescription("Bans a user.")
       .addUserOption(user => user
         .setName("user")
-        .setDescription("The user you want to kick.")
+        .setDescription("The user you want to ban.")
         .setRequired(true)
       )
       .addStringOption(string => string
         .setName("reason")
-        .setDescription("The reason of kicking.")
+        .setDescription("The reason of banning.")
         .setRequired(false)
       );
   }
@@ -22,17 +22,17 @@ module.exports = class Kick {
   run(interaction) {
     if (interaction.user.id !== OWNER && !ADMIN.includes(interaction.user.id)) return;
 
-    client = interaction.client;
+    const client = interaction.client;
     const user = interaction.options.getUser("user");
     const reason = interaction.options.getString("reason");
     const channel = client.channels.cache.get("979337971159420928");
 
     const embed = new EmbedBuilder()
-      .setTitle("Kicked successfully.")
+      .setTitle("Banned successfully.")
       .setColor(getColor(100));
     
     const embed1 = new EmbedBuilder()
-      .setTitle(`Kicked ${user}`)
+      .setTitle(`Banned ${user}`)
       .addFields(
         { name: "Moderator", value: `${interaction.member.nickname}` },
       )
@@ -41,7 +41,7 @@ module.exports = class Kick {
     
     if (reason) embed1.addFields({ name: "Reason", value: `${reason}` });
 
-    user.kick();
+    user.ban();
     interaction.editReply({ embeds: [embed], ephemeral: true });
     channel.send({ embeds: [embed1] });
   }

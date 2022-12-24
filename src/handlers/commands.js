@@ -5,13 +5,16 @@ const chalk = require("chalk");
 module.exports = class Commands {
   constructor(client) {
     this.client = client;
-    this.commands = [];
     this.commandFiles = getFiles(path.join(process.cwd(), "src", "commands"), ".js");
 
     (async () => {
       try {
-        for (const command of this.commandFiles) this.loadCommand(command);
-        await this.client.commands.set(this.commands);
+        for (const commandFile of this.commandFiles) {
+          const command = requireReload(commandFile);
+          const commandData = new (command)(this.client, this.commands, this).data;
+      
+          await this.client.application.commands.create(commandData);
+        };
       } catch (error) {
         if (error instanceof TypeError) console.error(`An error occurred while setting the commands: ${error.message}`);
         else throw error;
@@ -19,41 +22,5 @@ module.exports = class Commands {
     })();
 
     console.log(chalk.greenBright("Commands? Registered."));
-  }
-
-  async loadCommand(name) {
-    const findCommandFile = this.commandFiles.find(commandFile => commandFile === name);
-    const commandFile = requireReload(findCommandFile);
-    const command = new (commandFile)(this.client, this.commands, this).data;
-
-    this.commands.push(command);
-  }
-
-  async reloadCommands() {
-    await this.removeCommands();
-    for (const command of this.commandFiles) this.loadCommand(command);
-  }
-
-  reloadCommand(name) {
-    this.removeCommand(name);
-
-    const findCommandFile = this.commandFiles.find(commandFile => commandFile === name);
-    const commandFile = requireReload(findCommandFile);
-    const command = new (commandFile)(this.client, this.commands, this).data;
-
-    this.loadCommand(command);
-  }
-
-  async removeCommands() {
-    await this.client.commands.delete(this.commands);
-  }
-
-  async removeCommand(name) {
-    const findCommandFile = this.commandFiles.find(commandFile => commandFile === name);
-    const commandFile = requireReload(findCommandFile);
-    if (commandFile == null) return false;
-
-    await this.client.commands.delete(commandFile).catch(() => {});
-    return true;
   }
 }

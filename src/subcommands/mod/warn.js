@@ -1,9 +1,9 @@
-const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandSubcommandBuilder } = require("discord.js");
 const { getColor } = require("../../utils/misc");
 
 module.exports = class Warn {
   constructor() {
-    this.data = new SlashCommandBuilder()
+    this.data = new SlashCommandSubcommandBuilder()
       .setName("warn")
       .setDescription("This command warns a person.")
       .addUserOption(user => user

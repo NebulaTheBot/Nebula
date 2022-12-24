@@ -1,5 +1,5 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { getColor } = require("../../utils/misc");
+const { getColor } = require("../utils/misc");
 
 module.exports = class Help {
   constructor() {

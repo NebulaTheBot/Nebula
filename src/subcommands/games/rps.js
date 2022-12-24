@@ -1,12 +1,12 @@
 const {
   EmbedBuilder, ActionRowBuilder, ButtonBuilder,
-  SelectMenuBuilder, SlashCommandBuilder
+  SelectMenuBuilder, SlashCommandSubcommandBuilder
 } = require("discord.js");
 const { getColor } = require("../../utils/misc");
 
 module.exports = class Rps {
   constructor() {
-    this.data = new SlashCommandBuilder()
+    this.data = new SlashCommandSubcommandBuilder()
       .setName("rps")
       .setDescription("A rock-paper-scissors mini-game.")
       .addStringOption(string => string
