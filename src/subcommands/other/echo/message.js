@@ -1,4 +1,4 @@
-const { SlashCommandSubcommandBuilder } = require("discord.js");
+const { SlashCommandSubcommandBuilder, EmbedBuilder } = require("discord.js");
 
 module.exports = class Message {
   constructor() {
