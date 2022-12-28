@@ -1,10 +1,10 @@
-const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandSubcommandBuilder } = require("discord.js");
 const { getColor } = require("../../utils/misc");
 
-module.exports = class Userinfo {
+module.exports = class User {
   constructor() {
-    this.data = new SlashCommandBuilder()
-      .setName("userinfo")
+    this.data = new SlashCommandSubcommandBuilder()
+      .setName("user")
       .setDescription("Shows yours (or the user's) info.")
       .addUserOption(user => user
         .setName("user")

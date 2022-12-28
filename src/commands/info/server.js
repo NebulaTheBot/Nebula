@@ -1,10 +1,10 @@
-const { EmbedBuilder, SlashCommandBuilder, PermissionsBitField } = require("discord.js");
+const { EmbedBuilder, SlashCommandSubcommandBuilder, PermissionsBitField } = require("discord.js");
 const { getColor } = require("../../utils/misc");
 
-module.exports = class Serverinfo {
+module.exports = class Server {
   constructor() {
-    this.data = new SlashCommandBuilder()
-      .setName("serverinfo")
+    this.data = new SlashCommandSubcommandBuilder()
+      .setName("server")
       .setDescription("Shows this server's info.");
   }
 

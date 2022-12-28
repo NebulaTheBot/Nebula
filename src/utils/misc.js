@@ -1,18 +1,21 @@
 const fs = require("fs");
 const path = require("path");
 
-function getFiles(dpath, suffix) {
+function getFolders(dpath, suffix) {
   const commandFiles = fs.readdirSync(dpath, { withFileTypes: true });
   const files = [];
 
   for (const file of commandFiles) {
-    if (file.isDirectory()) {
-      files.push(...getFiles(path.join(dpath, file.name), suffix));
-      continue;
-    }
-
-    if (file.name.endsWith(suffix)) files.push(path.join(dpath, file.name));
+    if (file.isDirectory()) files.push(...getFiles(path.join(dpath, file.name), suffix));
   }
+  return files;
+}
+
+function getFiles(dpath) {
+  const commandFiles = fs.readdirSync(dpath, { withFileTypes: true });
+  const files = [];
+
+  for (const file of commandFiles) files.push(path.join(dpath, file.name));
   return files;
 }
 
@@ -34,19 +37,12 @@ function randomise(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-function clearModule(moduleName) {
-  const mp = require.resolve(moduleName);
-  if (require.cache[mp]) delete require.cache[mp];
+function requireReload(name) {
+  ((moduleName) => {
+    const mp = require.resolve(moduleName);
+    if (require.cache[mp]) delete require.cache[mp];
+  })(name);
+  return require(name);
 }
 
-function requireReload(moduleName) {
-  clearModule(moduleName);
-  return require(moduleName);
-}
-
-module.exports = {
-  getFiles,
-  getColor,
-  randomise,
-  requireReload
-};
+module.exports = { getFolders, getColor, getFiles, randomise, requireReload };

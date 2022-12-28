@@ -1,9 +1,9 @@
-const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandSubcommandBuilder } = require("discord.js");
 const { getColor, randomise } = require("../../utils/misc");
 
 module.exports = class Changelog {
   constructor() {
-    this.data = new SlashCommandBuilder()
+    this.data = new SlashCommandSubcommandBuilder()
       .setName("changelog")
       .setDescription("Shows the changelog for the latest update.");
   }

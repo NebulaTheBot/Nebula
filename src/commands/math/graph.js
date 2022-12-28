@@ -1,12 +1,12 @@
 const {
-  EmbedBuilder, ModalBuilder, SlashCommandBuilder,
+  EmbedBuilder, ModalBuilder, SlashCommandSubcommandBuilder,
   ActionRowBuilder, TextInputBuilder
 } = require("discord.js");
 const { getColor } = require("../../utils/misc");
 
 module.exports = class Graph {
   constructor() {
-    this.data = new SlashCommandBuilder()
+    this.data = new SlashCommandSubcommandBuilder()
       .setName("graph")
       .setDescription("Displays a graph of a function.")
       .addStringOption(string => string
