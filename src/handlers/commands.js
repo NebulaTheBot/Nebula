@@ -16,7 +16,7 @@ module.exports = class Commands {
           const stats = fs.statSync(commandFile);
 
           if (stats.isDirectory()) {
-            console.log(stats.name); // undefined
+            console.log(stats.name);
             let commandFolder = SlashCommandBuilder()
               .name = commandFile;
 

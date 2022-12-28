@@ -6,7 +6,7 @@ function getFolders(dpath, suffix) {
   const files = [];
 
   for (const file of commandFiles) {
-    if (file.isDirectory()) files.push(...getFiles(path.join(dpath, file.name), suffix)); // damn, evolution
+    if (file.isDirectory()) files.push(...getFiles(path.join(dpath, file.name), suffix));
   }
   return files;
 }
