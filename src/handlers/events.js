@@ -1,4 +1,4 @@
-const { getFiles, requireReload } = require("../utils/misc");
+const { getFolders, requireReload } = require("../utils/misc");
 const chalk = require("chalk");
 const path = require("path");
 
@@ -7,23 +7,22 @@ module.exports = class Events {
     this.client = client;
     this.commands = commands;
     this.events = [];
-    this.eventFiles = getFiles(path.join(process.cwd(), "src", "events"), ".js");
+    this.eventFiles = getFolders(path.join(process.cwd(), "src", "events"), ".js");
 
     (async () => {
       try {
-        for (const eventTest of this.eventFiles) {
-          const eventFile = requireReload(eventTest);
-          const event = new (eventFile.event)(this.client, this.commands, this);
-          const clientEvent = this.client.on(eventFile.name, event.run);
+        for (const eventFile of this.eventFiles) {
+          const event = requireReload(eventFile);
+          const eventConstructor = new (event.event)(this.client, this.commands, this);
+          const clientEvent = this.client.on(event.name, eventConstructor.run);
 
-          this.events.push({ name: eventFile.name, event: clientEvent });
-        };
+          this.events.push({ name: event.name, event: clientEvent });
+        }
+        console.log(chalk.greenBright("Events? Registered."));
       } catch (error) {
-        if (error instanceof TypeError) console.error(`An error occurred while starting events: ${error.message}`);
+        if (error instanceof TypeError) console.error(chalk.redBright(`An error occurred while starting events: ${error.message}`));
         else throw error;
       }
     })();
-
-    console.log(chalk.greenBright("Events? Registered."));
   }
 }
