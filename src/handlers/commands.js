@@ -18,7 +18,7 @@ module.exports = class Commands {
           if (stats.isDirectory()) {
             console.log(stats.name); // undefined
             let commandFolder = SlashCommandBuilder()
-              .name = stats.name;
+              .name = commandFile;
 
             for (const subcommandFile of this.subcommandFiles) {
               const subcommand = requireReload(subcommandFile);
