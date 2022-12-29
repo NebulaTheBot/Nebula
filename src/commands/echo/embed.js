@@ -1,4 +1,5 @@
 const { SlashCommandSubcommandBuilder, EmbedBuilder } = require("discord.js");
+const { getColor } = require("../../utils/misc.js");
 
 module.exports = class Embed {
   constructor() {
@@ -20,14 +21,10 @@ module.exports = class Embed {
   async run(interaction) {
     const title = interaction.options.getString("title");
     const description = interaction.options.getString("description");
-    let embed = new EmbedBuilder()
-      .setTitle("You have sent a message.")
-      .setColor(getColor(100));
-
-    await interaction.editReply({ embeds: [embed], ephemeral: true });
+    let embed = new EmbedBuilder;
 
     embed.setTitle(title).setColor(getColor(270));
     if (description) embed.setDescription(description);
-    await interaction.channel.send({ embeds: [embed] });
+    await interaction.editReply({ embeds: [embed] });
   }
 }

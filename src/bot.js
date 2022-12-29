@@ -1,4 +1,4 @@
-const { Client, ActivityType, Collection } = require("discord.js");
+const { Client, ActivityType } = require("discord.js");
 const Events = require("./handlers/events");
 const Commands = require("./handlers/commands");
 const chalk = require("chalk");
@@ -16,12 +16,9 @@ const client = new Client({
   ]
 });
 
-client.subcommands = new Collection();
-client.on("ready", () => {
-  const commands = new Commands(client);
-  new Events(client, commands);
-  
+client.on("ready", async () => {
+  new Events(client, new Commands(client));
   console.log(chalk.green("Start completed. Bot has been alive'd."));
 });
 
-client.login(process.env.ENTITY_CANARY);
+client.login(process.env.TOKEN);

@@ -15,30 +15,15 @@ module.exports = {
       if (!interaction.isChatInputCommand()) return;
       await interaction.deferReply();
       try {
-        const commandFiles = getFiles(path.join(process.cwd(), "src", "commands"), ".js");
-        const findCommandFile = commandFiles.find(file => file.indexOf(`${interaction.commandName}.js`) !== -1);
+        const subcommandName = interaction.options.getSubcommand(false);
+        const commandFiles = getFiles(path.join(process.cwd(), "src", "commands", (subcommandName ? interaction.commandName : "")));
+        const findCommandFile = commandFiles.find(file => file.indexOf(`${(subcommandName ? subcommandName : interaction.commandName)}.js`) !== -1);
         const commandFile = requireReload(findCommandFile);
         const command = new (commandFile)(this.client, this.commands, this);
 
-        const subcommandGroup = interaction.options.getSubcommandGroup(false);
-        const subcommandName = interaction.options.getSubcommand(false);
-        console.log(subcommandGroup, subcommandName);
-  
-        if (subcommandName) {
-          if (subcommandGroup) this.client.application.commands.get(command.data.name).groupCommands
-            .get(subcommandGroup)
-            .get(subcommandName)
-            .run(interaction);
-          else this.client.application.commands.get(command.data.name).groupCommands
-            .get(subcommandName)
-            .run(interaction);
-   
-          return;
-        }
-  
         command.run(interaction);
       } catch (error) {
-        if (error instanceof TypeError) console.error(chalk.redBright(`An error occurred while executing: ${error.message}`));
+        if (error instanceof TypeError) console.error(chalk.redBright(`An error occurred while executing (interactionCreate): ${error.message}`));
         else throw error;
       }
     }
