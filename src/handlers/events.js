@@ -1,4 +1,4 @@
-const { getFolders, requireReload } = require("../utils/misc");
+const { getFiles, requireReload } = require("../utils/misc");
 const chalk = require("chalk");
 const path = require("path");
 
@@ -7,7 +7,7 @@ module.exports = class Events {
     this.client = client;
     this.commands = commands;
     this.events = [];
-    this.eventFiles = getFolders(path.join(process.cwd(), "src", "events"), ".js");
+    this.eventFiles = getFiles(path.join(process.cwd(), "src", "events"));
 
     (async () => {
       try {

@@ -18,29 +18,29 @@ module.exports = class Graph {
           { name: "Cubic parabola", value: "cubicParabola" },
           { name: "Hyperbola", value: "hyperbola" }
         )
-        .setRequired(true)
+        .setRequired(false)
       );
   }
 
   async run(interaction) {
     let modal = new ModalBuilder()
-      .setTitle("Input numbers")
+      .setTitle("Test modal")
       .setCustomId("modal");
 
+    const inputM = new TextInputBuilder()
+      .setLabel("Test input")
+      .setStyle("Short")
+      .setCustomId("m")
+      .setRequired(true);
+
+    const actionRow = new ActionRowBuilder().addComponents(inputM);
+    modal.addComponents(actionRow);
+
     let embed = new EmbedBuilder()
-      .setColor(getColor(200));
+      .setTitle("this is a test embed, nothing different")
+      .setColor(getColor(270));
 
-    if (type === "linear") {
-      const inputM = new TextInputBuilder()
-        .setLabel("Input m")
-        .setStyle("Short")
-        .setCustomId("m")
-        .setRequired(true);
-
-      const actionRow = new ActionRowBuilder().addComponents(inputM);
-      modal.addComponents(actionRow);
-
-      await interaction.showModal(modal);
-    }
+    interaction.editReply({ embeds: [embed] });
+    await interaction.showModal(modal);
   }
 }

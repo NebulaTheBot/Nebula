@@ -1,16 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 
-function getFolders(dpath, suffix) {
-  const commandFiles = fs.readdirSync(dpath, { withFileTypes: true });
-  const files = [];
-
-  for (const file of commandFiles) {
-    if (file.isDirectory()) files.push(...getFiles(path.join(dpath, file.name), suffix));
-  }
-  return files;
-}
-
 function getFiles(dpath) {
   const commandFiles = fs.readdirSync(dpath, { withFileTypes: true });
   const files = [];
@@ -20,9 +10,9 @@ function getFiles(dpath) {
 }
 
 function getColor(hue) {
-  const h = hue + 20 * Math.random();
+  const h = hue + 15 * Math.random();
   let s = 100;
-  let l = 50 + 20 * Math.random();
+  let l = 50 + 25 * Math.random();
 
   s /= 100;
   l /= 100;
@@ -45,4 +35,4 @@ function requireReload(name) {
   return require(name);
 }
 
-module.exports = { getFolders, getColor, getFiles, randomise, requireReload };
+module.exports = { getColor, getFiles, randomise, requireReload };
