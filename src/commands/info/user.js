@@ -25,34 +25,36 @@ module.exports = class User {
     const selectedMember = allMembers
       .filter(m => m.user.id === user ? user.id : member.user.id)
       .get(user ? user.id : member.user.id);
+
     const userRoles = [...allRoles.filter(r => r !== everyone && selectedMember._roles.includes(r.id))]
       .sort((a, b) => (b[1].rawPosition)-(a[1].rawPosition));
 
-    let embed = new EmbedBuilder()
+    const embed = new EmbedBuilder()
       .setTitle(`Showing info for ${selectedMember.user.username}#${selectedMember.user.discriminator}`)
       .addFields(
         {
           name: selectedMember.user.bot === false ? "👤 • User info" : "🤖 • Bot info",
           value: [
             `**Username**: ${selectedMember.user.username}`,
-            `**Created on**: <t:${new Date(selectedMember.user.createdAt / 1000).valueOf()}:d>`
+            `**Created on** <t:${new Date(selectedMember.user.createdAt / 1000).valueOf()}:D>`
           ].join("\n")
         },
         {
           name: "👥 • Member info",
           value: [
             `**Server nickname**: ${selectedMember.nickname == null ? "*None*" : selectedMember.nickname}`,
-            `**Joined on**: <t:${parseInt(selectedMember.joinedTimestamp / 1000)}:d>`
+            `**Joined on** <t:${parseInt(selectedMember.joinedTimestamp / 1000)}:D>`
           ].join("\n")
-        },
-        userRoles == [] ? null : {
-          name: `🎭 • Roles: ${allRoles.filter(r => r !== everyone && selectedMember._roles.includes(r.id)).size}`,
-          value: `${userRoles.slice(0, roleDisplayLimit).map(r => `${r[1]}`).join(", ")}${userRoles.length > roleDisplayLimit ? ` **and ${userRoles.length - roleDisplayLimit} more**` : ""}`
         }
       )
       .setFooter({ text: `User ID: ${selectedMember.id}` })
       .setThumbnail(selectedMember.displayAvatarURL())
       .setColor(getColor(200));
+
+    userRoles.length == 0 ? null : embed.addFields({
+      name: `🎭 • Roles: ${allRoles.filter(r => r !== everyone && selectedMember._roles.includes(r.id)).size}`,
+      value: `${userRoles.slice(0, roleDisplayLimit).map(r => `${r[1]}`).join(", ")}${userRoles.length > roleDisplayLimit ? ` **and ${userRoles.length - roleDisplayLimit} more**` : ""}`
+    })
 
     interaction.editReply({ embeds: [embed] });
   }

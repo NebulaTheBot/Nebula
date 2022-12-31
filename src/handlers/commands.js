@@ -7,11 +7,12 @@ const { SlashCommandBuilder } = require("discord.js");
 module.exports = class Commands {
   constructor(client) {
     this.client = client;
+    this.commands = [];
     this.commandFiles = getFiles(path.join(process.cwd(), "src", "commands"));
 
     (async () => {
-      await this.client.application.commands.set([]).catch(console.error);
       try {
+        await this.client.application.commands.set([]);
         for (const commandFile of this.commandFiles) {
           const stats = fs.statSync(commandFile);
           let commandName = commandFile.split("\\").join("/").split("/").slice(-1)[0];
@@ -28,18 +29,19 @@ module.exports = class Commands {
 
               commandFolder.options.push(subcommandData);
             }
-            await this.client.application.commands.create(commandFolder);
+            this.commands.push(commandFolder);
           }
           if (stats.isFile()) {
             const command = requireReload(commandFile);
             const commandData = new (command)(this.client, this).data;
-            
-            await this.client.application.commands.create(commandData);
+
+            this.commands.push(commandData);
           }
-          console.log(chalk.greenBright(`${commandName}? Registered.`));
         }
+        // await this.client.application.commands.set(this.commands);
+        console.log(chalk.greenBright(`Commands? Registered.`));
       } catch (error) {
-        if (error instanceof TypeError) console.error(chalk.redBright(`An error occurred while setting the commands: ${error.message}\nStack: ${error.stack}`));
+        if (error instanceof TypeError) console.error(chalk.redBright(`What is it? It's a command error! ${error.stack}`));
         else throw error;
       }
     })();
