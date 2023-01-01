@@ -15,14 +15,14 @@ module.exports = class Changelog {
         {
           name: "✅ • Added",
           value: [
-            "**Commands**: /echo, /info changelog; server",
+            "**Commands**: /echo embed; message, /help, /info changelog; server; user",
             "**Subcommands**"
           ].join("\n") 
         },
         {
           name: "🗂️ • Changed",
           value: [
-            "**Commands**: /about",
+            "**Commands**: /info about",
             "**Version number**: Rounded to 0.1 (previously - 0.0000000001)",
             "**Embed color**: Fixed, slightly random."
           ].join("\n")

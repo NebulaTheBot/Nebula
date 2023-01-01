@@ -12,7 +12,7 @@ module.exports = class Commands {
 
     (async () => {
       try {
-        await this.client.application.commands.set([]);
+        // await this.client.application.commands.set([]); // uncomment if you experience command weirdness to remove them all
         for (const commandFile of this.commandFiles) {
           const stats = fs.statSync(commandFile);
           let commandName = commandFile.split("\\").join("/").split("/").slice(-1)[0];
@@ -38,7 +38,7 @@ module.exports = class Commands {
             this.commands.push(commandData);
           }
         }
-        // await this.client.application.commands.set(this.commands);
+        await this.client.application.commands.set(this.commands);
         console.log(chalk.greenBright(`Commands? Registered.`));
       } catch (error) {
         if (error instanceof TypeError) console.error(chalk.redBright(`What is it? It's a command error! ${error.stack}`));

@@ -21,7 +21,7 @@ module.exports = class About {
           {
             name: "📃 • General",
             value: [
-              "**Version**: 0.1.0-beta",
+              "**Version**: 0.1-beta",
               "**Working on**: The Grand Update",
               `**Guild count**: ${guildCount}`
             ].join("\n"),
@@ -35,7 +35,7 @@ module.exports = class About {
               "**Web developers**: <@715602019166978139>, <@349005764247158785>",
               "**Helper**: <@492653578423369740>",
               "**Testers**: <@367638567402340363>, <@492653578423369740>",
-              "**Sponsors**: [FyreBlitz Hosting](https://fyreblitz.com)"
+              "**Sponsors**: [FyreBlitz](https://fyreblitz.com)"
             ].join("\n")
           }
         )

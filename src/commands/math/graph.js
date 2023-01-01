@@ -1,6 +1,6 @@
 const {
   EmbedBuilder, ModalBuilder, SlashCommandSubcommandBuilder,
-  ActionRowBuilder, TextInputBuilder
+  ActionRowBuilder, TextInputBuilder, ButtonBuilder
 } = require("discord.js");
 const { getColor } = require("../../utils/misc");
 
@@ -39,6 +39,13 @@ module.exports = class Graph {
     let embed = new EmbedBuilder()
       .setTitle("this is a test embed, nothing different")
       .setColor(getColor(270));
+
+    const buttons = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setLabel("test")
+        .setStyle("Primary")
+        .setCustomId("test")
+    )
 
     interaction.editReply({ embeds: [embed] });
     await interaction.showModal(modal);
