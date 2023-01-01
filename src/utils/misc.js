@@ -28,7 +28,7 @@ function randomise(array) {
 }
 
 function requireReload(name) {
-  ((moduleName) => {
+  (moduleName => {
     const mp = require.resolve(moduleName);
     if (require.cache[mp]) delete require.cache[mp];
   })(name);

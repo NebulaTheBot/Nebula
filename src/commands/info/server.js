@@ -34,7 +34,7 @@ module.exports = class Server {
           name: "📃 • General",
           value: [
             `**Owner**: <@${guild.ownerId}>`,
-            `**Created on**: <t:${parseInt(guild.createdTimestamp / 1000)}:d>`,
+            `**Created on** <t:${parseInt(guild.createdTimestamp / 1000)}:D>`,
             `**Community**: ${guild.features.includes("COMMUNITY") ? "Enabled" : "Disabled"}`,
           ].join("\n"),
           inline: true

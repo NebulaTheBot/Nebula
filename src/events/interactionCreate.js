@@ -5,9 +5,8 @@ const chalk = require("chalk");
 module.exports = {
   name: "interactionCreate",
   event: class InteractionCreate {
-    constructor(commands, subcommands, events) {
+    constructor(commands, events) {
       this.commands = commands;
-      this.subcommands = subcommands;
       this.events = events;
     }
 
@@ -23,7 +22,7 @@ module.exports = {
 
         command.run(interaction);
       } catch (error) {
-        if (error instanceof TypeError) console.error(chalk.redBright(`An error occurred while executing (interactionCreate): ${error.message}`));
+        if (error instanceof TypeError) console.error(chalk.redBright(`What is it? It's an interactionCreate error! ${error.message}`));
         else throw error;
       }
     }
