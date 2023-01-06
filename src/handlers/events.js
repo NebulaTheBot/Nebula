@@ -20,7 +20,7 @@ module.exports = class Events {
         }
         console.log(chalk.greenBright("Events? Registered."));
       } catch (error) {
-        if (error instanceof TypeError) console.error(chalk.redBright(`What is it? It's an event error! ${error.message}`));
+        if (error instanceof TypeError) console.error(chalk.redBright(`What is it? It's an event error! ${error.stack}`));
         else throw error;
       }
     })();

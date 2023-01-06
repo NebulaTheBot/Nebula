@@ -44,10 +44,25 @@ module.exports = class Graph {
       new ButtonBuilder()
         .setLabel("test")
         .setStyle("Primary")
-        .setCustomId("test")
-    )
+        .setCustomId("test"),
+      new ButtonBuilder()
+        .setLabel("exit")
+        .setStyle("Danger")
+        .setCustomId("exit")
+    );
 
-    interaction.editReply({ embeds: [embed] });
-    await interaction.showModal(modal);
+    interaction.editReply({ embeds: [embed], components: [buttons] });
+    const filter = ButtonInteraction => {
+      return interaction.user.id !== ButtonInteraction.user.id || interaction.user.id === ButtonInteraction.user.id;
+    }
+    const collector = interaction.channel.createMessageComponentCollector({ filter, max: 1, time: 30000 });
+
+    collector.on("collect", collection => {
+      interaction.deleteReply();
+      collection.forEach(async () => {
+        if (collection.first().customId === "exit") return;
+        else if (collection.first().customId === "test") await interaction.showModal(modal);
+      })
+    })
   }
 }

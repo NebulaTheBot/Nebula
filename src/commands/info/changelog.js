@@ -27,7 +27,6 @@ module.exports = class Changelog {
             "**Embed color**: Fixed, slightly random."
           ].join("\n")
         },
-        { name: "👀 • Temporarily removed", value: "**Commands**: /ban, /clear, /kick, /warn" },
         {
           name: "🗑️ • Removed",
           value: [

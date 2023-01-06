@@ -30,7 +30,7 @@ module.exports = class User {
       .sort((a, b) => (b[1].rawPosition)-(a[1].rawPosition));
 
     const embed = new EmbedBuilder()
-      .setTitle(`Showing info for ${selectedMember.user.username}#${selectedMember.user.discriminator}`)
+      .setAuthor({ name: `${selectedMember.user.username}#${selectedMember.user.discriminator}`, iconURL: selectedMember.displayAvatarURL() })
       .addFields(
         {
           name: selectedMember.user.bot === false ? "👤 • User info" : "🤖 • Bot info",
