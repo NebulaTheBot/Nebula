@@ -70,8 +70,7 @@ module.exports = class Server {
           name: `🌟 • Boosts: ${guild.premiumSubscriptionCount}${boostTier === 0 ? "/2" : boostTier === 1 ? "/7" : boostTier === 2 ? "/14" : ""}`,
           value: [
             boostTier == 0 ? null : `Level ${boostTier}`,
-            `${boosters}yeah
-             ${boosters === 1 ? "booster" : "boosters"}`
+            `${boosters} ${boosters === 1 ? "booster" : "boosters"}`
           ].join("\n"),
           inline: true
         }

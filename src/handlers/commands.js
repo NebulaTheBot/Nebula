@@ -20,7 +20,7 @@ module.exports = class Commands {
           if (stats.isDirectory()) {
             const commandFolder = new SlashCommandBuilder()
               .setName(commandName)
-              .setDescription("Entity is a great bot");
+              .setDescription("Nebula is a great bot");
             
             const subcommandFiles = getFiles(path.join(process.cwd(), "src", "commands", commandName));
             for (const subcommandFile of subcommandFiles) {
@@ -30,7 +30,7 @@ module.exports = class Commands {
               if (stats.isDirectory()) {
                 const subcommandFolder = new SlashCommandSubcommandGroupBuilder()
                   .setName(subcommandName)
-                  .setDescription("Entity is a great bot");
+                  .setDescription("Nebula is a great bot");
 
                 const subcommandGroupFiles = getFiles(path.join(process.cwd(), "src", "commands", commandName, subcommandName));
                 for (const subcommandGroupFile of subcommandGroupFiles) {
