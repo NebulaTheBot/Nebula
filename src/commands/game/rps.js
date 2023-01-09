@@ -1,6 +1,6 @@
 const {
   EmbedBuilder, ActionRowBuilder, ButtonBuilder,
-  SelectMenuBuilder, SlashCommandSubcommandBuilder
+  StringSelectMenuBuilder, SlashCommandSubcommandBuilder
 } = require("discord.js");
 const { getColor } = require("../../utils/misc");
 
@@ -46,7 +46,7 @@ module.exports = class Rps {
     const collector = interaction.channel.createMessageComponentCollector({ filter, max: 1, time: 30000 });
 
     collector.on("collect", collection => {
-      interaction.channel.bulkDelete(1, true);
+      interaction.deleteReply();
       collection.forEach(click => {
         if (collection.first().customId === "decline") {
           const embed = new EmbedBuilder()
@@ -60,7 +60,7 @@ module.exports = class Rps {
             .setFooter({ text: "You have 30 seconds to choose an option." });
 
           const list = new ActionRowBuilder().addComponents(
-            new SelectMenuBuilder()
+            new StringSelectMenuBuilder()
               .setCustomId("list")
               .setPlaceholder("Choose one of the options!")
               .addOptions([

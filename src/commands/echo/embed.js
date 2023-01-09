@@ -21,9 +21,8 @@ module.exports = class Embed {
   async run(interaction) {
     const title = interaction.options.getString("title");
     const description = interaction.options.getString("description");
-    let embed = new EmbedBuilder;
+    let embed = new EmbedBuilder().setTitle(title).setColor(getColor(270));
 
-    embed.setTitle(title).setColor(getColor(270));
     if (description) embed.setDescription(description);
     await interaction.editReply({ embeds: [embed] });
   }

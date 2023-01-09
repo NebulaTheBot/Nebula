@@ -1,7 +1,7 @@
 {
-  "name": "entity",
+  "name": "nebula",
   "description": "A bot.",
-  "author": "Serge",
+  "author": "The Nebula Team",
   "license": "MIT",
   "main": "src/index.js",
   "dependencies": {

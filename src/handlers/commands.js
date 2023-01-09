@@ -1,8 +1,8 @@
+const { SlashCommandBuilder, SlashCommandSubcommandGroupBuilder } = require("discord.js");
 const { getFiles, requireReload } = require("../utils/misc");
 const fs = require("fs");
 const path = require("path");
 const chalk = require("chalk");
-const { SlashCommandBuilder } = require("discord.js");
 
 module.exports = class Commands {
   constructor(client) {
@@ -15,19 +15,38 @@ module.exports = class Commands {
         // await this.client.application.commands.set([]); // uncomment if you experience command weirdness to remove them all
         for (const commandFile of this.commandFiles) {
           const stats = fs.statSync(commandFile);
-          let commandName = commandFile.split("\\").join("/").split("/").slice(-1)[0];
+          const commandName = commandFile.split("\\").join("/").split("/").slice(-1)[0];
 
           if (stats.isDirectory()) {
-            let commandFolder = new SlashCommandBuilder()
+            const commandFolder = new SlashCommandBuilder()
               .setName(commandName)
-              .setDescription("Entity is a great bot");
-
+              .setDescription("Nebula is a great bot");
+            
             const subcommandFiles = getFiles(path.join(process.cwd(), "src", "commands", commandName));
             for (const subcommandFile of subcommandFiles) {
-              const subcommand = requireReload(subcommandFile);
-              const subcommandData = new (subcommand)(this.client, this).data;
+              const stats = fs.statSync(subcommandFile);
+              const subcommandName = subcommandFile.split("\\").join("/").split("/").slice(-1)[0];
 
-              commandFolder.options.push(subcommandData);
+              if (stats.isDirectory()) {
+                const subcommandFolder = new SlashCommandSubcommandGroupBuilder()
+                  .setName(subcommandName)
+                  .setDescription("Nebula is a great bot");
+
+                const subcommandGroupFiles = getFiles(path.join(process.cwd(), "src", "commands", commandName, subcommandName));
+                for (const subcommandGroupFile of subcommandGroupFiles) {
+                  const subcommand = requireReload(subcommandGroupFile);
+                  const subcommandData = new (subcommand)(this.client, this).data;
+    
+                  subcommandFolder.options.push(subcommandData);
+                }
+                commandFolder.options.push(subcommandFolder);
+              }
+              if (stats.isFile()) {
+                const subcommand = requireReload(subcommandFile);
+                const subcommandData = new (subcommand)(this.client, this).data;
+  
+                commandFolder.options.push(subcommandData);
+              }
             }
             this.commands.push(commandFolder);
           }

@@ -1,4 +1,5 @@
 const { SlashCommandSubcommandBuilder, EmbedBuilder } = require("discord.js");
+const { getColor } = require("../../utils/misc");
 
 module.exports = class Message {
   constructor() {

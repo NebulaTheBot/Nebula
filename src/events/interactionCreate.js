@@ -14,15 +14,21 @@ module.exports = {
       if (!interaction.isChatInputCommand()) return;
       await interaction.deferReply();
       try {
-        const subcommandName = interaction.options.getSubcommand(false);
-        const commandFiles = getFiles(path.join(process.cwd(), "src", "commands", (subcommandName ? interaction.commandName : "")));
-        const findCommandFile = commandFiles.find(file => file.indexOf(`${(subcommandName ? subcommandName : interaction.commandName)}.js`) !== -1);
+        const subcommand = interaction.options.getSubcommand(false);
+        const subcommandGroup = interaction.options.getSubcommandGroup(false);
+
+        const commandFiles = getFiles(
+          path.join(process.cwd(), "src", "commands", (subcommand ? interaction.commandName : ""), (subcommandGroup ? interaction.options._group : ""))
+        );
+        const findCommandFile = commandFiles
+          .find(file => file.indexOf(`${subcommand ? subcommand : interaction.commandName}.js`) !== -1);
+
         const commandFile = requireReload(findCommandFile);
         const command = new (commandFile)(this.client, this.commands, this);
 
         command.run(interaction);
       } catch (error) {
-        if (error instanceof TypeError) console.error(chalk.redBright(`What is it? It's an interactionCreate error! ${error.message}`));
+        if (error instanceof TypeError) console.error(chalk.redBright(`What is it? It's an interactionCreate error! ${error.stack}`));
         else throw error;
       }
     }
