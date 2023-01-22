@@ -26,11 +26,14 @@ module.exports = class User {
       .filter(m => m.user.id === user ? user.id : member.user.id)
       .get(user ? user.id : member.user.id);
 
-    const userRoles = [...allRoles.filter(r => r !== everyone && selectedMember._roles.includes(r.id))]
+    const memberRoles = [...allRoles.filter(r => r !== everyone && selectedMember._roles.includes(r.id))]
       .sort((a, b) => (b[1].rawPosition)-(a[1].rawPosition));
 
     const embed = new EmbedBuilder()
-      .setAuthor({ name: `${selectedMember.user.username}#${selectedMember.user.discriminator}`, iconURL: selectedMember.displayAvatarURL() })
+      .setAuthor({
+        name: `•  ${selectedMember.nickname == null ? selectedMember.user.username : selectedMember.nickname}#${selectedMember.user.discriminator}`,
+        iconURL: selectedMember.displayAvatarURL()
+      })
       .addFields(
         {
           name: selectedMember.user.bot === false ? "👤 • User info" : "🤖 • Bot info",
@@ -51,9 +54,9 @@ module.exports = class User {
       .setThumbnail(selectedMember.displayAvatarURL())
       .setColor(getColor(200));
 
-    userRoles.length == 0 ? null : embed.addFields({
+    if (memberRoles.length != 0) embed.addFields({
       name: `🎭 • Roles: ${allRoles.filter(r => r !== everyone && selectedMember._roles.includes(r.id)).size}`,
-      value: `${userRoles.slice(0, roleDisplayLimit).map(r => `${r[1]}`).join(", ")}${userRoles.length > roleDisplayLimit ? ` **and ${userRoles.length - roleDisplayLimit} more**` : ""}`
+      value: `${memberRoles.slice(0, roleDisplayLimit).map(r => `${r[1]}`).join(", ")}${memberRoles.length > roleDisplayLimit ? ` **and ${memberRoles.length - roleDisplayLimit} more**` : ""}`
     })
 
     interaction.editReply({ embeds: [embed] });
