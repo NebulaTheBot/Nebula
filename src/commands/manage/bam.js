@@ -2,19 +2,19 @@ const { EmbedBuilder, SlashCommandSubcommandBuilder } = require("discord.js");
 const { OWNER, ADMIN } = require("../../../config.json");
 const { getColor } = require("../../utils/misc");
 
-module.exports = class Ban {
+module.exports = class Bam {
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
-      .setName("ban")
-      .setDescription("Bans a user.")
+      .setName("bam")
+      .setDescription("Bams a user.")
       .addUserOption(user => user
         .setName("user")
-        .setDescription("The user you want to ban.")
+        .setDescription("The user you want to bam.")
         .setRequired(true)
       )
       .addStringOption(string => string
         .setName("reason")
-        .setDescription("The reason of banning.")
+        .setDescription("The reason of bamming.")
         .setRequired(false)
       );
   }
@@ -36,21 +36,21 @@ module.exports = class Ban {
     const selectedMember = allMembers.filter(m => m.user.id === user.id).get(user.id);
     const yes = allRoles.filter(r => r !== everyone && selectedMember._roles.includes(r.id)).sort((a, b) => Math.max([a[1].rawPosition, b[1].rawPosition]));
 
-    const embed = new EmbedBuilder()
-      .setTitle(`Banned ${selectedMember.nickname == null ? user.username : selectedMember.nickname}`)
-      .addFields({ name: "🔨 • Moderator", value: `${member.nickname == null ? member.user.username : member.nickname}` })
+    let embed = new EmbedBuilder()
+      .setTitle(`Bammed ${user.username}#${user.discriminator}`)
+      .addFields({ name: "Moderator", value: `${interaction.member.nickname}` })
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(getColor(100));
 
     if (reason) embed.addFields({ name: "🖊️ • Reason", value: `${reason}` });
 
     if (selectedMember === member) {
-      errorEmbed.setTitle("You can't ban yourself")
+      errorEmbed.setTitle("You can't bam yourself")
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 
     if (selectedMember.user.bot === true) {
-      errorEmbed.setTitle("You can't ban a bot")
+      errorEmbed.setTitle("You can't bam a bot")
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 
@@ -59,7 +59,6 @@ module.exports = class Ban {
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 
-    // selectedMember.ban();
     interaction.editReply({ embeds: [embed] });
     channel.send({ embeds: [embed] });
   }

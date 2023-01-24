@@ -21,7 +21,11 @@ module.exports = class Clear {
   }
 
   run(interaction) {
-    if (interaction.user.id !== OWNER && !ADMIN.includes(interaction.user.id)) return;
+    let errorEmbed = new EmbedBuilder().setColor(getColor(0));
+    if (interaction.user.id !== OWNER && !ADMIN.includes(interaction.user.id)) {
+      errorEmbed.setTitle("You don't have the permission to execute this command");
+      return interaction.editReply({ embeds: [errorEmbed] });
+    }
 
     const client = interaction.client;
     const amount = interaction.options.getNumber("amount");
@@ -29,33 +33,30 @@ module.exports = class Clear {
     const channel1 = client.channels.cache.get("979337971159420928");
 
     if (amount > 100) {
-      const embed = new EmbedBuilder()
-        .setTitle("Too many messages provided.")
-        .setColor(getColor(0));
-
-      return interaction.editReply({ embeds: [embed], ephemeral: true });
+      errorEmbed.setTitle("Too many messages provided.");
+      return interaction.editReply({ embeds: [errorEmbed] });
     }
 
     let embed = new EmbedBuilder()
-      .setTitle(`Deleted ${amount} messages!`)
-      .setColor(getColor(100));
-    
-    let embed1 = new EmbedBuilder()
       .setTitle(`Cleared at ${interaction.channel.name}`)
       .addFields(
-        { name: "Amount", value: `${amount}` },
-        { name: "Moderator", value: `${interaction.member.nickname}` }
+        { name: "🔨 • Moderator", value: `${interaction.member.nickname}` },
+        { name: "🔢 • Amount", value: `${amount}` }
       )
       .setColor(getColor(100));
 
-    interaction.editReply({ embeds: [embed], ephemeral: true });
+    if (amount > 100) {
+      errorEmbed.setTitle("Too many messages provided.");
+      return interaction.editReply({ embeds: [errorEmbed] });
+    }
 
     if (channel) {
       embed.setTitle(`Cleared at ${channel.name}`);
       return channel.bulkDelete(amount, true);
     }
-    
+
     interaction.channel.bulkDelete(amount, true);
-    channel1.send({ embeds: [embed1] });
+    interaction.editReply({ embeds: [embed] });
+    channel1.send({ embeds: [embed] });
   }
 }
