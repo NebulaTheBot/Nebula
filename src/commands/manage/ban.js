@@ -21,10 +21,10 @@ module.exports = class Ban {
 
   async run(interaction) {
     let errorEmbed = new EmbedBuilder().setColor(getColor(0));
-    // if (interaction.user.id !== OWNER && !ADMIN.includes(interaction.user.id)) {
-    //   errorEmbed.setTitle("You don't have the permission to execute this command");
-    //   return interaction.editReply({ embeds: [errorEmbed] });
-    // }
+    if (interaction.user.id !== OWNER && !ADMIN.includes(interaction.user.id)) {
+      errorEmbed.setTitle("You don't have the permission to execute this command");
+      return interaction.editReply({ embeds: [errorEmbed] });
+    }
 
     const user = interaction.options.getUser("user");
     const reason = interaction.options.getString("reason");
