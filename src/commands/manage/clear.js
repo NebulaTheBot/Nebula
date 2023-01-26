@@ -27,25 +27,19 @@ module.exports = class Clear {
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 
-    const client = interaction.client;
     const amount = interaction.options.getNumber("amount");
     const channel = interaction.options.getChannel("channel");
-    const channel1 = client.channels.cache.get("979337971159420928");
-
-    if (amount > 100) {
-      errorEmbed.setTitle("Too many messages provided.");
-      return interaction.editReply({ embeds: [errorEmbed] });
-    }
+    const channel1 = interaction.client.channels.cache.get("979337971159420928");
 
     let embed = new EmbedBuilder()
       .setTitle(`Cleared at ${interaction.channel.name}`)
       .addFields(
-        { name: "🔨 • Moderator", value: `${interaction.member.nickname}` },
+        { name: "🔨 • Moderator", value: `${member.nickname == null ? member.user.username : member.nickname}` },
         { name: "🔢 • Amount", value: `${amount}` }
       )
       .setColor(getColor(100));
 
-    if (amount > 100) {
+    if (amount > 1000) {
       errorEmbed.setTitle("Too many messages provided.");
       return interaction.editReply({ embeds: [errorEmbed] });
     }

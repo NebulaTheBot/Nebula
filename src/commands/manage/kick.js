@@ -26,20 +26,16 @@ module.exports = class Kick {
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 
-    const client = interaction.client;
     const user = interaction.options.getUser("user");
     const reason = interaction.options.getString("reason");
-    const channel = client.channels.cache.get("979337971159420928");
+    const channel = interaction.client.channels.cache.get("979337971159420928");
     const member = interaction.member;
-    const everyone = member.guild.roles.everyone;
     const allMembers = await member.guild.members.fetch();
-    const allRoles = await member.guild.roles.fetch();
     const selectedMember = allMembers.filter(m => m.user.id === user.id).get(user.id);
-    // const yes = allRoles.filter(r => r !== everyone && selectedMember._roles.includes(r.id)).sort((a, b) => Math.max([a[1].rawPosition, b[1].rawPosition]));
 
-    const embed = new EmbedBuilder()
+    let embed = new EmbedBuilder()
       .setTitle(`Kicked ${selectedMember.nickname == null ? user.username : selectedMember.nickname}`)
-      .addFields({ name: "🔨 • Moderator", value: `${interaction.member.nickname}` })
+      .addFields({ name: "🔨 • Moderator", value: `${member.nickname == null ? member.user.username : member.nickname}` })
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(getColor(100));
 
@@ -55,8 +51,8 @@ module.exports = class Kick {
       return interaction.editReply({ embeds: [errorEmbed] });
     }
     
-    if (null) {
-      errorEmbed.setTitle("The bot doesn't have the needed permissions or its role is lower than the user's")
+    if (selectedMember.manageable === false) {
+      errorEmbed.setTitle("Nebula doesn't have the permissions required")
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 
