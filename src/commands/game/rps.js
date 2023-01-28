@@ -67,19 +67,19 @@ module.exports = class Rps {
                 {
                   label: "Rock",
                   value: "rock",
-                  description: "It's about drive, it's about power",
+                  description: "It's about drive, it's about power.",
                   emoji: "🗿"
                 },
                 {
                   label: "Paper",
                   value: "paper",
-                  description: "idk",
+                  description: "The best thing if you want to write.",
                   emoji: "📄"
                 },
                 {
                   label: "Scissors",
                   value: "scissors",
-                  description: "idk",
+                  description: "A very powerful tool, you can even cut paper with it.",
                   emoji: "✂"
                 }
               ])
@@ -110,11 +110,17 @@ module.exports = class Rps {
             else if (
               optionValue === "rock" && value === "scissors" ||
               optionValue === "scissors" && value === "rock"
-            ) embed.setTitle("rock scissors");
+            ) embed.setTitle([
+              "Whoa, that's quite amazing!",
+              "However, Rock won the battle this time."
+            ].join("\n"));
             else if (
               optionValue === "paper" && value === "scissors" ||
               optionValue === "scissors" && value === "paper"
-            ) embed.setTitle("paper scissors");
+            ) embed.setTitle([
+              "The actual classic, Paper vs. Scissors",
+              "But yeah, it's the same as always, scissors won 👏" 
+            ].join("\n"));
 
             collected.channel.send({ embeds: [embed] });
           })
