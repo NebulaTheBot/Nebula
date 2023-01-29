@@ -16,8 +16,7 @@ module.exports = class About {
       const hearts = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
 
       const embed = new EmbedBuilder()
-        .setAuthor({ name: client.user.username, iconURL: client.user.displayAvatarURL() })
-        .setTitle("About")
+        .setAuthor({ name: `•  About ${client.user.username}`, iconURL: client.user.displayAvatarURL() })
         .addFields(
           {
             name: "📃 • General",
@@ -34,6 +33,7 @@ module.exports = class About {
               "**Head developer**: <@725985503177867295>",
               "**Bot developers**: <@620111346129829919>, <@598009398865952768>, <@396374841474809866>, <@349005764247158785>, <@1001860180230819870>, <@820917763240624148>",
               "**Web developers**: <@715602019166978139>, <@349005764247158785>",
+              "**Designer**: <@807903704472223754>",
               "**Helper**: <@492653578423369740>",
               "**Testers**: <@367638567402340363>, <@492653578423369740>",
               "**Sponsors**: [FyreBlitz](https://fyreblitz.com/en)"
@@ -45,6 +45,6 @@ module.exports = class About {
         .setColor(getColor(200));
 
       return interaction.editReply({ embeds: [embed] });
-    }).catch(console.error);
+    });
   }
 }
