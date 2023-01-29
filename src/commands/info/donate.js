@@ -3,9 +3,9 @@ const { getColor } = require("../../utils/misc");
 
 module.exports = class Donate {
     constructor() {
-    this.data = new SlashCommandSubcommandBuilder()
+      this.data = new SlashCommandSubcommandBuilder()
         .setName("donate")
-        .setDescription("Donate money to the Nebula team.")
+        .setDescription("Donate money to the Nebula team.");
     }
 
     run(interaction) {
