@@ -46,11 +46,6 @@ module.exports = class Kick {
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 
-    if (selectedMember.user.bot === true) {
-      errorEmbed.setTitle("You can't kick a bot")
-      return interaction.editReply({ embeds: [errorEmbed] });
-    }
-    
     if (selectedMember.manageable === false) {
       errorEmbed.setTitle("Nebula doesn't have the permissions required")
       return interaction.editReply({ embeds: [errorEmbed] });

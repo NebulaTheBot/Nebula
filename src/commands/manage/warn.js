@@ -45,11 +45,6 @@ module.exports = class Warn {
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 
-    if (selectedMember.user.bot === true) {
-      errorEmbed.setTitle("You can't warn a bot")
-      return interaction.editReply({ embeds: [errorEmbed] });
-    }
-
     if (selectedMember.manageable === false) {
       errorEmbed.setTitle("Nebula doesn't have the permissions required")
       return interaction.editReply({ embeds: [errorEmbed] });

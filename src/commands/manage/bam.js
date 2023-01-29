@@ -35,7 +35,7 @@ module.exports = class Bam {
 
     let embed = new EmbedBuilder()
       .setTitle(`Bammed ${selectedMember.nickname == null ? user.username : selectedMember.nickname}`)
-      .addFields({ name: "Moderator", value: `${member.nickname == null ? member.user.username : member.nickname}` })
+      .addFields({ name: "🔨 • Moderator", value: `${member.nickname == null ? member.user.username : member.nickname}` })
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(getColor(100));
 
@@ -43,11 +43,6 @@ module.exports = class Bam {
 
     if (selectedMember === member) {
       errorEmbed.setTitle("You can't bam yourself")
-      return interaction.editReply({ embeds: [errorEmbed] });
-    }
-
-    if (selectedMember.user.bot === true) {
-      errorEmbed.setTitle("You can't bam a bot")
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 
