@@ -13,7 +13,7 @@ module.exports = class About {
 
     client.shard.fetchClientValues("guilds.cache.size").then(results => {
       const guildCount = results.reduce((acc, guildCount) => acc + guildCount, 0);
-      const hearts = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞", "🫶"];
+      const hearts = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
 
       const embed = new EmbedBuilder()
         .setAuthor({ name: client.user.username, iconURL: client.user.displayAvatarURL() })

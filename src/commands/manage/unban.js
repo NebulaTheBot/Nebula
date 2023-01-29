@@ -29,7 +29,6 @@ module.exports = class Ban {
     const allRoles = await member.guild.roles.fetch();
     const selectedMember = allMembers.filter(m => m.user.id === user.id).get(user.id);
     const bannedUsers = interaction.guild.bans.fetch()
-    console.log(bannedUsers)
     const bannedUserArray = bannedUsers.map(user => user.user.username);
     const yes = allRoles.filter(r => r !== everyone && selectedMember._roles.includes(r.id)).sort((a, b) => Math.max([a[1].rawPosition, b[1].rawPosition]));
 
@@ -40,7 +39,7 @@ module.exports = class Ban {
       .setColor(getColor(100));
 
     if (!bannedUserArray.includes(selectedMember)) {
-      errorEmbed.setTitle("You can't unban this user, as it was never banned.")
+      errorEmbed.setTitle("You can't unban this user, as they were was never banned.")
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 

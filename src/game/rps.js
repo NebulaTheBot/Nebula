@@ -67,19 +67,19 @@ module.exports = class Rps {
                 {
                   label: "Rock",
                   value: "rock",
-                  description: "It's about drive, it's about power.",
+                  description: "It's about drive, it's about power",
                   emoji: "🗿"
                 },
                 {
                   label: "Paper",
                   value: "paper",
-                  description: "The best thing if you want to write.",
+                  description: "The best thing if you want to write",
                   emoji: "📄"
                 },
                 {
                   label: "Scissors",
                   value: "scissors",
-                  description: "A very powerful tool, you can even cut paper with it.",
+                  description: "A very powerful tool",
                   emoji: "✂"
                 }
               ])
