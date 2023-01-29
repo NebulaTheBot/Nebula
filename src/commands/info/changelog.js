@@ -15,7 +15,7 @@ module.exports = class Changelog {
         {
           name: "✅ • Added",
           value: [
-            "**Commands**: /echo embed; message, /help, /info changelog; server; user",
+            "**Commands**: /echo embed; message, /help, /info changelog; server; user; donate",
             "**Subcommands**"
           ].join("\n") 
         },

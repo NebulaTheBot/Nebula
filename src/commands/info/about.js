@@ -36,7 +36,7 @@ module.exports = class About {
               "**Web developers**: <@715602019166978139>, <@349005764247158785>",
               "**Helper**: <@492653578423369740>",
               "**Testers**: <@367638567402340363>, <@492653578423369740>",
-              "**Sponsors**: [FyreBlitz](https://fyreblitz.com)"
+              "**Sponsors**: [FyreBlitz](https://fyreblitz.com/en)"
             ].join("\n")
           }
         )
