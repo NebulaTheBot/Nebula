@@ -1,4 +1,4 @@
-const { EmbedBuilder, SlashCommandSubcommandBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandSubcommandBuilder, PermissionsBitField } = require("discord.js");
 const { getColor } = require("../../utils/misc");
 
 module.exports = class Warn {
@@ -20,7 +20,8 @@ module.exports = class Warn {
 
   async run(interaction) {
     let errorEmbed = new EmbedBuilder().setColor(getColor(0));
-    if (interaction.user.id !== OWNER && !ADMIN.includes(interaction.user.id)) {
+    const member = interaction.member;
+    if (member.user.id !== member.guild.ownerId && !member.permissions.has(PermissionsBitField.Flags.Administrator)) {
       errorEmbed.setTitle("You don't have the permission to execute this command");
       return interaction.editReply({ embeds: [errorEmbed] });
     }
@@ -28,7 +29,6 @@ module.exports = class Warn {
     const user = interaction.options.getUser("user");
     const reason = interaction.options.getString("reason");
     const channel = interaction.client.channels.cache.get("979337971159420928");
-    const member = interaction.member;
     const allMembers = await member.guild.members.fetch();
     const selectedMember = allMembers.filter(m => m.user.id === user.id).get(user.id);
 
@@ -41,12 +41,17 @@ module.exports = class Warn {
     if (reason) embed.addFields({ name: "🖊️ • Reason", value: `${reason}` });
 
     if (selectedMember === member) {
-      errorEmbed.setTitle("You can't warn yourself")
+      errorEmbed.setTitle("You can't warn yourself.");
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 
-    if (selectedMember.manageable === false) {
-      errorEmbed.setTitle("Nebula doesn't have the permissions required")
+    if (!selectedMember.manageable) {
+      errorEmbed.setTitle("Nebula doesn't have the permissions required.");
+      return interaction.editReply({ embeds: [errorEmbed] });
+    }
+
+    if (member.roles.highest.position < selectedMember.roles.highest.position) {
+      errorEmbed.setTitle("The selected member has a higher role position than you.");
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 

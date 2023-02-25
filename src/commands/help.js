@@ -15,10 +15,10 @@ module.exports = class Help {
     let embed = new EmbedBuilder()
       .setTitle("Help")
       .addFields(
-        { name: "🔉 • Echo", value: ["embed", "message"].join(", ") },
+        { name: "🔉 • Echo", value: "test" }, // ちーっす
         { name: "🎮 • Game", value: "rps" },
-        { name: "❔ • Info", value: ["about", "changelog", "server", "user"].join(", ") },
-        { name: "📊 • Manage", value: "*Temporarily deleted.*" },
+        { name: "❔ • Info", value: ["about", "changelog", "donate", "server", "user"].join(", ") },
+        { name: "📊 • Manage", value: ["ban", "clear", "kick", "unban", "warn"].join(", ") },
         { name: "🧮 • Math", value: "*Work in progress.*" }
       )
       .setColor(getColor(200));

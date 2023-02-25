@@ -1,5 +1,4 @@
-const { EmbedBuilder, SlashCommandSubcommandBuilder } = require("discord.js");
-const { OWNER, ADMIN } = require("../../../config.json");
+const { EmbedBuilder, SlashCommandSubcommandBuilder, PermissionsBitField } = require("discord.js");
 const { getColor } = require("../../utils/misc");
 
 module.exports = class Kick {
@@ -9,7 +8,7 @@ module.exports = class Kick {
       .setDescription("Kicks a user.")
       .addUserOption(user => user
         .setName("user")
-        .setDescription("The user you want to kick.")
+        .setDescription("The user that you want to kick.")
         .setRequired(true)
       )
       .addStringOption(string => string
@@ -21,7 +20,8 @@ module.exports = class Kick {
   
   async run(interaction) {
     let errorEmbed = new EmbedBuilder().setColor(getColor(0));
-    if (interaction.user.id !== OWNER && !ADMIN.includes(interaction.user.id)) {
+    const member = interaction.member;
+    if (member.user.id !== member.guild.ownerId && !member.permissions.has(PermissionsBitField.Flags.Administrator)) {
       errorEmbed.setTitle("You don't have the permission to execute this command");
       return interaction.editReply({ embeds: [errorEmbed] });
     }
@@ -29,7 +29,6 @@ module.exports = class Kick {
     const user = interaction.options.getUser("user");
     const reason = interaction.options.getString("reason");
     const channel = interaction.client.channels.cache.get("979337971159420928");
-    const member = interaction.member;
     const allMembers = await member.guild.members.fetch();
     const selectedMember = allMembers.filter(m => m.user.id === user.id).get(user.id);
 
@@ -42,17 +41,22 @@ module.exports = class Kick {
     if (reason) embed.addFields({ name: "🖊️ • Reason", value: `${reason}` });
 
     if (selectedMember === member) {
-      errorEmbed.setTitle("You can't kick yourself")
+      errorEmbed.setTitle("You can't kick yourself.");
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 
-    if (selectedMember.manageable === false) {
-      errorEmbed.setTitle("Nebula doesn't have the permissions required")
+    if (!selectedMember.manageable) {
+      errorEmbed.setTitle("Nebula doesn't have the permissions required.");
+      return interaction.editReply({ embeds: [errorEmbed] });
+    }
+
+    if (member.roles.highest.position < selectedMember.roles.highest.position) {
+      errorEmbed.setTitle("The selected member has a higher role position than you.");
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 
     selectedMember.kick();
-    interaction.editReply({ embeds: [embed], ephemeral: true });
+    interaction.editReply({ embeds: [embed] });
     channel.send({ embeds: [embed] });
   }
 }
