@@ -47,7 +47,6 @@ module.exports = class Help {
     const collector = interaction.channel.createMessageComponentCollector({ filter, max: 1, time: 30000 });
 
     collector.on("end", collected => {
-      interaction.deleteReply();
       const value = collected.values[0];
 
       const embed = new EmbedBuilder().setTitle("it works");
