@@ -17,5 +17,7 @@ steps:
 
 - script: |
     npm install
-    TOKEN=$(TOKEN) node src/test.js
+    node src/test.js
   displayName: 'npm install and run'
+  env:
+    TOKEN: $(TOKEN)
