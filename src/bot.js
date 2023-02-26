@@ -19,7 +19,7 @@ const client = new Client({
 
 client.on("ready", async () => {
   new Events(client, new Commands(client));
-  console.log(chalk.green("Start completed. Bot has been alive'd."));
+  console.log(chalk.green("ちーっす！"));
 });
 
 client.login(process.env.TOKEN);

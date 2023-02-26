@@ -1,19 +1,25 @@
 const { EmbedBuilder, SlashCommandSubcommandBuilder, PermissionsBitField } = require("discord.js");
 const { getColor } = require("../../utils/misc");
+const ms = require("ms");
 
-module.exports = class Ban {
+module.exports = class Mute {
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
-      .setName("ban")
-      .setDescription("Bans a user.")
+      .setName("mute")
+      .setDescription("Mutes the user.")
       .addUserOption(user => user
         .setName("user")
-        .setDescription("The user that you want to ban.")
+        .setDescription("The user that you want to mute.")
+        .setRequired(true)
+      )
+      .addStringOption(string => string
+        .setName("duration")
+        .setDescription("The duration.")
         .setRequired(true)
       )
       .addStringOption(string => string
         .setName("reason")
-        .setDescription("The reason of banning.")
+        .setDescription("Reason for the mute.")
         .setRequired(false)
       );
   }
@@ -28,20 +34,24 @@ module.exports = class Ban {
 
     const user = interaction.options.getUser("user");
     const reason = interaction.options.getString("reason");
+    const duration = interaction.options.getString("duration");
     const channel = interaction.client.channels.cache.get("979337971159420928");
     const allMembers = await member.guild.members.fetch();
     const selectedMember = allMembers.filter(m => m.user.id === user.id).get(user.id);
 
     let embed = new EmbedBuilder()
-      .setTitle(`Banned ${selectedMember.nickname == null ? user.username : selectedMember.nickname}`)
-      .addFields({ name: "🔨 • Moderator", value: `${member.nickname == null ? member.user.username : member.nickname}` })
+      .setTitle(`Muted ${selectedMember.nickname == null ? user.username : selectedMember.nickname}`)
+      .addFields(
+        { name: "🔨 • Moderator", value: `${member.nickname == null ? member.user.username : member.nickname}` },
+        { name: "🕐 • Duration", value: `${ms(ms(duration), { long: true })}` }
+      )
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(getColor(100));
 
     if (reason) embed.addFields({ name: "🖊️ • Reason", value: `${reason}` });
 
     if (selectedMember === member) {
-      errorEmbed.setTitle("You can't ban yourself.");
+      errorEmbed.setTitle("You can't mute yourself.");
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 
@@ -55,7 +65,12 @@ module.exports = class Ban {
       return interaction.editReply({ embeds: [errorEmbed] });
     }
 
-    selectedMember.ban();
+    if (!ms(duration) || ms(duration) > ms("28d")) {
+      errorEmbed.setTitle("The duration is invalid or is above the 28 day limit.");
+      return interaction.editReply({ embeds: [errorEmbed] });
+    }
+    
+    selectedMember.timeout(ms(duration), reason ? reason : null);
     interaction.editReply({ embeds: [embed] });
     channel.send({ embeds: [embed] });
   }

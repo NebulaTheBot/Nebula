@@ -11,58 +11,52 @@ module.exports = class Commands {
     this.commandFiles = getFiles(path.join(process.cwd(), "src", "commands"));
 
     (async () => {
-      try {
-        // await this.client.application.commands.set([]); // uncomment if you experience command weirdness to remove them all
-        for (const commandFile of this.commandFiles) {
-          const stats = fs.statSync(commandFile);
-          const commandName = commandFile.split("\\").join("/").split("/").slice(-1)[0];
+      for (const commandFile of this.commandFiles) {
+        const stats = fs.statSync(commandFile);
+        const commandName = commandFile.split("\\").join("/").split("/").slice(-1)[0];
+          
+        if (stats.isFile()) {
+          const command = requireReload(commandFile);
+          const commandData = new (command)(this.client, this).data;
 
-          if (stats.isDirectory()) {
-            const commandFolder = new SlashCommandBuilder()
-              .setName(commandName)
-              .setDescription("Nebula is a great bot");
-            
-            const subcommandFiles = getFiles(path.join(process.cwd(), "src", "commands", commandName));
-            for (const subcommandFile of subcommandFiles) {
-              const stats = fs.statSync(subcommandFile);
-              const subcommandName = subcommandFile.split("\\").join("/").split("/").slice(-1)[0];
-
-              if (stats.isDirectory()) {
-                const subcommandFolder = new SlashCommandSubcommandGroupBuilder()
-                  .setName(subcommandName)
-                  .setDescription("Nebula is a great bot");
-
-                const subcommandGroupFiles = getFiles(path.join(process.cwd(), "src", "commands", commandName, subcommandName));
-                for (const subcommandGroupFile of subcommandGroupFiles) {
-                  const subcommand = requireReload(subcommandGroupFile);
-                  const subcommandData = new (subcommand)(this.client, this).data;
-    
-                  subcommandFolder.options.push(subcommandData);
-                }
-                commandFolder.options.push(subcommandFolder);
-              }
-              if (stats.isFile()) {
-                const subcommand = requireReload(subcommandFile);
-                const subcommandData = new (subcommand)(this.client, this).data;
-  
-                commandFolder.options.push(subcommandData);
-              }
-            }
-            this.commands.push(commandFolder);
-          }
-          if (stats.isFile()) {
-            const command = requireReload(commandFile);
-            const commandData = new (command)(this.client, this).data;
-
-            this.commands.push(commandData);
-          }
+          this.commands.push(commandData);
+          continue;
         }
-        await this.client.application.commands.set(this.commands);
-        console.log(chalk.greenBright(`Commands? Registered.`));
-      } catch (error) {
-        if (error instanceof TypeError) console.error(chalk.redBright(`What is it? It's a command error! ${error.stack}`));
-        else throw error;
+          
+        const commandFolder = new SlashCommandBuilder()
+          .setName(commandName)
+          .setDescription("Nebula is a great bot");
+            
+        const subcommandFiles = getFiles(path.join(process.cwd(), "src", "commands", commandName));
+        for (const subcommandFile of subcommandFiles) {
+          const stats = fs.statSync(subcommandFile);
+          const subcommandName = subcommandFile.split("\\").join("/").split("/").slice(-1)[0];
+
+          if (stats.isFile()) {
+            const subcommand = requireReload(subcommandFile);
+            const subcommandData = new (subcommand)(this.client, this).data;
+
+            commandFolder.options.push(subcommandData);
+            continue;
+          }
+
+          const subcommandFolder = new SlashCommandSubcommandGroupBuilder()
+            .setName(subcommandName)
+            .setDescription("Nebula is a great bot");
+
+          const subcommandGroupFiles = getFiles(path.join(process.cwd(), "src", "commands", commandName, subcommandName));
+          for (const subcommandGroupFile of subcommandGroupFiles) {
+            const subcommand = requireReload(subcommandGroupFile);
+            const subcommandData = new (subcommand)(this.client, this).data;
+    
+            subcommandFolder.options.push(subcommandData);
+          }
+          commandFolder.options.push(subcommandFolder);      
+        }
+        this.commands.push(commandFolder);
       }
+      await this.client.application.commands.set(this.commands); // replace this.commands with [] in case you wanna remove commands
+      console.log(chalk.greenBright(`Commands? Registered.`));
     })();
   }
 }

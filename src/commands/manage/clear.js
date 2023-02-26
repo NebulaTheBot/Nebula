@@ -1,5 +1,7 @@
-const { EmbedBuilder, ChannelType, SlashCommandSubcommandBuilder } = require("discord.js");
-const { OWNER, ADMIN } = require("../../../config.json");
+const {
+  EmbedBuilder, ChannelType, SlashCommandSubcommandBuilder,
+  PermissionsBitField
+} = require("discord.js");
 const { getColor } = require("../../utils/misc");
 
 module.exports = class Clear {
@@ -22,7 +24,8 @@ module.exports = class Clear {
 
   run(interaction) {
     let errorEmbed = new EmbedBuilder().setColor(getColor(0));
-    if (interaction.user.id !== OWNER && !ADMIN.includes(interaction.user.id)) {
+    const member = interaction.member;
+    if (member.user.id !== member.guild.ownerId && !member.permissions.has(PermissionsBitField.Flags.Administrator)) {
       errorEmbed.setTitle("You don't have the permission to execute this command");
       return interaction.editReply({ embeds: [errorEmbed] });
     }
