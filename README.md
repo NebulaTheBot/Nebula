@@ -1,10 +1,10 @@
-<div style="display: grid;place-items: center;">
+<div align="center">
   <p>
     <img src="static/banner.svg" />
   </p>
   <p>
     <a href="https://discord.gg/7RdABJhQss"><img src="https://img.shields.io/discord/903852579837059113?color=5865F2&logo=discord&logoColor=white" /></a>
-    <a href="https://discord.com/api/oauth2/authorize?client_id=902220336249061467&permissions=8&scope=bot%20applications.commands"><img src="https://img.shields.io/badge/bot-Invite%20the%20bot%20here!-blue" /></a>
+    <a href="https://ptb.discord.com/api/oauth2/authorize?client_id=873918300726394960&permissions=8&scope=bot%20applications.commands"><img src="https://img.shields.io/badge/bot-Invite%20the%20bot%20here!-blue" /></a>
   </p>
 </div>
 
