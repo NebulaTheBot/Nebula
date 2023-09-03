@@ -16,7 +16,7 @@ steps:
   displayName: 'Install Node.js'
 
 - script: |
-    npm install && npm run build
+    npm install && tsc -b ./
   displayName: 'Installing packages and building'
   env:
     TOKEN: $(TOKEN)
