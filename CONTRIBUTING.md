@@ -24,8 +24,8 @@ We use MySQL for the database. You need to set one up to be able to run the bot.
 - Copy the `example.env` file and replace the content with your own credentials inside a file called `.env`.
 
 ### Running
-- Run `npm i` to install all the modules needed by the bot. 
-- Run `npm run start`
+- Run `bun i` to install all the modules needed by the bot. 
+- Run `bun start`
 
 Be sure to open a pull request when you're ready to push your changes. Be descriptive of the changes you've made.
 
