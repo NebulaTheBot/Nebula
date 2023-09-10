@@ -29,28 +29,31 @@ export default class News {
     const guild = interaction.guild;
     let page = interaction.options.getNumber("page") ?? 1;
 
-    const news = await newsletterTable?.get(`${guild.id}.news`).then(
-      (news: any) => news as any[] ?? []
-    ).catch(() => []);
+    const news = await newsletterTable
+      ?.get(`${guild.id}.news`)
+      .then(news => news as any[] ?? [])
+      .catch(() => []);
+
+    const newsSorted = (
+      Object.values(news).map((newsItem, i) => {
+        return {
+          id: Object.keys(news)[i],
+          ...newsItem
+        }
+      }) as any[]
+    )?.sort((a, b) => b.createdAt - a.createdAt);
+
     if (!news) return await interaction.followUp({
       embeds: [errorEmbed("No news found.\nAdmins can add news with the **/settings news add** command.")]
     });
 
-    const newsSorted = (Object.values(news).map((newsItem: any, i) => {
-      return {
-        id: Object.keys(news)[i],
-        ...newsItem
-      }
-    }) as any[])?.sort((a, b) => b.createdAt - a.createdAt);
     if (!newsSorted) return await interaction.followUp({
       embeds: [errorEmbed("No news found.\nAdmins can add news with the **/settings news add** command.")]
     });
 
-    if (newsSorted.length == 0) {
-      return await interaction.followUp({
-        embeds: [errorEmbed("No news found.\nAdmins can add news with the **/settings news add** command.")]
-      });
-    }
+    if (newsSorted.length == 0) return await interaction.followUp({
+      embeds: [errorEmbed("No news found.\nAdmins can add news with the **/settings news add** command.")]
+    });
 
     if (page > newsSorted.length) page = newsSorted.length;
     if (page < 1) page = 1;

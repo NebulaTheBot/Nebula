@@ -5,7 +5,7 @@ import { readdirSync } from "fs";
 import database, { getSettingsTable } from "../utils/database.js";
 import { QuickDB } from "quick.db";
 
-const COMMANDS_PATH = join(process.cwd(), "dist", "commands");
+const COMMANDS_PATH = join(process.cwd(), "src", "commands");
 export default class Commands {
   client: Client;
   commands: any[] = [];
@@ -26,18 +26,14 @@ export default class Commands {
 
     // Add the subcommands to the top command
     for (const subCommandFile of subCommandFiles) {
-      const subCommandName = subCommandFile.name.replaceAll(".js", "");
-      if (
-        disabledCommands?.find(
-          (command) => command?.split("/")?.[0] == name && command?.split("/")?.[1] == subCommandName
-        )
-      ) continue;
+      const subCommandName = subCommandFile.name.replaceAll(".ts", "");
+      if (disabledCommands?.find(
+        command => command?.split("/")?.[0] == name && command?.split("/")?.[1] == subCommandName
+      )) continue;
 
       if (subCommandFile.isFile()) {
         const subCommand = await import(pathToFileURL(join(COMMANDS_PATH, name, subCommandFile.name)).toString());
-        try {
-          command.addSubcommand(new subCommand.default().data);
-        } catch {}
+        command.addSubcommand(new subCommand.default().data);
         continue;
       }
 
@@ -49,14 +45,12 @@ export default class Commands {
 
       for (const subCommandGroupFile of subCommandGroupFiles) {
         if (!subCommandGroupFile.isFile()) continue;
-        if (
-          disabledCommands?.find(
-            (command) =>
-              command?.split("/")?.[0] == name &&
-              command?.split("/")?.[1] == subCommandFile.name.replaceAll(".js", "") &&
-              command?.split("/")?.[2] == subCommandGroupFile.name.replaceAll(".js", "")
-          )
-        ) continue;
+        if (disabledCommands?.find(
+          command =>
+            command?.split("/")?.[0] == name &&
+            command?.split("/")?.[1] == subCommandFile.name.replaceAll(".ts", "") &&
+            command?.split("/")?.[2] == subCommandGroupFile.name.replaceAll(".ts", "")
+        )) continue;
 
         const subCommand = await import(
           pathToFileURL(join(COMMANDS_PATH, name, subCommandFile.name, subCommandGroupFile.name)).toString()
@@ -75,7 +69,7 @@ export default class Commands {
 
     for (const commandFile of commandFiles) {
       const name = commandFile.name;
-      if (disabledCommands?.includes(name.replaceAll(".js", ""))) continue;
+      if (disabledCommands?.includes(name.replaceAll(".ts", ""))) continue;
 
       if (commandFile.isFile()) {
         // Add the commands it found to the list

@@ -1,7 +1,5 @@
-import { ColorResolvable, EmbedBuilder, TextChannel, type Message } from "discord.js";
-import Vibrant from "node-vibrant";
-import sharp from "sharp";
-import { genColor, genRGBColor } from "../utils/colorGen.js";
+import { EmbedBuilder, TextChannel, type Message } from "discord.js";
+import { genColor } from "../utils/colorGen.js";
 import database, { getLevelingTable, getSettingsTable } from "../utils/database.js";
 import { Reward } from "../commands/settings/leveling/rewards.js";
 
@@ -23,35 +21,22 @@ export default {
 
       if (message.author.bot) return;
 
-      const levelingEnabled = await settingsTable?.get(`${message.guild.id}.leveling.enabled`).then(
-        (enabled) => !!enabled
-      ).catch(() => false);
+      const levelingEnabled = await settingsTable
+        ?.get(`${message.guild.id}.leveling.enabled`)
+        .then(enabled => !!enabled)
+        .catch(() => false);
 
       if (!levelingEnabled) return;
 
       const { exp, levels } = await levelingTable?.get(`${message.guild.id}.${target.id}`).catch(() => {
-        return {
-          exp: 0,
-          levels: 0
-        };
+        return { exp: 0, levels: 0 };
       });
       const { exp: expGlobal, levels: levelsGlobal } = await levelingTable?.get(`global.${target.id}`).then(
-        (data) => {
-          if (!data) return {
-            exp: 0,
-            levels: 0
-          };
-          return {
-            exp: Number(data.exp),
-            levels: Number(data.levels)
-          };
+        data => {
+          if (!data) return { exp: 0, levels: 0 };
+          return { exp: Number(data.exp), levels: Number(data.levels) };
         }
-      ).catch(() => {
-        return {
-          exp: 0,
-          levels: 0
-        };
-      });
+      ).catch(() => { return { exp: 0, levels: 0 } });
 
       const expUntilLevelup = Math.floor(BASE_EXP_FOR_NEW_LEVEL * DIFFICULTY_MULTIPLIER * (levels + 1));
       const expUntilLevelupGlobal = Math.floor(BASE_EXP_FOR_NEW_LEVEL * DIFFICULTY_MULTIPLIER * (levelsGlobal + 1));
@@ -99,33 +84,19 @@ export default {
 
       // Level up embed
       const leveledEmbed = new EmbedBuilder()
+        .setAuthor({ name: target.displayName, iconURL: target.avatarURL() })
         .setTitle("⚡ • Level Up!")
         .setDescription([
           `**Congratulations <@${target.id}>**!`,
           `You made it to **level ${levels + 1}**`,
           `You need ${expUntilNextLevelup} exp to level up again.`
         ].join("\n"))
-        .setAuthor({
-          name: target.displayName,
-          url: target.avatarURL()
-        })
         .setThumbnail(target.avatarURL())
-        .setColor(genColor(200))
-        .setTimestamp();
-
-      // Get vibrant color
-      try {
-        const imageBuffer = await (await fetch(target.avatarURL())).arrayBuffer();
-        const image = sharp(imageBuffer).toFormat("jpg");
-        const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant;
-        leveledEmbed.setColor(genRGBColor(r, g, b) as ColorResolvable);
-      } catch { }
+        .setTimestamp()
+        .setColor(genColor(200));
 
       // Sending the level up
-      levelChannel.send({
-        embeds: [leveledEmbed],
-        content: `<@${target.id}>`
-      });
+      levelChannel.send({ embeds: [leveledEmbed], content: `<@${target.id}>` });
 
       // Checking if there is a level reward
       const levelRewards = await settingsTable?.get(`${message.guild.id}.leveling.rewards`).then(

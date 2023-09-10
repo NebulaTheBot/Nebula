@@ -5,7 +5,6 @@ import {
 } from "discord.js";
 import { getNewsTable } from "../../../utils/database.js";
 import { genColor } from "../../../utils/colorGen.js";
-import { v4 as uuidv4 } from "uuid";
 import errorEmbed from "../../../utils/embeds/errorEmbed.js";
 import sendSubscribedNews, { News } from "../../../utils/sendSubscribedNews.js";
 import sendChannelNews from "../../../utils/sendChannelNews.js";
@@ -95,7 +94,7 @@ export default class Add {
         return;
       }
 
-      const id = uuidv4();
+      const id = crypto.randomUUID();
       const news = {
         id,
         title,

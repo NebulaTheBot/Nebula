@@ -11,7 +11,6 @@ export default class Server {
 
   async run(interaction: ChatInputCommandInteraction) {
     const embed = await serverEmbed({ guild: interaction.guild, roles: true });
-    
     await interaction.followUp({ embeds: [embed] });
   }
 }

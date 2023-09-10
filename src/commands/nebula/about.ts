@@ -30,7 +30,7 @@ export default class About {
           value: [
             "**Head developer**: Goos",
             "**Developers**: Golem64, ThatBOI",
-            "**Designers**: Optix, ProJM, Slider_on_the_black, Fox",
+            "**Designers**: Optix, proJM, Slider_on_the_black",
             "**Translators**: Golem64, ThatBOI, Optix, Sungi, SaFire",
             "**And YOU, for using Nebula.**",
           ].join("\n")

@@ -48,7 +48,6 @@ function partition(sortItems: number[], corresponding: Corresponding, leftIndex:
  * @param rightIndex The right index of the sortItems array
  * @returns The sorted items and corresponding items
  */
-// Initialize the quicksort function
 export default function quickSort(
   sortItems: number[],
   corresponding: Corresponding,

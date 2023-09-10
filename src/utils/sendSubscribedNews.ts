@@ -18,7 +18,7 @@ export default async function sendSubscribedNews(guild: Guild, news: News) {
   const newsTable = await getNewsTable(db);
 
   const subscriptions = await newsTable.get(`${guild.id}.subscriptions`).then(
-    (subscriptions) => subscriptions as string[] ?? [] as string[]
+    subscriptions => subscriptions as string[] ?? [] as string[]
   ).catch(() => [] as string[]);
   const members = await guild.members.fetch();
   const subscribed = members.filter((member) => subscriptions.includes(member.id));

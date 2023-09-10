@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "noImplicitAny": false,
     "removeComments": true,
     "preserveConstEnums": true,
@@ -14,7 +14,8 @@
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "strict": false
+    "strict": false,
+    "types": ["bun-types"]
   },
-  "exclude": ["node_modules", "dist/**/*"],
+  "exclude": ["node_modules"],
 }

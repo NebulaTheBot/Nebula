@@ -1,7 +1,5 @@
-import { ColorResolvable, EmbedBuilder, type Guild } from "discord.js";
-import { genColor, genRGBColor } from "../colorGen.js";
-import Vibrant from "node-vibrant";
-import sharp from "sharp";
+import { EmbedBuilder, type Guild } from "discord.js";
+import { genColor } from "../colorGen.js";
 import database, { getServerboardTable } from "../database.js";
 
 type Options = {
@@ -32,10 +30,11 @@ export default async function serverEmbed(options: Options) {
 
   // Getting the invite table
   const showInvite = options.showInvite;
-  const serverbTable = await getServerboardTable(db);
-  const invite = await serverbTable?.get(`${guild.id}.invite`).then(
-    async (invite) => invite ? String(invite) : null
-  ).catch(() => null);
+  const serverTable = await getServerboardTable(db);
+  const invite = await serverTable
+    ?.get(`${guild.id}.invite`)
+    .then(async invite => invite ? String(invite) : null)
+    .catch(() => null);
 
   // Getting different types of members
   const members = guild.members.cache;
@@ -71,27 +70,12 @@ export default async function serverEmbed(options: Options) {
   if (showInvite && invite) generalValues.push(`**Invite link**: ${invite}`);
 
   const embed = new EmbedBuilder()
-    .setAuthor({
-      name: `${pages ? `#${page}  •  ` : ""}${guild.name}`,
-      url: showInvite && invite ? invite : null,
-      iconURL: iconURL
-    })
+    .setAuthor({ name: `${pages ? `#${page}  •  ` : ""}${guild.name}`, iconURL: iconURL })
     .setDescription(guild.description ? guild.description : null)
-    .setFields({
-      name: "📃 • General",
-      value: generalValues.join("\n")
-    })
+    .setFields({ name: "📃 • General", value: generalValues.join("\n") })
     .setFooter({ text: `Server ID: ${guild.id}${pages ? ` • Page ${page}/${pages}` : ""}` })
     .setThumbnail(iconURL)
     .setColor(genColor(200));
-
-  // Set the embed color
-  try {
-    const imageBuffer = await (await fetch(iconURL)).arrayBuffer(); // Stream the buffer
-    const image = sharp(imageBuffer).toFormat("jpg");
-    const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant; // Get the most vibrant color
-    embed.setColor(genRGBColor(r, g, b) as ColorResolvable);
-  } catch { }
 
   // Adding the fields
   if (options.roles) embed.addFields({
@@ -121,7 +105,7 @@ export default async function serverEmbed(options: Options) {
     {
       name: `🌟 • ${boostCount}${boostTier === 0 ? "/2" : boostTier === 1 ? "/7" : boostTier === 2 ? "/14" : ""} boosts`,
       value: [
-        boostTier == 0 ? "No boosts" : `Level ${boostTier}`,
+        boostTier == 0 ? "No level" : `Level ${boostTier}`,
         `${boosters.size} ${boosters.size === 1 ? "booster" : "boosters"}`
       ].join("\n"),
       inline: true

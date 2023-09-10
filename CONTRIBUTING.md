@@ -1,8 +1,8 @@
 # Nebula Contributing Guide
 
 ## Prerequisites
-- Basic knowledge of TypeScript and discord.js.
-- Node.js and MySQL installed.
+- Basic knowledge of [TypeScript](https://typescriptlang.org/) and [discord.js](https://discord.js.org/).
+- [Bun](https://bun.sh) and [MySQL](https://mysql.com/) installed.
 
 ## Get started with developing
 ### Getting the code

@@ -21,7 +21,7 @@ export default async function sendChannelNews(guild: Guild, news: News, id: stri
   const newsTable = await getNewsTable(db);
 
   const subscribedChannel = await newsTable.get(`${guild.id}.channel`).then(
-    (channel) => channel as { channelId: string | null, roleId: string | null }
+    channel => channel as { channelId: string | null, roleId: string | null }
   ).catch(() => {
     return {
       channelId: null as string | null,

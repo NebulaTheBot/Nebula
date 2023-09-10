@@ -1,12 +1,5 @@
-import {
-  ColorResolvable,
-  SlashCommandSubcommandBuilder,
-  EmbedBuilder,
-  type ChatInputCommandInteraction
-} from "discord.js";
-import { genColor, genRGBColor } from "../../utils/colorGen.js";
-import Vibrant from "node-vibrant";
-import sharp from "sharp";
+import { SlashCommandSubcommandBuilder, EmbedBuilder, type ChatInputCommandInteraction } from "discord.js";
+import { genColor } from "../../utils/colorGen.js";
 import { getLevelingTable, getSettingsTable } from "../../utils/database.js";
 import { BASE_EXP_FOR_NEW_LEVEL, DIFFICULTY_MULTIPLIER } from "../../events/leveling.js";
 import errorEmbed from "../../utils/embeds/errorEmbed.js";
@@ -39,38 +32,32 @@ export default class Level {
     const avatarURL = selectedMember.displayAvatarURL();
 
     const levelEnabled = await settingsTable?.get(`${guild.id}.leveling.enabled`).then(
-      (data) => {
+      data => {
         if (!data) return false;
         return Boolean(data);
       }
     ).catch(() => false);
-    if (!levelEnabled) {
-      return await interaction.followUp({
-        embeds: [errorEmbed("Leveling is disabled for this server.")]
-      });
-    }
+    if (!levelEnabled) return await interaction.followUp({
+      embeds: [errorEmbed("Leveling is disabled for this server.")]
+    });
 
     const { exp, levels } = await levelingTable?.get(`${guild.id}.${selectedMember.id}`).then(
-      (data) => {
+      data => {
         if (!data) return { exp: 0, level: 0 };
         return { exp: Number(data.exp), levels: Number(data.levels) };
       }
-    ).catch(() => {
-      return { exp: 0, levels: 0 };
-    });
+    ).catch(() => { return { exp: 0, levels: 0 } });
     const formattedExp = exp?.toLocaleString("en-US");
 
-    if (!exp && !levels) {
-      await levelingTable.set(`${guild.id}.${selectedMember.id}`, {
-        levels: 0,
-        exp: 0
-      });
-    }
+    if (!exp && !levels) await levelingTable.set(`${guild.id}.${selectedMember.id}`, {
+      levels: 0,
+      exp: 0
+    });
 
     let rewards = [];
     let nextReward = null;
     const levelRewards = await settingsTable?.get(`${interaction.guild.id}.leveling.rewards`).then(
-      (data) => {
+      data => {
         if (!data) return [] as Reward[] ?? [] as Reward[];
         return data as Reward[] ?? [] as Reward[];
       }
@@ -91,6 +78,7 @@ export default class Level {
     const expUntilLevelup = Math.floor(BASE_EXP_FOR_NEW_LEVEL * DIFFICULTY_MULTIPLIER * ((levels ?? 0) + 1));
     const formattedExpUntilLevelup = expUntilLevelup?.toLocaleString("en-US");
     const levelUpEmbed = new EmbedBuilder()
+      .setAuthor({ name: `•  ${selectedMember.user.username}`, iconURL: avatarURL })
       .setFields([
         {
           name: `⚡ • Level ${levels ?? 0}`,
@@ -102,26 +90,14 @@ export default class Level {
         {
           name: `🎁 • ${rewards.length} Rewards`,
           value: [
-            `${rewards.length > 0 ? rewards.map(reward => `<@&${reward.id}>`).join(" ") : "No rewards unlocked"
-            }`,
+            `${rewards.length > 0 ? rewards.map(reward => `<@&${reward.id}>`).join(" ") : "No rewards unlocked"}`,
             nextReward ? `**Upcoming reward**: <@&${nextReward.roleId}>` : "**Upcoming reward**: *Cricket, cricket, cricket* - Looks like you claimed everything!"
           ].join("\n")
         }
       ])
-      .setAuthor({
-        name: `•  ${selectedMember.user.username}`,
-        iconURL: avatarURL
-      })
       .setThumbnail(avatarURL)
-      .setColor(genColor(200))
-      .setTimestamp();
-
-    try {
-      const imageBuffer = await (await fetch(avatarURL)).arrayBuffer();
-      const image = sharp(imageBuffer).toFormat("jpg");
-      const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant;
-      levelUpEmbed.setColor(genRGBColor(r, g, b) as ColorResolvable);
-    } catch { }
+      .setTimestamp()
+      .setColor(genColor(200));
 
     await interaction.followUp({ embeds: [levelUpEmbed] });
   }

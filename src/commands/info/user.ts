@@ -1,12 +1,5 @@
-import {
-  ColorResolvable,
-  SlashCommandSubcommandBuilder,
-  EmbedBuilder,
-  type ChatInputCommandInteraction,
-} from "discord.js";
-import { genColor, genRGBColor } from "../../utils/colorGen.js";
-import Vibrant from "node-vibrant";
-import sharp from "sharp";
+import { SlashCommandSubcommandBuilder, EmbedBuilder, type ChatInputCommandInteraction } from "discord.js";
+import { genColor } from "../../utils/colorGen.js";
 
 export default class User {
   data: SlashCommandSubcommandBuilder;
@@ -14,7 +7,10 @@ export default class User {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("user")
       .setDescription("Shows your (or another user's) info.")
-      .addUserOption((option) => option.setName("user").setDescription("Select the user."));
+      .addUserOption(option => option
+        .setName("user")
+        .setDescription("Select the user.")
+      );
   }
 
   async run(interaction: ChatInputCommandInteraction) {
@@ -27,25 +23,22 @@ export default class User {
     const avatarURL = selectedMember.displayAvatarURL();
     const selectedUser = selectedMember.user;
 
-    // Sorting the roles
-    const guildRoles = guild.roles.cache.filter((role) => selectedMember.roles.cache.has(role.id));
+    const guildRoles = guild.roles.cache.filter(role => selectedMember.roles.cache.has(role.id));
     const memberRoles = [...guildRoles].sort((role1, role2) => role2[1].position - role1[1].position);
     memberRoles.pop();
     const rolesOrRole = memberRoles.length === 1 ? "role" : "roles";
 
     let embed = new EmbedBuilder()
       .setAuthor({
-        name: `•  ${selectedMember.nickname == null ? selectedUser.username : selectedMember.nickname}${selectedUser.discriminator == "0" ? "" : `#${selectedUser.discriminator}`
-          }`,
-        iconURL: avatarURL,
+        name: `•  ${selectedMember.nickname == null ? selectedUser.username : selectedMember.nickname}${selectedUser.discriminator == "0" ? "" : `#${selectedUser.discriminator}`}`,
+        iconURL: avatarURL
       })
       .setFields(
         {
           name: selectedUser.bot === false ? "👤 • User info" : "🤖 • Bot info",
           value: [
             `**Username**: ${selectedUser.username}`,
-            `**Display name**: ${selectedUser.displayName === selectedUser.username ? "*None*" : selectedUser.displayName
-            }`,
+            `**Display name**: ${selectedUser.displayName === selectedUser.username ? "*None*" : selectedUser.displayName}`,
             `**Created on** <t:${Math.round(selectedUser.createdAt.valueOf() / 1000)}:D>`,
           ].join("\n"),
         },
@@ -58,22 +51,13 @@ export default class User {
       .setThumbnail(avatarURL)
       .setColor(genColor(200));
 
-    try {
-      const imageBuffer = await (await fetch(avatarURL)).arrayBuffer();
-      const image = sharp(imageBuffer).toFormat("jpg");
-      const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant;
-      embed.setColor(genRGBColor(r, g, b) as ColorResolvable);
-    } catch { }
-
-    if (memberRoles.length != 0) {
-      embed.addFields({
-        name: `🎭 • ${guildRoles.filter((role) => selectedMember.roles.cache.has(role.id)).size - 1} ${rolesOrRole}`,
-        value: `${memberRoles
-          .slice(0, 5)
-          .map((role) => `<@&${role[1].id}>`)
-          .join(", ")}${memberRoles.length > 5 ? ` **and ${memberRoles.length - 5} more**` : ""}`,
-      });
-    }
+    if (memberRoles.length !== 0) embed.addFields({
+      name: `🎭 • ${guildRoles.filter(role => selectedMember.roles.cache.has(role.id)).size - 1} ${rolesOrRole}`,
+      value: `${memberRoles
+        .slice(0, 5)
+        .map(role => `<@&${role[1].id}>`)
+        .join(", ")}${memberRoles.length > 5 ? ` **and ${memberRoles.length - 5} more**` : ""}`,
+    });
 
     await interaction.followUp({ embeds: [embed] });
   }
