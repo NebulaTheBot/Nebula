@@ -6,7 +6,7 @@ import { genColor } from "../colorGen.js";
  * @param description Description of the error.
  * @returns Embed with the error description.
  */
-export default function errorEmbed(description: string) {
+export function errorEmbed(description: string) {
   return new EmbedBuilder()
     .setTitle("❌ • Error!")
     .setDescription(description)

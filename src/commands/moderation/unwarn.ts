@@ -4,7 +4,7 @@ import {
   ChannelType, Channel
 } from "discord.js";
 import { genColor } from "../../utils/colorGen.js";
-import errorEmbed from "../../utils/embeds/errorEmbed.js";
+import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
 import { QuickDB } from "quick.db";
 import { getModerationTable, getSettingsTable } from "../../utils/database.js";
 

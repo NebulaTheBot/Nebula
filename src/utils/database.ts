@@ -1,10 +1,10 @@
 import { QuickDB, MySQLDriver } from "quick.db";
 
-async function database() {
+export async function database() {
   const mysql = new MySQLDriver({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USERNAME,
-    port: Number(process.env.MYSQL_PORT),
+    port: parseInt(process.env.MYSQL_PORT),
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
     enableKeepAlive: true,
@@ -21,5 +21,3 @@ export const getLevelingTable = async (db: QuickDB<any>) => await db.tableAsync(
 export const getServerboardTable = async (db: QuickDB<any>) => await db.tableAsync("serverboard");
 export const getNewsTable = async (db: QuickDB<any>) => await db.tableAsync("news");
 export const getModerationTable = async (db: QuickDB<any>) => await db.tableAsync("moderation");
-
-export default database;

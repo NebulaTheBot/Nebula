@@ -3,9 +3,9 @@ import {
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen.js";
-import errorEmbed from "../../utils/embeds/errorEmbed.js";
 import { QuickDB } from "quick.db";
 import { getModerationTable } from "../../utils/database.js";
+import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
 
 type Warn = {
   id: number;
@@ -34,15 +34,15 @@ export default class Warns {
     const modTable = await getModerationTable(db);
 
     const user = interaction.options.getUser("user");
-    const members = interaction.guild.members.cache;
-    const member = members.get(interaction.member.user.id);
+    const member = interaction.guild.members.cache.get(interaction.member.user.id);
 
-    const warns = await modTable.get(`${interaction.guild.id}.${user.id}.warns`).then(
-      warns => {
+    const warns = await modTable
+      .get(`${interaction.guild.id}.${user.id}.warns`)
+      .then(warns => {
         if (!warns) return [] as Warn[];
         return warns as Warn[] ?? [] as Warn[];
-      }
-    ).catch(() => [] as Warn[]);
+      })
+      .catch(() => [] as Warn[]);
 
     const warnsEmbed = new EmbedBuilder()
       .setTitle(`✅ • Warns of ${user.username}`)
@@ -57,10 +57,7 @@ export default class Warns {
             ].join("\n"),
             inline: true,
           };
-        }) : [{
-          name: "No warns",
-          value: "This user has no warns."
-        }]
+        }) : [{ name: "No warns", value: "This user has no warns." }]
       )
       .setThumbnail(user.displayAvatarURL())
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })

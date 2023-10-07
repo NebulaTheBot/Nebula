@@ -4,8 +4,8 @@ import {
 } from "discord.js";
 import { genColor } from "../../utils/colorGen.js";
 import { getNewsTable } from "../../utils/database.js";
-import errorEmbed from "../../utils/embeds/errorEmbed.js";
 import { QuickDB } from "quick.db";
+import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
 
 type SubscriptionType = string[];
 
@@ -17,7 +17,7 @@ export default class Subscribe {
     this.db = db;
     this.data = new SlashCommandSubcommandBuilder()
       .setName("subscribe")
-      .setDescription("Subscribe to the news of the current server you're in.");
+      .setDescription("Subscribe to the news of this server.");
   }
 
   async run(interaction: ChatInputCommandInteraction) {
@@ -41,13 +41,11 @@ export default class Subscribe {
       embeds: [errorEmbed("You need to **enable DMs from server members** to subscribe to the news.")]
     });
 
-    const sendDms = await dmChannel?.send("You have updated the subscription status of \`" + guild.name + "\`.").catch(() => {});
-    if (!sendDms) {
-      await newsTable.pull(`${guild.id}.subscriptions`, user.id);
+    await dmChannel?.send("You have updated the subscription status of \`" + guild.name + "\`.").catch(async () => {
       return await interaction.followUp({
         embeds: [errorEmbed("You need to **enable DMs from server members** to subscribe to the news.")]
       });
-    }
+    });
 
     await newsTable[!hasSub ? "push" : "pull"](`${guild.id}.subscriptions`, user.id);
 

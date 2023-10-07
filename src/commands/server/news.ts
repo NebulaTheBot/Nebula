@@ -4,8 +4,8 @@ import {
 } from "discord.js";
 import { genColor } from "../../utils/colorGen.js";
 import { getNewsTable } from "../../utils/database.js";
-import errorEmbed from "../../utils/embeds/errorEmbed.js";
 import { QuickDB } from "quick.db";
+import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
 
 export default class News {
   data: SlashCommandSubcommandBuilder;
@@ -15,7 +15,7 @@ export default class News {
     this.db = db;
     this.data = new SlashCommandSubcommandBuilder()
       .setName("news")
-      .setDescription("The news of the current server you're in.")
+      .setDescription("The news of this server.")
       .addNumberOption(option => option
         .setName("page")
         .setDescription("The page of the news you want to see")
@@ -25,7 +25,6 @@ export default class News {
   async run(interaction: ChatInputCommandInteraction) {
     const db = this.db;
     const newsletterTable = await getNewsTable(db);
-
     const guild = interaction.guild;
     let page = interaction.options.getNumber("page") ?? 1;
 
@@ -98,15 +97,8 @@ export default class News {
         if (page > newsSorted.length) page = 1;
       }
 
-      currentNews = newsSorted[page - 1];
-      newsEmbed = new EmbedBuilder()
-        .setAuthor({ name: currentNews.author, iconURL: currentNews.authorPfp ?? null })
-        .setTitle(currentNews.title)
-        .setDescription(currentNews.body)
-        .setImage(currentNews.imageURL || null)
-        .setTimestamp(parseInt(currentNews.updatedAt))
-        .setFooter({ text: `Page ${page} of ${newsSorted.length} • ID: ${currentNews.id}` })
-        .setColor(genColor(200));
+      currentNews = currentNews;
+      newsEmbed = newsEmbed;
 
       await interaction.editReply({ embeds: [newsEmbed], components: [row] });
       await i.deferUpdate();

@@ -1,11 +1,11 @@
 import { SlashCommandSubcommandBuilder, type ChatInputCommandInteraction } from "discord.js";
-import serverEmbed from "../../utils/embeds/serverEmbed.js";
+import { serverEmbed } from "../../utils/embeds/serverEmbed.js";
 
-export default class Server {
+export default class ServerInfo {
   data: SlashCommandSubcommandBuilder;
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
-      .setName("server")
+      .setName("info")
       .setDescription("Shows this server's info.");
   }
 

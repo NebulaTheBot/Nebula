@@ -1,20 +1,13 @@
 import {
-  SlashCommandSubcommandBuilder,
-  EmbedBuilder,
-  PermissionsBitField,
-  type ChatInputCommandInteraction,
-  ModalBuilder,
-  TextInputBuilder,
-  ActionRowBuilder,
-  TextInputStyle,
-  TextChannel,
-  Message,
+  SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
+  ModalBuilder, TextInputBuilder, ActionRowBuilder,
+  TextInputStyle, TextChannel, Message,
+  type ChatInputCommandInteraction
 } from "discord.js";
 import { getNewsTable } from "../../../utils/database.js";
 import { genColor } from "../../../utils/colorGen.js";
-import errorEmbed from "../../../utils/embeds/errorEmbed.js";
-import sendSubscribedNewsletter, { News } from "../../../utils/sendSubscribedNews.js";
-import validateURL from "../../../utils/validateURL.js";
+import { errorEmbed } from "../../../utils/embeds/errorEmbed.js";
+import { sendSubscribedNews, News } from "../../../utils/sendSubscribedNews.js";
 import { QuickDB } from "quick.db";
 
 export default class Edit {
@@ -27,11 +20,10 @@ export default class Edit {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("edit")
       .setDescription("Edits new of your guild.")
-      .addStringOption((option) =>
-        option
-          .setName("id")
-          .setDescription("The ID of the news you want to edit.")
-          .setRequired(true)
+      .addStringOption(option => option
+        .setName("id")
+        .setDescription("The ID of the news you want to edit.")
+        .setRequired(true)
       );
   }
 
@@ -42,21 +34,22 @@ export default class Edit {
     const user = interaction.user;
     const guild = interaction.guild;
     const id = interaction.options.getString("id", true).trim();
-    const news = await newsTable?.get(`${guild.id}.news.${id}`).then(
-      (news) => news as News
-    ).catch(() => null as News | null);
+    const news = await newsTable
+      ?.get(`${guild.id}.news.${id}`)
+      .then(news => news as News)
+      .catch(() => null as News | null);
 
-    if (!news) return await interaction.followUp({ embeds: [errorEmbed("The specified news doesn't exist.")] });
+    if (!news) return await interaction.followUp({
+      embeds: [errorEmbed("The specified news doesn't exist.")]
+    });
 
     const author = user.displayName ?? user.username;
     const timestamp = Date.now().toString();
     const member = guild.members.cache.get(user.id);
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
-      return await interaction.followUp({
-        embeds: [errorEmbed("You need **Manage Server** permissions to add news.")],
-      });
-    }
+    if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild))  return await interaction.followUp({
+      embeds: [errorEmbed("You need **Manage Server** permissions to add news.")],
+    });
 
     const editModal = new ModalBuilder()
       .setCustomId("editnews")
@@ -94,9 +87,7 @@ export default class Edit {
     const thirdActionRow = new ActionRowBuilder().addComponents(imageURLInput) as ActionRowBuilder<TextInputBuilder>;
 
     editModal.addComponents(firstActionRow, secondActionRow, thirdActionRow);
-    await interaction.showModal(editModal).catch((err) => {
-      console.error(err);
-    });
+    await interaction.showModal(editModal).catch(err => console.error(err));
 
     interaction.client.once("interactionCreate", async (interaction) => {
       if (!interaction.isModalSubmit()) return;
@@ -105,10 +96,8 @@ export default class Edit {
       const title = interaction.fields.getTextInputValue("title") as string;
       const body = interaction.fields.getTextInputValue("body") as string;
       const imageURL = interaction.fields.getTextInputValue("imageurl") as string | undefined;
-      let validURL = false;
-      if (imageURL) validURL = validateURL(imageURL);
 
-      if (!validURL && imageURL) {
+      if (imageURL) {
         await interaction.reply({
           embeds: [errorEmbed("The image URL you provided is invalid.")],
         });
@@ -125,12 +114,8 @@ export default class Edit {
         updatedAt: timestamp
       };
 
-      sendSubscribedNewsletter(guild, {
-        ...newNews,
-        title: `Updated: ${newNews.title}`,
-      } as News).catch((err) => {
-        console.error(err);
-      });
+      sendSubscribedNews(guild, {...newNews, title: `Updated: ${newNews.title}`} as News)
+        .catch(err => console.error(err));
 
       const newsEmbed = new EmbedBuilder()
         .setAuthor({ name: newNews.author, iconURL: newNews.authorPfp ?? null })
@@ -141,15 +126,14 @@ export default class Edit {
         .setFooter({ text: `Updated news from ${guild.name}` })
         .setColor(genColor(200));
 
-      const subscribedNewsChannel = await newsTable?.get(`${guild.id}.channel`).then(
-        (channel) => channel as { channelId: string; roleId: string } | null
-      ).catch(() => {
-        return {
-          channelId: null as string | null,
-          roleId: null as string | null
-        };
-      });
-      if (Boolean(subscribedNewsChannel.channelId)) {
+      const subscribedNewsChannel = await newsTable
+        ?.get(`${guild.id}.channel`)
+        .then(channel => channel as { channelId: string; roleId: string } | null)
+        .catch(() => {
+          return { channelId: null as string | null, roleId: null as string | null };
+        });
+
+      if (subscribedNewsChannel.channelId) {
         const messageId = newNews?.messageId;
         const newsChannel = (await guild.channels.fetch(subscribedNewsChannel?.channelId ?? "").catch(() => { })) as TextChannel | null;
 

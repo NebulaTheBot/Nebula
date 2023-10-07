@@ -1,8 +1,11 @@
-import { SlashCommandBuilder, SlashCommandSubcommandGroupBuilder, Guild, type Client } from "discord.js";
+import {
+  SlashCommandBuilder, SlashCommandSubcommandGroupBuilder, Guild,
+  type Client 
+} from "discord.js";
 import { pathToFileURL } from "url";
 import { join } from "path";
 import { readdirSync } from "fs";
-import database, { getSettingsTable } from "../utils/database.js";
+import { database, getSettingsTable } from "../utils/database.js";
 import { QuickDB } from "quick.db";
 
 const COMMANDS_PATH = join(process.cwd(), "src", "commands");
@@ -42,14 +45,12 @@ export default class Commands {
         .setDescription("This subcommand group has no description.");
 
       const subCommandGroupFiles = readdirSync(join(COMMANDS_PATH, name, subCommandFile.name), { withFileTypes: true });
-
       for (const subCommandGroupFile of subCommandGroupFiles) {
         if (!subCommandGroupFile.isFile()) continue;
-        if (disabledCommands?.find(
-          command =>
-            command?.split("/")?.[0] == name &&
-            command?.split("/")?.[1] == subCommandFile.name.replaceAll(".ts", "") &&
-            command?.split("/")?.[2] == subCommandGroupFile.name.replaceAll(".ts", "")
+        if (disabledCommands?.find(command =>
+          command?.split("/")?.[0] == name &&
+          command?.split("/")?.[1] == subCommandFile.name.replaceAll(".ts", "") &&
+          command?.split("/")?.[2] == subCommandGroupFile.name.replaceAll(".ts", "")
         )) continue;
 
         const subCommand = await import(
@@ -101,9 +102,11 @@ export default class Commands {
     // Adding the commands to the guilds
     console.log("Adding commands to guilds...");
     for (const guildID of guilds.keys()) {
-      const disabledCommands = await settingsTable?.get(`${guildID}.disabledCommands`).then(
-        (disabledCommands: string[]) => disabledCommands as string[] ?? [] as string[]
-      ).catch(() => [] as string[]);
+      const disabledCommands = await settingsTable
+        ?.get(`${guildID}.disabledCommands`)
+        .then((disabledCommands: string[]) => disabledCommands as string[] ?? [] as string[])
+        .catch(() => [] as string[]);
+
       if (disabledCommands.length > 0) await this.loadCommands(...disabledCommands);
       await guilds.get(guildID)?.commands.set(this.commands);
     }

@@ -1,4 +1,5 @@
 import { Client, ActivityType } from "discord.js";
+import { start } from "./webserver/server.js";
 import Commands from "./handlers/commands.js";
 import Events from "./handlers/events.js";
 
@@ -17,9 +18,10 @@ const client = new Client({
 });
 
 client.on("ready", async () => {
+  start(client);
   new Events(client);
   await new Commands(client).registerCommands();
   console.log("ちーっす！");
 });
 
-client.login(process.env.TOKEN);
+client.login(process.env.ANOTHER_TOKEN);

@@ -5,7 +5,7 @@ import {
 } from "discord.js";
 import ms from "ms";
 import { genColor } from "../../utils/colorGen.js";
-import errorEmbed from "../../utils/embeds/errorEmbed.js";
+import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
 import { getSettingsTable } from "../../utils/database.js";
 import { QuickDB } from "quick.db";
 

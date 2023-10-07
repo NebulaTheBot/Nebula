@@ -4,7 +4,7 @@ import {
   Channel
 } from "discord.js";
 import { genColor } from "../../utils/colorGen.js";
-import errorEmbed from "../../utils/embeds/errorEmbed.js";
+import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
 import { getSettingsTable } from "../../utils/database.js";
 import { QuickDB } from "quick.db";
 
@@ -17,14 +17,15 @@ export default class Purge {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("purge")
       .setDescription("Purges messages.")
-      .addNumberOption((number) =>
-        number.setName("amount").setDescription("The amount of messages that you want to purge.").setRequired(true)
+      .addNumberOption(number => number
+        .setName("amount")
+        .setDescription("The amount of messages that you want to purge.")
+        .setRequired(true)
       )
-      .addChannelOption((channel) =>
-        channel
-          .setName("channel")
-          .setDescription("The channel that you want to purge (if not the current channel)")
-          .addChannelTypes(ChannelType.GuildText, ChannelType.PublicThread, ChannelType.PrivateThread)
+      .addChannelOption(channel => channel
+        .setName("channel")
+        .setDescription("The channel that you want to purge (if not the current channel)")
+        .addChannelTypes(ChannelType.GuildText, ChannelType.PublicThread, ChannelType.PrivateThread)
       );
   }
 

@@ -8,7 +8,7 @@ export default {
   event: class MessageCreate {
     async run(message: Message) {
       if (message.author.bot) return;
-      if (message.guildId !== "903852579837059113" && message.guildId !== "986268144446341142") return;
+      if (message.guildId !== "903852579837059113") return;
       const eventsPath = join(process.cwd(), "src", "events", "easterEggs");
 
       for (const easterEggFile of readdirSync(eventsPath)) {
@@ -16,5 +16,5 @@ export default {
         new msg.default().run(message, ...message.content);
       }
     }
-  },
+  }
 };

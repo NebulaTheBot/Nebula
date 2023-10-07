@@ -3,7 +3,7 @@ import {
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../../utils/colorGen.js";
-import errorEmbed from "../../../utils/embeds/errorEmbed.js";
+import { errorEmbed } from "../../../utils/embeds/errorEmbed.js";
 import { getServerboardTable } from "../../../utils/database.js";
 import { QuickDB } from "quick.db";
 
@@ -26,24 +26,22 @@ export default class Toggle {
     const guild = interaction.guild;
     const member = guild.members.cache.get(interaction.user.id);
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild))
-      return await interaction.followUp({ embeds: [errorEmbed("You need **Manage Server** permissions to add an invite.")] });
+    if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return await interaction.followUp({
+      embeds: [errorEmbed("You need **Manage Server** permissions to add an invite.")]
+    });
 
-    const invite = await serverbTable?.get(`${guild.id}.invite`).then(
-      (invite) => String(invite)
-    ).catch(() => "");
-    if (Boolean(invite)) {
+    const invite = await serverbTable
+      ?.get(`${guild.id}.invite`)
+      .then(invite => String(invite))
+      .catch(() => "");
+
+    if (invite) {
       // Delete invite
       let invites = await rulesChannel?.fetchInvites();
       if (!rulesChannel) invites = await guild.invites.fetch();
-
-      if (invite) {
-        await invites.find(inv => inv.url == invite)
-          .delete("Serverboard invite disabled");
-      }
+      if (invite) await invites.find(inv => inv.url === invite).delete("Serverboard invite disabled");
 
       await serverbTable.delete(`${guild.id}.invite`);
-
       const embed = new EmbedBuilder()
         .setTitle("✅ • Invite deleted!")
         .setColor(genColor(100));
@@ -51,13 +49,11 @@ export default class Toggle {
       return await interaction.followUp({ embeds: [embed] });
     }
 
-    if (!rulesChannel) return await interaction.followUp({ embeds: [errorEmbed("You need a **rules channel** to create an invite.")] });
-
-    const newInvite = await rulesChannel.createInvite({
-      maxAge: 0,
-      maxUses: 0,
-      reason: "Serverboard invite enabled"
+    if (!rulesChannel) return await interaction.followUp({
+      embeds: [errorEmbed("You need a **rules channel** to create an invite.")]
     });
+
+    const newInvite = await rulesChannel.createInvite({ maxAge: 0, maxUses: 0, reason: "Serverboard invite enabled" });
     await serverbTable.set(`${guild.id}.invite`, newInvite.url);
 
     const embed = new EmbedBuilder()

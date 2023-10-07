@@ -1,11 +1,9 @@
 import {
-  SlashCommandSubcommandBuilder,
-  EmbedBuilder,
-  PermissionsBitField,
-  type ChatInputCommandInteraction,
+  SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
+  type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../../utils/colorGen.js";
-import errorEmbed from "../../../utils/embeds/errorEmbed.js";
+import { errorEmbed } from "../../../utils/embeds/errorEmbed.js";
 import { QuickDB } from "quick.db";
 import { getSettingsTable } from "../../../utils/database.js";
 
@@ -23,13 +21,11 @@ export default class List {
   async run(interaction: ChatInputCommandInteraction) {
     const db = this.db;
     const settingsTable = await getSettingsTable(db);
-
     const member = interaction.guild.members.cache.get(interaction.user.id);
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild))
-      return await interaction.followUp({
-        embeds: [errorEmbed("You need **Manage Server** permissions to list commands.")],
-      });
+    if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return await interaction.followUp({
+      embeds: [errorEmbed("You need **Manage Server** permissions to list commands.")],
+    });
 
     const disabledCommands = await settingsTable
       ?.get(`${interaction.guild.id}.disabledCommands`)
@@ -42,7 +38,7 @@ export default class List {
         !disabledCommands || disabledCommands?.length == 0
           ? "There are no disabled commands."
           : disabledCommands
-            .map((command) => {
+            .map(command => {
               const [commandName, subcommandName] = command.split("/");
               return `/${commandName}${subcommandName ? ` ${subcommandName}` : ""}`;
             })

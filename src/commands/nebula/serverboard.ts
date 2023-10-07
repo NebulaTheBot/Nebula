@@ -4,10 +4,10 @@ import {
   CacheType, StringSelectMenuInteraction, UserSelectMenuInteraction,
   RoleSelectMenuInteraction, MentionableSelectMenuInteraction, ChannelSelectMenuInteraction
 } from "discord.js";
-import quickSort from "../../utils/quickSort.js";
-import serverEmbed from "../../utils/embeds/serverEmbed.js";
-import database, { getNewsTable, getServerboardTable } from "../../utils/database.js";
-import errorEmbed from "../../utils/embeds/errorEmbed.js";
+import { quickSort } from "../../utils/quickSort.js";
+import { serverEmbed } from "../../utils/embeds/serverEmbed.js";
+import { database, getNewsTable, getServerboardTable } from "../../utils/database.js";
+import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
 import { QuickDB } from "quick.db";
 
 export default class Serverboard {
@@ -37,7 +37,7 @@ export default class Serverboard {
     const shownGuilds = (await serverbTable.all().catch(() => [])) as any[];
     for (const guild of guilds.values()) {
       const shownVal = shownGuilds?.find(shown => shown?.id == guild.id)?.value?.shown;
-      const isShown = shownVal == null ? null : Boolean(shownVal);
+      const isShown = shownVal == null ? null : shownVal;
       const isCommunity = guild?.rulesChannelId != null;
 
       if (isShown == false) continue;

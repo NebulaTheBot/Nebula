@@ -1,11 +1,16 @@
-import { SlashCommandSubcommandBuilder, EmbedBuilder, type ChatInputCommandInteraction } from "discord.js";
-import { genColor } from "../../utils/colorGen.js";
+import {
+  SlashCommandSubcommandBuilder, EmbedBuilder, ColorResolvable,
+  type ChatInputCommandInteraction
+} from "discord.js";
+import { genColor, genRGBColor } from "../../utils/colorGen.js";
+// import Vibrant from "node-vibrant";
+// import sharp from "sharp";
 
-export default class User {
+export default class UserInfo {
   data: SlashCommandSubcommandBuilder;
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
-      .setName("user")
+      .setName("info")
       .setDescription("Shows your (or another user's) info.")
       .addUserOption(option => option
         .setName("user")
@@ -50,6 +55,13 @@ export default class User {
       .setFooter({ text: `User ID: ${selectedMember.id}` })
       .setThumbnail(avatarURL)
       .setColor(genColor(200));
+
+    // try {
+    //   const imageBuffer = await (await fetch(avatarURL)).arrayBuffer();
+    //   const image = sharp(imageBuffer).toFormat("jpg");
+    //   const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant;
+    //   embed.setColor(genRGBColor(r, g, b) as ColorResolvable);
+    // } catch { }
 
     if (memberRoles.length !== 0) embed.addFields({
       name: `🎭 • ${guildRoles.filter(role => selectedMember.roles.cache.has(role.id)).size - 1} ${rolesOrRole}`,

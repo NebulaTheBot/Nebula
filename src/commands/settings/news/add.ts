@@ -1,14 +1,13 @@
 import {
   SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
-  type ChatInputCommandInteraction, ModalBuilder, TextInputBuilder,
-  ActionRowBuilder, TextInputStyle
+  ModalBuilder, TextInputBuilder, ActionRowBuilder,
+  TextInputStyle, type ChatInputCommandInteraction
 } from "discord.js";
 import { getNewsTable } from "../../../utils/database.js";
 import { genColor } from "../../../utils/colorGen.js";
-import errorEmbed from "../../../utils/embeds/errorEmbed.js";
-import sendSubscribedNews, { News } from "../../../utils/sendSubscribedNews.js";
-import sendChannelNews from "../../../utils/sendChannelNews.js";
-import validateURL from "../../../utils/validateURL.js";
+import { errorEmbed } from "../../../utils/embeds/errorEmbed.js";
+import { sendSubscribedNews, News } from "../../../utils/sendSubscribedNews.js";
+import { sendChannelNews } from "../../../utils/sendChannelNews.js";
 import { QuickDB } from "quick.db";
 
 export default class Add {
@@ -29,16 +28,13 @@ export default class Add {
 
     const user = interaction.user;
     const guild = interaction.guild;
-
     const author = user.displayName ?? user.username;
     const timestamp = Date.now().toString();
     const member = guild.members.cache.get(user.id);
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
-      return await interaction.reply({
-        embeds: [errorEmbed("You need **Manage Server** permissions to add news.")],
-      });
-    }
+    if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return await interaction.reply({
+      embeds: [errorEmbed("You need **Manage Server** permissions to add news.")],
+    });
 
     const newsModal = new ModalBuilder()
       .setCustomId("addnews")
@@ -73,21 +69,17 @@ export default class Add {
     const thirdActionRow = new ActionRowBuilder().addComponents(imageURLInput) as ActionRowBuilder<TextInputBuilder>;
 
     newsModal.addComponents(firstActionRow, secondActionRow, thirdActionRow);
-    await interaction.showModal(newsModal).catch((err) => {
-      console.error(err);
-    });
+    await interaction.showModal(newsModal).catch(err => console.error(err));
 
-    interaction.client.once("interactionCreate", async (interaction) => {
+    interaction.client.once("interactionCreate", async interaction => {
       if (!interaction.isModalSubmit()) return;
       if (interaction.customId !== "addnews") return;
 
       const title = interaction.fields.getTextInputValue("title") as string;
       const body = interaction.fields.getTextInputValue("body") as string;
       const imageURL = interaction.fields.getTextInputValue("imageurl") as string | undefined;
-      let validURL = false;
-      if (imageURL) validURL = validateURL(imageURL);
 
-      if (!validURL && imageURL) {
+      if (imageURL) {
         await interaction.reply({
           embeds: [errorEmbed("The image URL you provided is invalid.")],
         });
@@ -107,12 +99,8 @@ export default class Add {
         messageId: null
       };
 
-      sendSubscribedNews(interaction.guild, news as News).catch((err) => {
-        console.error(err);
-      });
-      sendChannelNews(interaction.guild, news as News, id).catch((err) => {
-        console.error(err);
-      });
+      sendSubscribedNews(interaction.guild, news as News).catch(err => console.error(err));
+      sendChannelNews(interaction.guild, news as News, id).catch(err => console.error(err));
 
       const embed = new EmbedBuilder()
         .setTitle("✅ • News sent!")

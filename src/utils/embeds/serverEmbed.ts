@@ -1,6 +1,6 @@
 import { EmbedBuilder, type Guild } from "discord.js";
 import { genColor } from "../colorGen.js";
-import database, { getServerboardTable } from "../database.js";
+import { database, getServerboardTable } from "../database.js";
 
 type Options = {
   guild: Guild
@@ -17,9 +17,8 @@ type Options = {
  * @param options Options of the embed.
  * @returns Embed that contains the guild info.
  */
-export default async function serverEmbed(options: Options) {
+export async function serverEmbed(options: Options) {
   const db = await database();
-
   const page = options.page;
   const pages = options.pages;
 
@@ -43,15 +42,12 @@ export default async function serverEmbed(options: Options) {
   const bots = members.filter(member => member.user.bot);
 
   // Formatting numbers to the American comma format
-  const formattedMemberCount = guild.memberCount?.toLocaleString("en-US");
-  const formattedOnlineMembers = onlineMembers?.toLocaleString("en-US");
   const formattedUserCount = (guild.memberCount - bots.size)?.toLocaleString("en-US");
-  const formattedBotCount = bots.size?.toLocaleString("en-US");
 
   // Sorting the roles
   const roles = guild.roles.cache;
-  const rolesSorted = [...roles].sort((role1, role2) => role2[1].position - role1[1].position);
-  rolesSorted.pop();
+  const sortedRoles = [...roles].sort((role1, role2) => role2[1].position - role1[1].position);
+  sortedRoles.pop();
 
   // Organising the channel sizes
   const channels = guild.channels.cache;
@@ -59,13 +55,13 @@ export default async function serverEmbed(options: Options) {
     text: channels.filter(channel => channel.type === 0 || channel.type === 15 || channel.type === 5).size,
     voice: channels.filter(channel => channel.type === 2 || channel.type === 13).size,
     categories: channels.filter(channel => channel.type === 4).size
-  }
+  };
 
   // Create the embed
   const generalValues = [
     `**Owner**: <@${guild.ownerId}>`,
-    `**Created on** <t:${Math.round(guild.createdAt.valueOf() / 1000)}:D>`,
-  ]
+    `**Created on** <t:${Math.round(guild.createdAt.valueOf() / 1000)}:D>`
+  ];
   if (options.showSubs) generalValues.push(`**Subscribers**: ${options.subs}`);
   if (showInvite && invite) generalValues.push(`**Invite link**: ${invite}`);
 
@@ -82,15 +78,15 @@ export default async function serverEmbed(options: Options) {
     name: `🎭 • ${roles.size - 1} ${roles.size === 1 ? "role" : "roles"}`,
     value: roles.size === 1
       ? "*None*"
-      : `${rolesSorted.slice(0, 5).map(role => `<@&${role[0]}>`).join(", ")}${roles.size > 5 ? ` **and ${roles.size - 5} more**` : ""}`
+      : `${sortedRoles.slice(0, 5).map(role => `<@&${role[0]}>`).join(", ")}${roles.size > 5 ? ` **and ${roles.size - 5} more**` : ""}`
   })
 
   embed.addFields(
     {
-      name: `👥 • ${formattedMemberCount} members`,
+      name: `👥 • ${guild.memberCount?.toLocaleString("en-US")} members`,
       value: [
-        `${formattedUserCount} users • ${formattedBotCount} bots`,
-        `${formattedOnlineMembers} online`
+        `${formattedUserCount} users • ${bots.size?.toLocaleString("en-US")} bots`,
+        `${onlineMembers?.toLocaleString("en-US")} online`
       ].join("\n"),
       inline: true
     },

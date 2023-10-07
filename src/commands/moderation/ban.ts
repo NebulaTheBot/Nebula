@@ -3,7 +3,7 @@ import {
   type ChatInputCommandInteraction, TextChannel, DMChannel
 } from "discord.js";
 import { genColor } from "../../utils/colorGen.js";
-import errorEmbed from "../../utils/embeds/errorEmbed.js";
+import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
 import { QuickDB } from "quick.db";
 import { getSettingsTable } from "../../utils/database.js";
 
