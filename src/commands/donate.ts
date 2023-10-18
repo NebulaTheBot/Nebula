@@ -1,8 +1,10 @@
 import { SlashCommandSubcommandBuilder, EmbedBuilder, type ChatInputCommandInteraction } from "discord.js";
-import { genColor } from "../../utils/colorGen.js";
+import { genColor } from "../utils/colorGen.js";
 
 export default class Donate {
   data: SlashCommandSubcommandBuilder;
+  deferred: boolean = false;
+
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("donate")
@@ -28,6 +30,6 @@ export default class Donate {
       .setThumbnail(interaction.client.user.avatarURL())
       .setColor(genColor(270));
 
-    await interaction.followUp({ embeds: [donationEmbed] });
+    await interaction.reply({ embeds: [donationEmbed] });
   }
 }

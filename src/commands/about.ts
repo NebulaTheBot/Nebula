@@ -1,9 +1,11 @@
 import { SlashCommandSubcommandBuilder, EmbedBuilder, type ChatInputCommandInteraction } from "discord.js";
-import { genColor } from "../../utils/colorGen.js";
-import { randomise } from "../../utils/randomise.js";
+import { genColor } from "../utils/colorGen.js";
+import { randomise } from "../utils/randomise.js";
 
 export default class About {
   data: SlashCommandSubcommandBuilder;
+  deferred: boolean = false;
+
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("about")
@@ -12,19 +14,20 @@ export default class About {
 
   async run(interaction: ChatInputCommandInteraction) {
     const client = interaction.client;
+    const guilds = client.guilds.cache;
     const members = client.users.cache.filter(user => !user.bot).size;
-    const guilds = client.guilds.cache.size;
+    const shards = client.shard.count;
     const hearts = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
 
     const embed = new EmbedBuilder()
-      .setAuthor({ name: `•  About`, iconURL: client.user.displayAvatarURL() })
+      .setAuthor({ name: "•  About", iconURL: client.user.displayAvatarURL() })
       .setDescription("Nebula is a multiplatform, multipurpose bot with the ability to add extensions to have additional features.")
       .setFields(
         {
           name: "📃 • General",
           value: [
             "**Version** 0.1-alpha.1",
-            `**${members}** members • **${guilds}** guild • **${client.shard.count}** shard`
+            `**${members}** member${members === 1 ? "" : "s"} • **${guilds.size}** guild${guilds.size === 1 ? "" : "s"} • **${shards}** shard${shards === 1 ? "" : "s"}`
           ].join("\n")
         },
         {
@@ -34,7 +37,7 @@ export default class About {
             "**Developers**: Golem64, ThatBOI",
             "**Designers**: ArtyH, Optix, proJM, Slider_on_the_black",
             "**Translators**: Candel, Dimkauzh, Golem64, Optix, Sungi, SaFire, ThatBOI",
-            "**And YOU, for using Nebula.**"
+            "And **YOU**, for using Nebula."
           ].join("\n")
         }
       )
@@ -42,6 +45,6 @@ export default class About {
       .setThumbnail(client.user.displayAvatarURL())
       .setColor(genColor(270));
 
-    await interaction.followUp({ embeds: [embed] });
+    await interaction.reply({ embeds: [embed] });
   }
 }

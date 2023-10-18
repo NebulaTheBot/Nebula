@@ -3,8 +3,8 @@ import {
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor, genRGBColor } from "../../utils/colorGen.js";
-// import Vibrant from "node-vibrant";
-// import sharp from "sharp";
+import Vibrant from "node-vibrant";
+import sharp from "sharp";
 
 export default class UserInfo {
   data: SlashCommandSubcommandBuilder;
@@ -56,12 +56,12 @@ export default class UserInfo {
       .setThumbnail(avatarURL)
       .setColor(genColor(200));
 
-    // try {
-    //   const imageBuffer = await (await fetch(avatarURL)).arrayBuffer();
-    //   const image = sharp(imageBuffer).toFormat("jpg");
-    //   const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant;
-    //   embed.setColor(genRGBColor(r, g, b) as ColorResolvable);
-    // } catch { }
+    try {
+      const imageBuffer = await (await fetch(avatarURL)).arrayBuffer();
+      const image = sharp(imageBuffer).toFormat("jpg");
+      const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant;
+      embed.setColor(genRGBColor(r, g, b) as ColorResolvable);
+    } catch { }
 
     if (memberRoles.length !== 0) embed.addFields({
       name: `🎭 • ${guildRoles.filter(role => selectedMember.roles.cache.has(role.id)).size - 1} ${rolesOrRole}`,

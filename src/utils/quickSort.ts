@@ -1,5 +1,22 @@
 type Corresponding = [...any[]] | null;
 
+function swap(sortItems: number[], corresponding: Corresponding, leftIndex: number, rightIndex: number) {
+  let temp = sortItems[leftIndex];
+  sortItems[leftIndex] = sortItems[rightIndex];
+  sortItems[rightIndex] = temp;
+
+  if (!corresponding) return;
+  for (let i = 0; i < corresponding.length; i++) {
+    let subArray = corresponding[i];
+
+    if (Array.isArray(subArray)) {
+      let tempValue = subArray[leftIndex];
+      subArray[leftIndex] = subArray[rightIndex];
+      subArray[rightIndex] = tempValue;
+    }
+  }
+}
+
 /**
  * Sorts an array of items and returns the sorted items and corresponding items
  * @param sortItems The items to sort
@@ -14,7 +31,7 @@ export function quickSort(
   leftIndex: number,
   rightIndex: number
 ): [number[], Corresponding] {
-  let pivot = sortItems[Math.floor((rightIndex + leftIndex) / 2)]; // middle element
+  let pivot = sortItems[Math.floor((rightIndex + leftIndex) / 2)];
   let leftPointer = leftIndex;
   let rightPointer = rightIndex;
 
@@ -23,21 +40,7 @@ export function quickSort(
     while (sortItems[rightPointer] > pivot) rightPointer--;
 
     if (leftPointer <= rightPointer) {
-      let temp = sortItems[leftIndex];
-      sortItems[leftIndex] = sortItems[rightIndex];
-      sortItems[rightIndex] = temp;
-
-      if (!corresponding) return;
-      for (let i = 0; i < corresponding.length; i++) {
-        let subArray = corresponding[i];
-
-        if (Array.isArray(subArray)) {
-          let tempValue = subArray[leftIndex];
-          subArray[leftIndex] = subArray[rightIndex];
-          subArray[rightIndex] = tempValue;
-        }
-      }
-
+      swap(sortItems, corresponding, leftPointer, rightPointer);
       leftPointer++;
       rightPointer--;
     }

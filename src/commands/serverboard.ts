@@ -4,10 +4,10 @@ import {
   CacheType, StringSelectMenuInteraction, UserSelectMenuInteraction,
   RoleSelectMenuInteraction, MentionableSelectMenuInteraction, ChannelSelectMenuInteraction
 } from "discord.js";
-import { quickSort } from "../../utils/quickSort.js";
-import { serverEmbed } from "../../utils/embeds/serverEmbed.js";
-import { database, getNewsTable, getServerboardTable } from "../../utils/database.js";
-import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
+import { quickSort } from "../utils/quickSort.js";
+import { serverEmbed } from "../utils/embeds/serverEmbed.js";
+import { database, getNewsTable, getServerboardTable } from "../utils/database.js";
+import { errorEmbed } from "../utils/embeds/errorEmbed.js";
 import { QuickDB } from "quick.db";
 
 export default class Serverboard {

@@ -101,7 +101,6 @@ export default class Edit {
         await interaction.reply({
           embeds: [errorEmbed("The image URL you provided is invalid.")],
         });
-        return;
       }
 
       const newNews = {

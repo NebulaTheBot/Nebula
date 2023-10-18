@@ -1,7 +1,7 @@
 import {
   SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
-  type ChatInputCommandInteraction, TextChannel, DMChannel,
-  Channel, ChannelType
+  TextChannel, DMChannel, Channel,
+  ChannelType, type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen.js";
 import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
@@ -38,50 +38,64 @@ export default class Kick {
 
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;;
     const kickEmbed = new EmbedBuilder()
+      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setTitle(`✅ • Kicked <@${user.id}>`)
       .setDescription([
         `**Moderator**: <@${interaction.user.id}>`,
         `**Reason**: ${reason ?? "No reason provided"}`
       ].join("\n"))
       .setThumbnail(user.displayAvatarURL())
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
     const embedDM = new EmbedBuilder()
+      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setTitle(`👢 • You were kicked`)
       .setDescription([
         `**Moderator**: ${interaction.user.username}`,
         `**Reason**: ${reason ?? "No reason provided"}`
       ].join("\n"))
       .setThumbnail(user.displayAvatarURL())
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(0));
 
-    if (!member.permissions.has(PermissionsBitField.Flags.KickMembers))
-      return await interaction.followUp({ embeds: [errorEmbed("You need the **Kick Members** permission to execute this command.")] });
-    if (selectedMember === member)
-      return await interaction.followUp({ embeds: [errorEmbed("You can't kick yourself.")] });
-    if (selectedMember.user.id === interaction.client.user.id)
-      return await interaction.followUp({ embeds: [errorEmbed("You can't kick Nebula.")] });
-    if (!selectedMember.manageable)
-      return await interaction.followUp({ embeds: [errorEmbed(`You can't kick ${name}, because they have a higher role position than Nebula.`)] });
-    if (member.roles.highest.position < selectedMember.roles.highest.position)
-      return await interaction.followUp({ embeds: [errorEmbed(`You can't kick ${name}, because they have a higher role position than you.`)] });
+    if (!member.permissions.has(PermissionsBitField.Flags.KickMembers)) return await interaction.followUp({
+      embeds: [errorEmbed("You need the **Kick Members** permission to execute this command.")]
+    });
+    
+    if (selectedMember === member) return await interaction.followUp({
+      embeds: [errorEmbed("You can't kick yourself.")]
+    });
+    
+    if (selectedMember.user.id === interaction.client.user.id) return await interaction.followUp({
+      embeds: [errorEmbed("You can't kick Nebula.")]
+    });
+    
+    if (!selectedMember.manageable) return await interaction.followUp({
+      embeds: [errorEmbed(`You can't kick ${name}, because they have a higher role position than Nebula.`)]
+    });
+    
+    if (member.roles.highest.position < selectedMember.roles.highest.position) return await interaction.followUp({
+      embeds: [errorEmbed(`You can't kick ${name}, because they have a higher role position than you.`)]
+    });
 
     const db = this.db;
     const settingsTable = await getSettingsTable(db);
-    const logChannel = await settingsTable?.get(`${interaction.guild.id}.logChannel`).then(
-      (channel: string | null) => channel ?? null
-    ).catch(() => null);
+    const logChannel = await settingsTable
+      ?.get(`${interaction.guild.id}.logChannel`)
+      .then((channel: string | null) => channel ?? null)
+      .catch(() => null);
+
     if (logChannel) {
-      const channel = await interaction.guild.channels.cache.get(logChannel).fetch().then(
-        (channel: Channel | null) => {
+      const channel = await interaction.guild.channels.cache
+        .get(logChannel)
+        .fetch()
+        .then((channel: Channel | null) => {
           if (channel.type != ChannelType.GuildText) return null;
           return channel as TextChannel;
-        }
-      ).catch(() => null);
+        })
+        .catch(() => null);
+
       if (channel) await channel.send({ embeds: [kickEmbed] });
     }
 

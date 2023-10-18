@@ -1,8 +1,7 @@
 import { SlashCommandSubcommandBuilder, EmbedBuilder, type ChatInputCommandInteraction } from "discord.js";
 import { genColor } from "../../utils/colorGen.js";
 import { getLevelingTable, getSettingsTable } from "../../utils/database.js";
-import { BASE_EXP_FOR_NEW_LEVEL, DIFFICULTY_MULTIPLIER } from "../../events/leveling.js";
-import errorEmbed from "../../utils/embeds/errorEmbed.js";
+import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
 import { QuickDB } from "quick.db";
 
 export default class Leaderboard {
@@ -21,10 +20,9 @@ export default class Leaderboard {
     const settingsTable = await getSettingsTable(db);
     const levelingTable = await getLevelingTable(db);
 
-    // Under maintenance
-    return await interaction.followUp({
-      embeds: [errorEmbed("This command is under maintenance.")]
-    });
+    // return await interaction.followUp({
+    //   embeds: [errorEmbed("This command is under maintenance.")]
+    // });
 
     const guild = interaction.guild;
     const levelEnabled = await settingsTable?.get(`${guild.id}.leveling.enabled`).catch(() => { });
@@ -41,9 +39,14 @@ export default class Leaderboard {
     const levelUpEmbed = new EmbedBuilder()
       .setTitle("⚡ • Top 10 active members")
       .setDescription(
-        levelKeys.slice(0, 10).map(level =>
-          `#${Object.keys(levels).indexOf(level) + 1} • <@${level}>\n**Level ${levels[level].levels}** - Next Level: ${levels[level].levels + 1}\n**Exp**: ${levels[level].exp}/${Math.floor(BASE_EXP_FOR_NEW_LEVEL * DIFFICULTY_MULTIPLIER * (levels[level].levels + 1))} until level up`
-        ).join("\n\n")
+        levelKeys
+          .slice(0, 10)
+          .map(level => [
+            `#${Object.keys(levels).indexOf(level) + 1} • <@${level}>`,
+            `**Level ${levels[level].levels}** - Next Level: ${levels[level].levels + 1}`,
+            `**Exp**: ${levels[level].exp}/${Math.floor((2 * 50) * 1.25 * (levels[level].levels + 1))} until level up`
+          ])
+          .join("\n\n")
       )
       .setColor(genColor(200))
       .setTimestamp();

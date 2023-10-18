@@ -4,7 +4,7 @@ import {
   Role,
 } from "discord.js";
 import { genColor } from "../../../utils/colorGen.js";
-import errorEmbed from "../../../utils/embeds/errorEmbed.js";
+import { errorEmbed } from "../../../utils/embeds/errorEmbed.js";
 import { getSettingsTable } from "../../../utils/database.js";
 import { QuickDB } from "quick.db";
 
@@ -159,14 +159,16 @@ export default class Rewards {
 
   async getRewards(guildId: string): Promise<Reward[]> {
     const settingsTable = await getSettingsTable(this.db);
-    const rewards = new Promise((resolve, reject) => {
-      settingsTable?.get(`${guildId}.leveling.rewards`).then(rewards => {
-        if (!rewards) return resolve([]);
-        resolve(rewards);
-      }).catch(() => {
-        resolve([]);
-      });
+    const rewards = new Promise(resolve => {
+      settingsTable
+        ?.get(`${guildId}.leveling.rewards`)
+        .then(rewards => {
+          if (!rewards) return resolve([]);
+          resolve(rewards);
+        })
+        .catch(() => resolve([]));
     });
+
     return rewards as Promise<Reward[]>;
   }
 }

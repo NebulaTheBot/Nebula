@@ -3,7 +3,7 @@ import {
   type ChatInputCommandInteraction,
 } from "discord.js";
 import { genColor } from "../../../utils/colorGen.js";
-import errorEmbed from "../../../utils/embeds/errorEmbed.js";
+import { errorEmbed } from "../../../utils/embeds/errorEmbed.js";
 import { getLevelingTable, getSettingsTable } from "../../../utils/database.js";
 import { QuickDB } from "quick.db";
 import { Reward } from "./rewards.js";

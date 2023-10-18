@@ -1,8 +1,7 @@
 import { SlashCommandSubcommandBuilder, EmbedBuilder, type ChatInputCommandInteraction } from "discord.js";
 import { genColor } from "../../utils/colorGen.js";
 import { getLevelingTable, getSettingsTable } from "../../utils/database.js";
-import { BASE_EXP_FOR_NEW_LEVEL, DIFFICULTY_MULTIPLIER } from "../../events/leveling.js";
-import errorEmbed from "../../utils/embeds/errorEmbed.js";
+import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
 import { QuickDB } from "quick.db";
 import { Reward } from "../settings/leveling/rewards.js";
 
@@ -34,7 +33,7 @@ export default class Level {
     const levelEnabled = await settingsTable?.get(`${guild.id}.leveling.enabled`).then(
       data => {
         if (!data) return false;
-        return Boolean(data);
+        return data;
       }
     ).catch(() => false);
     if (!levelEnabled) return await interaction.followUp({
@@ -64,7 +63,7 @@ export default class Level {
     ).catch(() => [] as Reward[]);
 
     for (const { roleId, level } of levelRewards) {
-      const role = await interaction.guild.roles.fetch(roleId).catch(() => { });
+      const role = await interaction.guild.roles.fetch(roleId).catch(() => {});
       const reward = { roleId, level };
 
       if (levels < level) {
@@ -75,11 +74,11 @@ export default class Level {
       rewards.push(role);
     }
 
-    const expUntilLevelup = Math.floor(BASE_EXP_FOR_NEW_LEVEL * DIFFICULTY_MULTIPLIER * ((levels ?? 0) + 1));
+    const expUntilLevelup = Math.floor((2 * 50) * 1.25 * ((levels ?? 0) + 1));
     const formattedExpUntilLevelup = expUntilLevelup?.toLocaleString("en-US");
     const levelUpEmbed = new EmbedBuilder()
       .setAuthor({ name: `•  ${selectedMember.user.username}`, iconURL: avatarURL })
-      .setFields([
+      .setFields(
         {
           name: `⚡ • Level ${levels ?? 0}`,
           value: [
@@ -94,7 +93,7 @@ export default class Level {
             nextReward ? `**Upcoming reward**: <@&${nextReward.roleId}>` : "**Upcoming reward**: *Cricket, cricket, cricket* - Looks like you claimed everything!"
           ].join("\n")
         }
-      ])
+      )
       .setThumbnail(avatarURL)
       .setTimestamp()
       .setColor(genColor(200));

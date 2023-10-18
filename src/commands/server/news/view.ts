@@ -2,23 +2,23 @@ import {
   SlashCommandSubcommandBuilder, EmbedBuilder, ActionRowBuilder,
   ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor } from "../../utils/colorGen.js";
-import { getNewsTable } from "../../utils/database.js";
+import { genColor } from "../../../utils/colorGen.js";
+import { getNewsTable } from "../../../utils/database.js";
 import { QuickDB } from "quick.db";
-import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
+import { errorEmbed } from "../../../utils/embeds/errorEmbed.js";
 
-export default class News {
+export default class View {
   data: SlashCommandSubcommandBuilder;
   db: QuickDB<any>;
 
   constructor(db?: QuickDB<any>) {
     this.db = db;
     this.data = new SlashCommandSubcommandBuilder()
-      .setName("news")
-      .setDescription("The news of this server.")
+      .setName("view")
+      .setDescription("View the news of this server.")
       .addNumberOption(option => option
         .setName("page")
-        .setDescription("The page of the news you want to see")
+        .setDescription("The page of the news you want to see.")
       );
   }
 
