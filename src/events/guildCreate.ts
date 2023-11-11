@@ -1,5 +1,5 @@
 import {
-  EmbedBuilder, DMChannel, type Client,
+  EmbedBuilder, type DMChannel, type Client,
   type Guild
 } from "discord.js";
 import { genColor } from "../utils/colorGen.js";

@@ -15,7 +15,6 @@ export default class About {
   async run(interaction: ChatInputCommandInteraction) {
     const client = interaction.client;
     const guilds = client.guilds.cache;
-    const members = client.users.cache.filter(user => !user.bot).size;
     const shards = client.shard.count;
     const hearts = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
 
@@ -26,8 +25,8 @@ export default class About {
         {
           name: "📃 • General",
           value: [
-            "**Version** 0.1-alpha.1",
-            `**${members}** member${members === 1 ? "" : "s"} • **${guilds.size}** guild${guilds.size === 1 ? "" : "s"} • **${shards}** shard${shards === 1 ? "" : "s"}`
+            "**Version** 0.1-alpha.1, *Dasshubodo update*",
+            `**${guilds.size}** guild${guilds.size === 1 ? "" : "s"} • **${shards}** shard${shards === 1 ? "" : "s"}`
           ].join("\n")
         },
         {
@@ -36,9 +35,13 @@ export default class About {
             "**Head developer**: Goos",
             "**Developers**: Golem64, ThatBOI",
             "**Designers**: ArtyH, Optix, proJM, Slider_on_the_black",
-            "**Translators**: Candel, Dimkauzh, Golem64, Optix, Sungi, SaFire, ThatBOI",
+            "**Translators**: Dimkauzh, Golem64, Optix, Sungi, SaFire, ThatBOI",
             "And **YOU**, for using Nebula."
           ].join("\n")
+        },
+        {
+          name: "📱 • Socials",
+          value: "[YouTube](https://www.youtube.com/@NebulaTheBot/)・[Instagram](https://instagram.com/NebulaTheBot)・[Guilded](https://guilded.gg/Nebula)・[Revolt](https://rvlt.gg/28TS9aXy)"
         }
       )
       .setFooter({ text: `Made by the Nebula team with ${randomise(hearts)}` })

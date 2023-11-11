@@ -30,37 +30,39 @@ export default class Level {
     const selectedMember = guild.members.cache.filter((member) => member.user.id === id).map((user) => user)[0];
     const avatarURL = selectedMember.displayAvatarURL();
 
-    const levelEnabled = await settingsTable?.get(`${guild.id}.leveling.enabled`).then(
-      data => {
+    const levelEnabled = await settingsTable
+      ?.get(`${guild.id}.leveling.enabled`)
+      .then(data => {
         if (!data) return false;
         return data;
-      }
-    ).catch(() => false);
+      })
+      .catch(() => false);
+
     if (!levelEnabled) return await interaction.followUp({
       embeds: [errorEmbed("Leveling is disabled for this server.")]
     });
 
-    const { exp, levels } = await levelingTable?.get(`${guild.id}.${selectedMember.id}`).then(
-      data => {
+    const { exp, levels } = await levelingTable
+      ?.get(`${guild.id}.${selectedMember.id}`)
+      .then(data => {
         if (!data) return { exp: 0, level: 0 };
         return { exp: Number(data.exp), levels: Number(data.levels) };
-      }
-    ).catch(() => { return { exp: 0, levels: 0 } });
+      })
+      .catch(() => { return { exp: 0, levels: 0 } });
+
     const formattedExp = exp?.toLocaleString("en-US");
 
-    if (!exp && !levels) await levelingTable.set(`${guild.id}.${selectedMember.id}`, {
-      levels: 0,
-      exp: 0
-    });
+    if (!exp && !levels) await levelingTable.set(`${guild.id}.${selectedMember.id}`, { levels: 0, exp: 0 });
 
     let rewards = [];
     let nextReward = null;
-    const levelRewards = await settingsTable?.get(`${interaction.guild.id}.leveling.rewards`).then(
-      data => {
+    const levelRewards = await settingsTable
+      ?.get(`${interaction.guild.id}.leveling.rewards`)
+      .then(data => {
         if (!data) return [] as Reward[] ?? [] as Reward[];
         return data as Reward[] ?? [] as Reward[];
-      }
-    ).catch(() => [] as Reward[]);
+      })
+      .catch(() => [] as Reward[]);
 
     for (const { roleId, level } of levelRewards) {
       const role = await interaction.guild.roles.fetch(roleId).catch(() => {});
@@ -71,6 +73,7 @@ export default class Level {
         nextReward = reward;
         break;
       }
+
       rewards.push(role);
     }
 

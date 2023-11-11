@@ -23,7 +23,6 @@ export default class Subscribe {
   async run(interaction: ChatInputCommandInteraction) {
     const db = this.db;
     const newsTable = await getNewsTable(db);
-
     const guild = interaction.guild;
     const user = interaction.user;
 

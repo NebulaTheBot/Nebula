@@ -1,4 +1,4 @@
-import { EmbedBuilder, ColorResolvable, type Guild } from "discord.js";
+import { EmbedBuilder, type ColorResolvable, type Guild } from "discord.js";
 import { genColor, genRGBColor } from "../colorGen.js";
 import { database, getServerboardTable } from "../database.js";
 import Vibrant from "node-vibrant";
@@ -53,7 +53,7 @@ export async function serverEmbed(options: Options) {
     `**Created on** <t:${Math.round(guild.createdAt.valueOf() / 1000)}:D>`
   ];
   if (options.showSubs) generalValues.push(`**Subscribers**: ${options.subs}`);
-  if (options.showInvite && invite) generalValues.push(`**Invite link**: ${invite}`);
+  if (options.showInvite && invite) generalValues.push(`**Invite link**: ${await invite}`);
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: `${pages ? `#${page}  •  ` : ""}${guild.name}`, iconURL: iconURL })

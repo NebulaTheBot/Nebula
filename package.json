@@ -17,9 +17,7 @@
     "mysql2": "^3.6.1",
     "node-vibrant": "^3.2.1-alpha.1",
     "quick.db": "^9.1.7",
-    "sharp": "0.33.0-alpha.4",
-    "socket.io": "^4.7.2",
-    "socket.io-client": "^4.7.2"
+    "sharp": "0.33.0-alpha.4"
   },
   "devDependencies": {
     "bun-types": "0.8.1",

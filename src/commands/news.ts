@@ -25,20 +25,17 @@ export default class News {
   async run(interaction: ChatInputCommandInteraction) {
     const db = this.db;
     const newsletterTable = await getNewsTable(db);
-
-    const nebulaId = "903852579837059113"
     let page = interaction.options.getNumber("page") ?? 1;
 
-    const news = await newsletterTable.get(`${nebulaId}.news`).then(
-      (news: any) => news as any[] ?? []
-    ).catch(() => []);
-    const newsSorted = (Object.values(news) as any[])?.sort((a, b) => b.createdAt - a.createdAt);
+    const news = await newsletterTable
+      .get(`903852579837059113.news`)
+      .then(news => news as any[] ?? [])
+      .catch(() => []);
 
-    if (newsSorted.length == 0) {
-      return await interaction.followUp({
-        embeds: [errorEmbed("No news found.\nAdmins can add news with the **/settings news add** command.")]
-      });
-    }
+    const newsSorted = (Object.values(news) as any[])?.sort((a, b) => b.createdAt - a.createdAt);
+    if (newsSorted.length == 0) return await interaction.followUp({
+      embeds: [errorEmbed("No news found.\nAdmins can add news with the **/settings news add** command.")]
+    });
 
     if (page > newsSorted.length) page = newsSorted.length;
     if (page < 1) page = 1;
@@ -65,10 +62,8 @@ export default class News {
     );
 
     await interaction.followUp({ embeds: [newsEmbed], components: [row] });
-
     const buttonCollector = interaction.channel.createMessageComponentCollector({
-      filter: i => i.user.id === interaction.user.id,
-      time: 60000
+      filter: i => i.user.id === interaction.user.id, time: 60000
     });
 
     buttonCollector.on("collect", async i => {
@@ -83,15 +78,8 @@ export default class News {
         if (page > newsSorted.length) page = 1;
       }
 
-      currentNews = newsSorted[page - 1];
-      newsEmbed = new EmbedBuilder()
-        .setAuthor({ name: currentNews.author, iconURL: currentNews.authorPfp ?? null })
-        .setTitle(currentNews.title)
-        .setDescription(currentNews.body)
-        .setImage(currentNews.imageURL || null)
-        .setTimestamp(parseInt(currentNews.updatedAt))
-        .setFooter({ text: `Page ${page} of ${newsSorted.length} • ID: ${currentNews.id}` })
-        .setColor(genColor(270));
+      currentNews = currentNews;
+      newsEmbed = newsEmbed;
 
       await interaction.editReply({ embeds: [newsEmbed], components: [row] });
       await i.deferUpdate();

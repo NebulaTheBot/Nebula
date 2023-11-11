@@ -1,7 +1,7 @@
-import { CommandInteraction, Client, AutocompleteInteraction } from "discord.js";
+import type { CommandInteraction, Client, AutocompleteInteraction } from "discord.js";
+import type { QuickDB } from "quick.db";
 import { pathToFileURL } from "url";
 import { join } from "path";
-import { QuickDB } from "quick.db";
 import { database } from "../utils/database.js";
 
 export default {
@@ -37,8 +37,7 @@ export default {
       const command = new (await import(pathToFileURL(commandImportPath).toString())).default(this.db);
 
       if (interaction.isChatInputCommand()) {
-        const deferred = command?.deferred ?? true;
-        if (deferred) await interaction.deferReply();
+        if (command?.deferred ?? true) await interaction.deferReply();
         command.run(interaction);
       } else if (interaction.isAutocomplete()) {
         if (!command.autocomplete) return;
@@ -46,4 +45,4 @@ export default {
       }
     }
   }
-};
+}
