@@ -1,6 +1,3 @@
-node_modules
-data
-tony's stuff
-package-lock.json
-config.json
+node_modules/
+dist/
 .env
