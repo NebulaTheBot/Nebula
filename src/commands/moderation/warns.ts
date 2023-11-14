@@ -32,10 +32,8 @@ export default class Warns {
   async run(interaction: ChatInputCommandInteraction) {
     const db = this.db;
     const modTable = await getModerationTable(db);
-
     const user = interaction.options.getUser("user");
     const member = interaction.guild.members.cache.get(interaction.member.user.id);
-
     const warns = await modTable
       .get(`${interaction.guild.id}.${user.id}.warns`)
       .then(warns => {
@@ -54,8 +52,7 @@ export default class Warns {
               `**Moderator**: <@${warn.moderator}>`,
               `**Reason**: ${warn.reason}`,
               `**Date**: <t:${Math.floor(warn.id / 1000)}:f>`,
-            ].join("\n"),
-            inline: true,
+            ].join("\n")
           };
         }) : [{ name: "No warns", value: "This user has no warns." }]
       )

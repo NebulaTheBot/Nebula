@@ -40,12 +40,11 @@ export default class Unwarn {
     const name = selectedMember.nickname ?? user.username;
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;;
     const id = interaction.options.getNumber("id", true);
-    const warns = await modTable?.get(`${interaction.guild.id}.${user.id}.warns`).then(
-      warns => warns as any[] ?? []
-    ).catch(() => []);
+    const warns = await modTable
+      ?.get(`${interaction.guild.id}.${user.id}.warns`)
+      .then(warns => warns as any[] ?? [])
+      .catch(() => []);
     const newWarns = warns.filter(warn => warn.id !== id);
-    if (newWarns.length === warns.length)
-      return await interaction.followUp({ embeds: [errorEmbed(`There is no warn with the id of ${id}.`)] });
 
     const unwarnEmbed = new EmbedBuilder()
       .setTitle(`✅ • Removed warning`)
@@ -57,6 +56,7 @@ export default class Unwarn {
       .setThumbnail(user.displayAvatarURL())
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setColor(genColor(100));
+
     const embedDM = new EmbedBuilder()
       .setTitle(`🤝 • You were unwarned`)
       .setDescription([
@@ -72,6 +72,8 @@ export default class Unwarn {
       return await interaction.followUp({ embeds: [errorEmbed("You need the **Moderate Members** permission to execute this command.")] });
     if (selectedMember === member)
       return await interaction.followUp({ embeds: [errorEmbed("You can't unwarn yourself.")] });
+    if (newWarns.length === warns.length)
+      return await interaction.followUp({ embeds: [errorEmbed(`There is no warn with the id of ${id}.`)] });
     if (!selectedMember.manageable)
       return await interaction.followUp({ embeds: [errorEmbed(`You can't unwarn ${name}, because they have a higher role position than Nebula.`)] });
     if (member.roles.highest.position < selectedMember.roles.highest.position)

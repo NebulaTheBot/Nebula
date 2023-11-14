@@ -22,4 +22,4 @@ client.on("ready", async () => {
   console.log("ちーっす！");
 });
 
-client.login(process.env.YES);
+client.login(process.env.TOKEN);

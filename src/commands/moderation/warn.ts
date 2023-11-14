@@ -47,49 +47,59 @@ export default class Warn {
     };
 
     const warnEmbed = new EmbedBuilder()
+      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setTitle(`✅ • Warned ${user.username}`)
       .setDescription([
         `**Moderator**: <@${member.id}>`,
         `**Reason**: ${interaction.options.getString("reason") ?? "No reason provided"}`
       ].join("\n"))
       .setThumbnail(user.displayAvatarURL())
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setFooter({ text: `User ID: ${user.id}` })
-      .setColor(genColor(100));
-    const embedDM = new EmbedBuilder()
-      .setTitle(`😡 • You were warned`)
-      .setDescription([
-        `**Moderator**: ${member.user.username}`,
-        `**Reason**: ${interaction.options.getString("reason") ?? "No reason provided"}`
-      ].join("\n"))
       .setThumbnail(user.displayAvatarURL())
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setFooter({ text: `User ID: ${user.id}` })
-      .setColor(genColor(0));
+      .setColor(genColor(100));
+
+    const embedDM = new EmbedBuilder()
+    .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
+    .setTitle("‼️ • You were warned")
+    .setDescription([
+      `**Moderator**: <@${member.id}>`,
+      `**Reason**: ${interaction.options.getString("reason") ?? "No reason provided"}`
+    ].join("\n"))
+    .setThumbnail(user.displayAvatarURL())
+    .setFooter({ text: `User ID: ${user.id}` })
+    .setThumbnail(user.displayAvatarURL())
+    .setColor(genColor(100));
 
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers))
-      return await interaction.followUp({ embeds: [errorEmbed("You need the **Moderate Members** permission to execute this command.")] });
-    if (selectedMember === member)
-      return await interaction.followUp({ embeds: [errorEmbed("You can't warn yourself.")] });
-    if (selectedMember.user.bot)
-      return await interaction.followUp({ embeds: [errorEmbed(`You can't warn ${name}, because it's a bot.`)] });
-    if (!selectedMember.manageable)
-      return await interaction.followUp({ embeds: [errorEmbed(`You can't warn ${name}, because they have a higher role position than Nebula.`)] });
-    if (member.roles.highest.position < selectedMember.roles.highest.position)
-      return await interaction.followUp({ embeds: [errorEmbed(`You can't warn ${name}, because they have a higher role position than you.`)] });
+    if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) return await interaction.followUp({
+      embeds: [errorEmbed("You need the **Moderate Members** permission to execute this command.")]
+    });
+
+    if (selectedMember === member) return await interaction.followUp({ embeds: [errorEmbed("You can't warn yourself.")] });
+
+    if (!selectedMember.manageable) return await interaction.followUp({
+      embeds: [errorEmbed(`You can't warn ${name}, because they have a higher role position than Nebula.`)]
+    });
+
+    if (member.roles.highest.position < selectedMember.roles.highest.position) return await interaction.followUp({
+      embeds: [errorEmbed(`You can't warn ${name}, because they have a higher role position than you.`)]
+    });
 
     const settingsTable = await getSettingsTable(db);
-    const logChannel = await settingsTable?.get(`${interaction.guild.id}.logChannel`).then(
-      (channel: string | null) => channel
-    ).catch(() => null);
+    const logChannel = await settingsTable
+      ?.get(`${interaction.guild.id}.logChannel`)
+      .then((channel: string | null) => channel)
+      .catch(() => null);
+
     if (logChannel) {
-      const channel = await interaction.guild.channels.cache.get(logChannel).fetch().then(
-        (channel: Channel) => {
+      const channel = await interaction.guild.channels.cache
+        .get(logChannel)
+        .fetch()
+        .then((channel: Channel) => {
           if (channel.type != ChannelType.GuildText) return null;
           return channel as TextChannel;
-        }
-      ).catch(() => null);
+        }).catch(() => null);
+
       if (channel) await channel.send({ embeds: [warnEmbed] });
     }
 

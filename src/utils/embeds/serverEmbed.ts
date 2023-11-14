@@ -75,7 +75,7 @@ export async function serverEmbed(options: Options) {
     value: roles.size === 1
       ? "*None*"
       : `${sortedRoles.slice(0, 5).map(role => `<@&${role[0]}>`).join(", ")}${roles.size > 5 ? ` **and ${roles.size - 5} more**` : ""}`
-  })
+  });
 
   embed.addFields(
     {
@@ -102,7 +102,7 @@ export async function serverEmbed(options: Options) {
       ].join("\n"),
       inline: true
     }
-  )
+  );
 
   return embed;
 }
