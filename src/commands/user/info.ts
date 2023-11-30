@@ -64,10 +64,9 @@ export default class UserInfo {
     const guildRoles = guild.roles.cache.filter(role => selectedMember.roles.cache.has(role.id));
     const memberRoles = [...guildRoles].sort((role1, role2) => role2[1].position - role1[1].position);
     memberRoles.pop();
-    const rolesOrRole = memberRoles.length === 1 ? "role" : "roles";
 
     if (memberRoles.length !== 0) embed.addFields({
-      name: `🎭 • ${guildRoles.filter(role => selectedMember.roles.cache.has(role.id)).size - 1} ${rolesOrRole}`,
+      name: `🎭 • ${guildRoles.filter(role => selectedMember.roles.cache.has(role.id)).size - 1} ${memberRoles.length === 1 ? "role" : "roles"}`,
       value: `${memberRoles
         .slice(0, 5)
         .map(role => `<@&${role[1].id}>`)

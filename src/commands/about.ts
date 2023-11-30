@@ -33,7 +33,7 @@ export default class About {
           name: "🌌 • Entities involved",
           value: [
             "**Head developer**: Goos",
-            "**Developers**: Golem64, ThatBOI",
+            "**Developers**: CodingFox, Golem64, Pigpot, ThatBOI",
             "**Designers**: ArtyH, Optix, proJM, Slider_on_the_black",
             "**Translators**: Dimkauzh, Golem64, Optix, Sungi, SaFire, ThatBOI",
             "And **YOU**, for using Nebula."
@@ -41,7 +41,7 @@ export default class About {
         },
         {
           name: "📱 • Socials",
-          value: "[YouTube](https://www.youtube.com/@NebulaTheBot/)・[Instagram](https://instagram.com/NebulaTheBot)・[Guilded](https://guilded.gg/Nebula)・[Revolt](https://rvlt.gg/28TS9aXy)"
+          value: "[YouTube](https://www.youtube.com/@NebulaTheBot/)・[Instagram](https://instagram.com/NebulaTheBot)・[Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social)・[Guilded](https://guilded.gg/Nebula)・[Revolt](https://rvlt.gg/28TS9aXy)"
         }
       )
       .setFooter({ text: `Made by the Nebula team with ${randomise(hearts)}` })

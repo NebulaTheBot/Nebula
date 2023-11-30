@@ -97,11 +97,9 @@ export default class Edit {
       const body = interaction.fields.getTextInputValue("body") as string;
       const imageURL = interaction.fields.getTextInputValue("imageurl") as string | undefined;
 
-      if (imageURL) {
-        await interaction.reply({
-          embeds: [errorEmbed("The image URL you provided is invalid.")],
-        });
-      }
+      if (imageURL) await interaction.reply({
+        embeds: [errorEmbed("The image URL you provided is invalid.")],
+      });
 
       const newNews = {
         ...news,
@@ -136,17 +134,20 @@ export default class Edit {
         const messageId = newNews?.messageId;
         const newsChannel = (await guild.channels.fetch(subscribedNewsChannel?.channelId ?? "").catch(() => { })) as TextChannel | null;
 
-        if (!messageId && newsChannel.id) {
-          newNews.messageId = ((await newsChannel?.send({
+        if (!messageId && newsChannel.id) newNews.messageId = ((await newsChannel
+          ?.send({
             embeds: [newsEmbed],
             content: subscribedNewsChannel.roleId ? `<@&${subscribedNewsChannel.roleId}>` : null
-          }).catch(() => { })) as Message<any> | null)?.id;
-        } else if (newsChannel.id) {
-          await newsChannel?.messages.edit(messageId, {
+          })
+          .catch(() => { })) as Message<any> | null
+        )?.id;
+
+        else if (newsChannel.id) await newsChannel?.messages
+          .edit(messageId, {
             embeds: [newsEmbed],
             content: subscribedNewsChannel.roleId ? `<@&${subscribedNewsChannel.roleId}>` : null
-          }).catch(() => { });
-        }
+          })
+          .catch(() => { });
       }
 
       const embed = new EmbedBuilder()

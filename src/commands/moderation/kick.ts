@@ -50,7 +50,7 @@ export default class Kick {
 
     const embedDM = new EmbedBuilder()
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`👢 • You were kicked`)
+      .setTitle(`🥾 • You were kicked`)
       .setDescription([
         `**Moderator**: ${interaction.user.username}`,
         `**Reason**: ${reason ?? "No reason provided"}`

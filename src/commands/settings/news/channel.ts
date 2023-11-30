@@ -34,10 +34,6 @@ export default class Channel {
     const channel = guild.channels.cache.get(channelOption?.id);
     const role = guild.roles.cache.get(roleOption?.id ?? "");
 
-    if (role?.name === "@everyone") return await interaction.followUp({
-      embeds: [errorEmbed("You can't ping @everyone.")]
-    });
-
     if (!channelOption && !roleOption) {
       await newsTable.delete(`${guild.id}.channel`);
       return await interaction.followUp({

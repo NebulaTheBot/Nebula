@@ -26,7 +26,7 @@ export default {
           iconURL: avatarURL
         })
         .setTitle("Goodbye!")
-        .setDescription("idk what to say here yet")
+        .setDescription(`**@${member.user.username}** has left the server 😥`)
         .setFooter({ text: `User ID: ${member.id}` })
         .setThumbnail(avatarURL)
         .setColor(genColor(200));

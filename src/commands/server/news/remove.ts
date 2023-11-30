@@ -18,7 +18,7 @@ export default class Remove {
       .setDescription("Removes news from your guild.")
       .addStringOption(option => option
         .setName("id")
-        .setDescription("The id of the news (can be found in the footer of the news).")
+        .setDescription("The ID of the news. Found in the footer of the news.")
         .setRequired(true)
       );
   }
@@ -26,7 +26,6 @@ export default class Remove {
   async run(interaction: ChatInputCommandInteraction) {
     const db = this.db;
     const newsTable = await getNewsTable(db);
-
     const user = interaction.user;
     const guild = interaction.guild;
     const providedId = interaction.options.getString("id");

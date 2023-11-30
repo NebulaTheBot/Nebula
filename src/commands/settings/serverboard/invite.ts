@@ -21,7 +21,6 @@ export default class Toggle {
   async run(interaction: ChatInputCommandInteraction) {
     const db = this.db;
     const serverbTable = await getServerboardTable(db);
-
     const rulesChannel = interaction.guild?.rulesChannel;
     const guild = interaction.guild;
     const member = guild.members.cache.get(interaction.user.id);
@@ -36,7 +35,6 @@ export default class Toggle {
       .catch(() => "");
 
     if (invite) {
-      // Delete invite
       let invites = await rulesChannel?.fetchInvites();
       if (!rulesChannel) invites = await guild.invites.fetch();
       if (invite) await invites.find(inv => inv.url === invite).delete("Serverboard invite disabled");

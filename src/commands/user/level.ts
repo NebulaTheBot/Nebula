@@ -14,7 +14,10 @@ export default class Level {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("level")
       .setDescription("Shows your (or another user's) level.")
-      .addUserOption((option) => option.setName("user").setDescription("Select the user."));
+      .addUserOption(option => option
+        .setName("user")
+        .setDescription("Select the user.")
+      );
   }
 
   async run(interaction: ChatInputCommandInteraction) {
@@ -27,7 +30,7 @@ export default class Level {
     const guild = interaction.guild;
 
     const id = user ? user.id : member.user.id;
-    const selectedMember = guild.members.cache.filter((member) => member.user.id === id).map((user) => user)[0];
+    const selectedMember = guild.members.cache.filter(member => member.user.id === id).map(user => user)[0];
     const avatarURL = selectedMember.displayAvatarURL();
 
     const levelEnabled = await settingsTable
@@ -46,7 +49,7 @@ export default class Level {
       ?.get(`${guild.id}.${selectedMember.id}`)
       .then(data => {
         if (!data) return { exp: 0, level: 0 };
-        return { exp: Number(data.exp), levels: Number(data.levels) };
+        return { exp: parseInt(data.exp), levels: parseInt(data.levels) };
       })
       .catch(() => { return { exp: 0, levels: 0 } });
 

@@ -60,7 +60,7 @@ export default class Warn {
 
     const embedDM = new EmbedBuilder()
     .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-    .setTitle("‼️ • You were warned")
+    .setTitle("⚠️ • You were warned")
     .setDescription([
       `**Moderator**: <@${member.id}>`,
       `**Reason**: ${interaction.options.getString("reason") ?? "No reason provided"}`
