@@ -25,7 +25,7 @@ export default class About {
         {
           name: "📃 • General",
           value: [
-            "**Version** 0.1-alpha.1, *Dasshubodo update*",
+            "**Version** 0.2, *Dasshubodo update*",
             `**${guilds.size}** guild${guilds.size === 1 ? "" : "s"} • **${shards}** shard${shards === 1 ? "" : "s"}`
           ].join("\n")
         },
@@ -33,15 +33,15 @@ export default class About {
           name: "🌌 • Entities involved",
           value: [
             "**Head developer**: Goos",
-            "**Developers**: CodingFox, Golem64, Pigpot, ThatBOI",
+            "**Developers**: Golem64, Pigpot, ThatBOI",
             "**Designers**: ArtyH, Optix, proJM, Slider_on_the_black",
             "**Translators**: Dimkauzh, Golem64, Optix, Sungi, SaFire, ThatBOI",
             "And **YOU**, for using Nebula."
           ].join("\n")
         },
         {
-          name: "📱 • Socials",
-          value: "[YouTube](https://www.youtube.com/@NebulaTheBot/)・[Instagram](https://instagram.com/NebulaTheBot)・[Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social)・[Guilded](https://guilded.gg/Nebula)・[Revolt](https://rvlt.gg/28TS9aXy)"
+          name: "🔗 • Links",
+          value: "[GitHub](https://www.github.com/NebulaTheBot)・[YouTube](https://www.youtube.com/@NebulaTheBot)・[Instagram](https://instagram.com/NebulaTheBot)・[Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social)・[Guilded](https://guilded.gg/Nebula)・[Revolt](https://rvlt.gg/28TS9aXy)"
         }
       )
       .setFooter({ text: `Made by the Nebula team with ${randomise(hearts)}` })

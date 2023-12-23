@@ -1,7 +1,7 @@
 import {
   SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
-  ChannelType, type ChatInputCommandInteraction, TextChannel,
-  Channel
+  ChannelType, TextChannel, type Channel,
+  type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen.js";
 import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
@@ -30,20 +30,8 @@ export default class Purge {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const db = this.db;
-    const settingsTable = await getSettingsTable(db);
     const amount = interaction.options.getNumber("amount");
-    const channelOption = interaction.options.getChannel("channel");
     const member = interaction.guild.members.cache.get(interaction.member.user.id);
-    const channel = interaction.guild.channels.cache.get(interaction.channel.id ?? channelOption.id);
-
-    const purgeEmbed = new EmbedBuilder()
-      .setTitle(`✅ • Purged ${amount} messages.`)
-      .setDescription([
-        `**Moderator**: <@${member.id}>`,
-        `**Channel**: ${channelOption ?? `<#${channel.id}>`}`,
-      ].join("\n"))
-      .setColor(genColor(100));
 
     if (amount > 100) return await interaction.followUp({
       embeds: [errorEmbed("You can only purge up to 100 messages at a time.")],
@@ -57,11 +45,21 @@ export default class Purge {
       embeds: [errorEmbed("You need the **Manage Messages** permission to execute this command.")],
     });
 
+    const channelOption = interaction.options.getChannel("channel");
+    const channel = interaction.guild.channels.cache.get(interaction.channel.id ?? channelOption.id);
+    const embed = new EmbedBuilder()
+      .setTitle(`✅ • Purged ${amount} messages.`)
+      .setDescription([
+        `**Moderator**: <@${member.id}>`,
+        `**Channel**: ${channelOption ?? `<#${channel.id}>`}`,
+      ].join("\n"))
+      .setColor(genColor(100));
+
     if (channel.type === ChannelType.GuildText && ChannelType.PublicThread && ChannelType.PrivateThread) channel == interaction.channel
       ? await channel.bulkDelete(amount + 1, true)
       : await channel.bulkDelete(amount, true);
 
-    const logChannel = await settingsTable
+    const logChannel = await (await getSettingsTable(this.db))
       ?.get(`${interaction.guild.id}.logChannel`)
       .then((channel: string | null) => channel)
       .catch(() => null);
@@ -73,11 +71,12 @@ export default class Purge {
         .then((channel: Channel) => {
           if (channel.type != ChannelType.GuildText) return null;
           return channel as TextChannel;
-        }).catch(() => null);
+        })
+        .catch(() => null);
 
-      if (channel) await channel.send({ embeds: [purgeEmbed] });
+      if (channel) await channel.send({ embeds: [embed] });
     }
 
-    await interaction.followUp({ embeds: [purgeEmbed] });
+    await interaction.followUp({ embeds: [embed] });
   }
 }

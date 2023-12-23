@@ -1,7 +1,7 @@
 import {
   SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
-  TextChannel, DMChannel, Channel,
-  ChannelType, type ChatInputCommandInteraction
+  TextChannel, DMChannel, ChannelType,
+  type Channel, type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen.js";
 import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
@@ -30,14 +30,33 @@ export default class Kick {
 
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user");
-    const reason = interaction.options.getString("reason");
     const members = interaction.guild.members.cache;
     const member = members.get(interaction.member.user.id);
     const selectedMember = members.get(user.id);
     const name = selectedMember.nickname ?? user.username;
 
-    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;;
-    const kickEmbed = new EmbedBuilder()
+    if (!member.permissions.has(PermissionsBitField.Flags.KickMembers)) return await interaction.followUp({
+      embeds: [errorEmbed("You need the **Kick Members** permission to execute this command.")]
+    });
+
+    if (selectedMember === member) return await interaction.followUp({
+      embeds: [errorEmbed("You can't kick yourself.")]
+    });
+
+    if (selectedMember.user.id === interaction.client.user.id) return await interaction.followUp({
+      embeds: [errorEmbed("You can't kick Nebula.")]
+    });
+
+    if (!selectedMember.manageable) return await interaction.followUp({
+      embeds: [errorEmbed(`You can't kick ${name}, because they have a higher role position than Nebula.`)]
+    });
+
+    if (member.roles.highest.position < selectedMember.roles.highest.position) return await interaction.followUp({
+      embeds: [errorEmbed(`You can't kick ${name}, because they have a higher role position than you.`)]
+    });
+
+    const reason = interaction.options.getString("reason");
+    const embed = new EmbedBuilder()
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setTitle(`✅ • Kicked <@${user.id}>`)
       .setDescription([
@@ -59,29 +78,7 @@ export default class Kick {
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(0));
 
-    if (!member.permissions.has(PermissionsBitField.Flags.KickMembers)) return await interaction.followUp({
-      embeds: [errorEmbed("You need the **Kick Members** permission to execute this command.")]
-    });
-    
-    if (selectedMember === member) return await interaction.followUp({
-      embeds: [errorEmbed("You can't kick yourself.")]
-    });
-    
-    if (selectedMember.user.id === interaction.client.user.id) return await interaction.followUp({
-      embeds: [errorEmbed("You can't kick Nebula.")]
-    });
-    
-    if (!selectedMember.manageable) return await interaction.followUp({
-      embeds: [errorEmbed(`You can't kick ${name}, because they have a higher role position than Nebula.`)]
-    });
-    
-    if (member.roles.highest.position < selectedMember.roles.highest.position) return await interaction.followUp({
-      embeds: [errorEmbed(`You can't kick ${name}, because they have a higher role position than you.`)]
-    });
-
-    const db = this.db;
-    const settingsTable = await getSettingsTable(db);
-    const logChannel = await settingsTable
+    const logChannel = await (await getSettingsTable(this.db))
       ?.get(`${interaction.guild.id}.logChannel`)
       .then((channel: string | null) => channel ?? null)
       .catch(() => null);
@@ -96,11 +93,12 @@ export default class Kick {
         })
         .catch(() => null);
 
-      if (channel) await channel.send({ embeds: [kickEmbed] });
+      if (channel) await channel.send({ embeds: [embed] });
     }
 
+    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
     if (dmChannel) await dmChannel.send({ embeds: [embedDM] });
     await selectedMember.kick(reason ?? undefined);
-    await interaction.followUp({ embeds: [kickEmbed] });
+    await interaction.followUp({ embeds: [embed] });
   }
 }

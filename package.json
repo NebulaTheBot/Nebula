@@ -1,11 +1,11 @@
 {
   "name": "nebula",
-  "description": "Welcome to Nebula, the multipurpose Discord bot.",
+  "description": "Welcome to Nebula, the multipurpose, multiplatform bot.",
   "contributors": [
     "The Nebula team",
     "The GitHub contributors"
   ],
-  "version": "0.0.1",
+  "version": "0.2.0",
   "main": "./src/index.ts",
   "type": "module",
   "scripts": {

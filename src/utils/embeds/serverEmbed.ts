@@ -24,7 +24,6 @@ export async function serverEmbed(options: Options) {
   const pages = options.pages;
   const guild = options.guild;
   const { premiumTier: boostTier, premiumSubscriptionCount: boostCount } = guild;
-  const iconURL = guild.iconURL();
 
   const invite = (await getServerboardTable(await database()))
     ?.get(`${guild.id}.invite`)
@@ -53,18 +52,18 @@ export async function serverEmbed(options: Options) {
     `**Created on** <t:${Math.round(guild.createdAt.valueOf() / 1000)}:D>`
   ];
   if (options.showSubs) generalValues.push(`**Subscribers**: ${options.subs}`);
-  if (options.showInvite && invite) generalValues.push(`**Invite link**: ${await invite}`);
+  if (options.showInvite && invite === null) generalValues.push(`**Invite link**: ${await invite}`);
 
   const embed = new EmbedBuilder()
-    .setAuthor({ name: `${pages ? `#${page}  •  ` : ""}${guild.name}`, iconURL: iconURL })
+    .setAuthor({ name: `${pages ? `#${page}  •  ` : ""}${guild.name}`, iconURL: guild.iconURL() })
     .setDescription(guild.description ? guild.description : null)
     .setFields({ name: "📃 • General", value: generalValues.join("\n") })
     .setFooter({ text: `Server ID: ${guild.id}${pages ? ` • Page ${page}/${pages}` : ""}` })
-    .setThumbnail(iconURL)
+    .setThumbnail(guild.iconURL())
     .setColor(genColor(200));
 
   try {
-    const imageBuffer = await (await fetch(iconURL)).arrayBuffer();
+    const imageBuffer = await (await fetch(guild.iconURL())).arrayBuffer();
     const image = sharp(imageBuffer).toFormat("jpg");
     const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant;
     embed.setColor(genRGBColor(r, g, b) as ColorResolvable);

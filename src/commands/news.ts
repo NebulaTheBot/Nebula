@@ -4,7 +4,6 @@ import {
 } from "discord.js";
 import { genColor } from "../utils/colorGen.js";
 import { getNewsTable } from "../utils/database.js";
-import { errorEmbed } from "../utils/embeds/errorEmbed.js";
 import { QuickDB } from "quick.db";
 
 export default class News {
@@ -23,17 +22,13 @@ export default class News {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const db = this.db;
-    const newsletterTable = await getNewsTable(db);
     let page = interaction.options.getNumber("page") ?? 1;
-
-    const news = await newsletterTable
+    const news = await (await getNewsTable(this.db))
       .get(`903852579837059113.news`) // News of the Nebula server
       .then(news => news as any[] ?? [])
       .catch(() => []);
 
     const newsSorted = (Object.values(news) as any[])?.sort((a, b) => b.createdAt - a.createdAt);
-
     if (page > newsSorted.length) page = newsSorted.length;
     if (page < 1) page = 1;
 
@@ -59,19 +54,15 @@ export default class News {
     );
 
     await interaction.followUp({ embeds: [newsEmbed], components: [row] });
-    const buttonCollector = interaction.channel.createMessageComponentCollector({
-      filter: i => i.user.id === interaction.user.id,
-      time: 60000
-    });
-
-    buttonCollector.on("collect", async i => {
+    interaction.channel
+      .createMessageComponentCollector({ filter: i => i.user.id === interaction.user.id, time: 60000 })
+      .on("collect", async i => {
       if (!i.isButton()) return;
-      const id = i.customId;
 
-      if (id == "left") {
+      if (i.customId === "left") {
         page--;
         if (page < 1) page = newsSorted.length;
-      } else if (id == "right") {
+      } else if (i.customId === "right") {
         page++;
         if (page > newsSorted.length) page = 1;
       }

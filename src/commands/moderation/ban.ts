@@ -1,6 +1,7 @@
 import {
   SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
-  TextChannel, DMChannel, type ChatInputCommandInteraction
+  TextChannel, DMChannel, ChannelType,
+  type Channel, type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen.js";
 import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
@@ -30,34 +31,10 @@ export default class Ban {
 
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user");
-    const reason = interaction.options.getString("reason");
     const members = interaction.guild.members.cache;
     const member = members.get(interaction.member.user.id);
     const selectedMember = members.get(user.id);
     const name = selectedMember.nickname ?? user.username;
-
-    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;;
-    const banEmbed = new EmbedBuilder()
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`✅ • Banned ${user.username}`)
-      .setDescription([
-        `**Moderator**: <@${interaction.user.id}>`,
-        `**Reason**: ${reason ?? "No reason provided"}`
-      ].join("\n"))
-      .setThumbnail(user.displayAvatarURL())
-      .setFooter({ text: `User ID: ${user.id}` })
-      .setColor(genColor(100));
-
-    const embedDM = new EmbedBuilder()
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`🔨 • You were banned`)
-      .setDescription([
-        `**Moderator**: ${interaction.user.username}`,
-        `**Reason**: ${reason ?? "No reason provided"}`
-      ].join("\n"))
-      .setThumbnail(user.displayAvatarURL())
-      .setFooter({ text: `User ID: ${user.id}` })
-      .setColor(genColor(0));
 
     if (!member.permissions.has(PermissionsBitField.Flags.BanMembers)) return await interaction.reply({
       embeds: [errorEmbed("You need the **Ban Members** permission to execute this command.")]
@@ -79,20 +56,50 @@ export default class Ban {
       embeds: [errorEmbed(`You can't ban ${name}, because they have a higher role position than you.`)]
     });
 
-    const db = this.db;
-    const settingsTable = await getSettingsTable(db);
-    const logChannel = await settingsTable
+    const reason = interaction.options.getString("reason");
+    const embed = new EmbedBuilder()
+      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
+      .setTitle(`✅ • Banned ${user.username}`)
+      .setDescription([
+        `**Moderator**: <@${interaction.user.id}>`,
+        `**Reason**: ${reason ?? "No reason provided"}`
+      ].join("\n"))
+      .setThumbnail(user.displayAvatarURL())
+      .setFooter({ text: `User ID: ${user.id}` })
+      .setColor(genColor(100));
+
+    const embedDM = new EmbedBuilder()
+      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
+      .setTitle(`🔨 • You were banned`)
+      .setDescription([
+        `**Moderator**: ${interaction.user.username}`,
+        `**Reason**: ${reason ?? "No reason provided"}`
+      ].join("\n"))
+      .setThumbnail(user.displayAvatarURL())
+      .setFooter({ text: `User ID: ${user.id}` })
+      .setColor(genColor(0));
+
+    const logChannel = await (await getSettingsTable(this.db))
       ?.get(`${interaction.guild.id}.logChannel`)
       .then((channel: string | null) => channel ?? null)
       .catch(() => null);
 
     if (logChannel) {
-      const channel = (await interaction.guild.channels.cache.get(logChannel).fetch()) as TextChannel;
-      await channel.send({ embeds: [banEmbed] });
+      const channel = await interaction.guild.channels.cache
+        .get(logChannel)
+        .fetch()
+        .then((channel: Channel) => {
+          if (channel.type != ChannelType.GuildText) return null;
+          return channel as TextChannel;
+        })
+        .catch(() => null);
+
+      if (channel) await channel.send({ embeds: [embed] });
     }
 
+    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
     if (dmChannel) await dmChannel.send({ embeds: [embedDM] });
     await selectedMember.ban({ reason: reason ?? undefined });
-    await interaction.reply({ embeds: [banEmbed] });
+    await interaction.reply({ embeds: [embed] });
   }
 }

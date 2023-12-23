@@ -23,18 +23,14 @@ export default class UserInfo {
 
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user");
-    const member = interaction.member;
-    const guild = interaction.guild;
-
-    const id = user ? user.id : member.user.id;
-    const selectedMember = guild.members.cache.filter(member => member.user.id === id).map(user => user)[0];
-    const avatarURL = selectedMember.displayAvatarURL();
+    const id = user ? user.id : interaction.member.user.id;
+    const selectedMember = interaction.guild.members.cache.filter(member => member.user.id === id).map(user => user)[0];
     const selectedUser = selectedMember.user;
 
     let embed = new EmbedBuilder()
       .setAuthor({
         name: `•  ${selectedMember.nickname == null ? selectedUser.username : selectedMember.nickname}${selectedUser.discriminator == "0" ? "" : `#${selectedUser.discriminator}`}`,
-        iconURL: avatarURL
+        iconURL: selectedMember.displayAvatarURL()
       })
       .setFields(
         {
@@ -51,17 +47,17 @@ export default class UserInfo {
         }
       )
       .setFooter({ text: `User ID: ${selectedMember.id}` })
-      .setThumbnail(avatarURL)
+      .setThumbnail(selectedMember.displayAvatarURL())
       .setColor(genColor(200));
 
     try {
-      const imageBuffer = await (await fetch(avatarURL)).arrayBuffer();
+      const imageBuffer = await (await fetch(selectedMember.displayAvatarURL())).arrayBuffer();
       const image = sharp(imageBuffer).toFormat("jpg");
       const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant;
       embed.setColor(genRGBColor(r, g, b) as ColorResolvable);
     } catch { }
 
-    const guildRoles = guild.roles.cache.filter(role => selectedMember.roles.cache.has(role.id));
+    const guildRoles = interaction.guild.roles.cache.filter(role => selectedMember.roles.cache.has(role.id));
     const memberRoles = [...guildRoles].sort((role1, role2) => role2[1].position - role1[1].position);
     memberRoles.pop();
 

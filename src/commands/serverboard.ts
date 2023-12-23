@@ -23,12 +23,10 @@ export default class Serverboard {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const db = this.db;
-    const guilds = interaction.client.guilds.cache;
     const guildsMapped = {};
-    const shownGuilds = (await (await getServerboardTable(db)).all().catch(() => [])) as any[];
+    const shownGuilds = (await (await getServerboardTable(this.db)).all().catch(() => [])) as any[];
 
-    for (const guild of guilds.values()) {
+    for (const guild of interaction.client.guilds.cache.values()) {
       const shownVal = shownGuilds?.find(shown => shown?.id == guild.id)?.value?.shown;
       const isShown = shownVal == null ? null : shownVal;
 
@@ -38,20 +36,18 @@ export default class Serverboard {
       guildsMapped[guild.memberCount + ":" + guild.id] = guild;
     }
 
-    const sortedGuilds = quickSort(
+    const guildsSorted = quickSort(
       [...Object.keys(guildsMapped).map(i => Number(i.split(":")[0]))],
       [[...Object.values(guildsMapped)]],
       0,
       Object.keys(guildsMapped).length - 1
-    );
-
-    const guildsSorted = sortedGuilds[1][0].reverse();
+    )[1][0].reverse();
     const pages = guildsSorted.length;
     const argPage = interaction.options.getNumber("page", false);
     let page = (argPage - 1 <= 0 ? 0 : argPage - 1 > pages ? pages - 1 : argPage - 1) || 0;
 
     let guild = guildsSorted[page];
-    let subs = await (await getNewsTable(db))
+    let subs = await (await getNewsTable(this.db))
       ?.get(`${guild.id}.subscriptions`)
       .then(subs => subs?.length > 0 ? subs as string[] : [] as string[])
       .catch(() => [] as string[]);
