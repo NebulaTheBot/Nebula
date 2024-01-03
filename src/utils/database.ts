@@ -1,6 +1,4 @@
 import { QuickDB, MySQLDriver } from "quick.db";
-import dotenv from "dotenv";
-dotenv.config();
 
 async function database() {
   const mysql = new MySQLDriver({
