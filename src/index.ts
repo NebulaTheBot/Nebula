@@ -1,6 +1,6 @@
 import { ShardingManager } from "discord.js";
 
-const manager = new ShardingManager("./src/index.js", { token: process.env.TOKEN });
+const manager = new ShardingManager("./src/bot.ts", { token: process.env.TOKEN });
 
 manager.on("shardCreate", shard => {
   shard.on("error", err => console.error(err));

@@ -11,7 +11,7 @@ export default class Events {
     this.client = client;
 
     (async () => {
-      const eventsPath = join(process.cwd(), "dist", "events");
+      const eventsPath = join(process.cwd(), "src", "events");
 
       for (const eventFile of readdirSync(eventsPath)) {
         if (!eventFile.endsWith("js")) continue;

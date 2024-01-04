@@ -4,7 +4,7 @@ import { join } from "path";
 import database from "../utils/database.js";
 import { QuickDB } from "quick.db";
 
-const COMMANDS_PATH = join(process.cwd(), "dist", "commands");
+const COMMANDS_PATH = join(process.cwd(), "src", "commands");
 
 async function getCommand(interaction: CommandInteraction | AutocompleteInteraction, options: any, db: QuickDB<any>): Promise<any> {
   const commandName = interaction.commandName;
@@ -17,7 +17,7 @@ async function getCommand(interaction: CommandInteraction | AutocompleteInteract
     `${commandName}/${commandgroupName ?
     `${commandgroupName}/${subcommandName}` :
     subcommandName}` :
-    commandName}.js`
+    commandName}.ts`
   );
   const command = new (await import(pathToFileURL(commandImportPath).toString())).default(db);
   return command;
