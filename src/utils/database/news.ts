@@ -1,13 +1,12 @@
-// TODO: 
+// TODO:
 
-import {getDatabase} from ".";
-import {TableDefinition} from "./types";
+import { getDatabase } from ".";
+import { TableDefinition } from "./types";
 
 const definition: TableDefinition = {
   name: "news",
   definition: {
     guild: "INTEGER",
-    id: "TEXT",
     title: "TEXT",
     body: "TEXT",
     imageURL: "TEXT",
@@ -16,6 +15,7 @@ const definition: TableDefinition = {
     createdAt: "TIMESTAMP",
     updatedAt: "TIMESTAMP",
     messageID: "INTEGER",
+    id: "TEXT",
   },
 };
 

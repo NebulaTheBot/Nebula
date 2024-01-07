@@ -1,5 +1,3 @@
-// TODO:
-
 import { getDatabase } from ".";
 import { TableDefinition, TypeOfDefinition } from "./types";
 
@@ -18,18 +16,18 @@ const database = getDatabase(tableDefinition);
 const getQuery = database.query(
   "SELECT * FROM blacklist WHERE guild = $1 AND user = $2;",
 );
-export function get(guildID: string, userID: string) {
+export function get(guildID: string, userID: string): [number, number] {
   const res = getQuery.all(guildID, userID) as TypeOfDefinition<
     typeof tableDefinition
   >[];
-  if (res.length == 0) return { level: 0, exp: 0 };
-  return { level: res[0].level, exp: res[0].exp };
+  if (res.length == 0) return [0, 0];
+  return [res[0].level, res[0].exp];
 }
 
 const setQuery = database.query("");
 const insertQuery = database.query("");
 export function set(
-  guildID: string,
+  guildID: string | number,
   userID: string,
   level: number,
   exp: number,

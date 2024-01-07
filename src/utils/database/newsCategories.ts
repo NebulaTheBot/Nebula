@@ -4,7 +4,7 @@ import {getDatabase} from ".";
 import {TableDefinition} from "./types";
 
 const definition: TableDefinition = {
-  name: "newsPresets",
+  name: "newsCategories",
   definition: {
     guild: "INTEGER",
     value: "TEXT",

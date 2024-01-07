@@ -18,20 +18,25 @@ const settingsDefinition = {
   "custometics.pingedGif": "BOOL",
   "leveling.enabled": "BOOL",
   "leveling.channel": "INTEGER",
+  "leveling.persistence": "BOOL",
   "log.channel": "INTEGER",
   "serverboard.inviteLink": "TEXT",
   "serverboard.shown": "BOOL",
 } satisfies Record<string, FieldData>;
+
+export const settingKeys = Object.keys(
+  settingsDefinition,
+) as (keyof typeof settingsDefinition)[];
 
 const database = getDatabase(tableDefinition);
 
 const getQuery = database.query(
   "SELECT * FROM settings WHERE guild = $1 AND key = $2;",
 );
-export function get(
+export function get<K extends keyof typeof settingsDefinition>(
   guild: string,
-  key: keyof typeof settingsDefinition,
-): TypeOfKey<typeof key> | null {
+  key: K,
+): TypeOfKey<K> | null {
   let res = getQuery.all(guild, key) as TypeOfDefinition<
     typeof tableDefinition
   >[];

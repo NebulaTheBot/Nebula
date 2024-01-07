@@ -17,7 +17,7 @@ const definition: TableDefinition = {
   },
 };
 
-type modType = "WARN" | "KICK" | "BAN";
+type modType = "MUTE" | "WARN" | "KICK" | "BAN";
 
 const database = getDatabase(definition);
 
@@ -35,3 +35,5 @@ export function add(
   const id = crypto.randomUUID();
   addQuery.run(guildID, userID, type, moderator, reason, pub, id, Date.now());
 }
+
+
