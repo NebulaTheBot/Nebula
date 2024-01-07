@@ -1,17 +1,17 @@
 // TODO: Add more settings
 
 import { getDatabase } from ".";
-import { FieldData, TableDefinition } from "./types";
+import { FieldData, SqlType, TableDefinition, TypeOfDefinition } from "./types";
 
 // Define table structure
-const tableDefinition: TableDefinition = {
+const tableDefinition = {
   name: "settings",
   definition: {
     guild: "INTEGER",
     key: "TEXT",
     value: "TEXT",
   },
-};
+} satisfies TableDefinition;
 
 // Define type of settings
 const settingsDefinition = {
@@ -32,10 +32,12 @@ export function get(
   guild: string,
   key: keyof typeof settingsDefinition,
 ): TypeOfKey<typeof key> | null {
-  let res = getQuery.all(guild, key) as string[];
+  let res = getQuery.all(guild, key) as TypeOfDefinition<
+    typeof tableDefinition
+  >[];
   if (res.length == 0) return null;
-  if (settingsDefinition[key] == "TEXT") return res[0] as string;
-  return JSON.parse(res[0]);
+  if (settingsDefinition[key] == "TEXT") return res[0].value;
+  return JSON.parse(res[0].value);
 }
 
 let setQuery = database.query(
@@ -50,10 +52,6 @@ export function set(
 }
 
 // Utility type
-type TypeOfKey<T extends keyof typeof settingsDefinition> = {
-  BOOL: boolean;
-  INTEGER: number;
-  FLOAT: number;
-  TEXT: string;
-  TIMESTAMP: Date;
-}[(typeof settingsDefinition)[T]];
+type TypeOfKey<T extends keyof typeof settingsDefinition> = SqlType<
+  (typeof settingsDefinition)[T]
+>;

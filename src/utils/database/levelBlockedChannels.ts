@@ -1,7 +1,7 @@
 import { getDatabase } from ".";
 import { TableDefinition } from "./types";
 
-const definition: TableDefinition = {
+const tableDefinition: TableDefinition = {
   name: "levelBlockedChannels",
   definition: {
     guild: "INTEGER",
@@ -9,7 +9,7 @@ const definition: TableDefinition = {
   },
 };
 
-const database = getDatabase(definition);
+const database = getDatabase(tableDefinition);
 
 const getQuery = database.query(
   "SELECT * FROM blacklist WHERE guild = $1 AND channel = $2;",
