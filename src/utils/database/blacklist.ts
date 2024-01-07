@@ -4,15 +4,15 @@ import { TableDefinition } from "./types";
 const definition: TableDefinition = {
   name: "blacklist",
   definition: {
-    guild: "TEXT",
+    guild: "INTEGER",
   },
 };
 
 const database = getDatabase(definition);
 
-const findQuery = database.query("SELECT * FROM blacklist WHERE guild = $1;");
-export function validate(guildID: string) {
-  return findQuery.all(guildID).length == 0;
+const getQuery = database.query("SELECT * FROM blacklist WHERE guild = $1;");
+export function get(guildID: string) {
+  return getQuery.all(guildID).length == 0;
 }
 
 const addQuery = database.query("INSERT INTO blacklist (guild) VALUES (?1);");
