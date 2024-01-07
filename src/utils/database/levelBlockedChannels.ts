@@ -2,7 +2,7 @@ import { getDatabase } from ".";
 import { TableDefinition } from "./types";
 
 const definition: TableDefinition = {
-  name: "blacklist",
+  name: "levelBlockedChannels",
   definition: {
     guild: "INTEGER",
     channel: "INTEGER",
