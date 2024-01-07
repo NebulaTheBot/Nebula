@@ -6,23 +6,37 @@ export type FieldData =
   | "TIMESTAMP"
   | "JSON";
 
-export const tableDefinition = {
+export type TableDefinition = {
+  name: string;
+  definition: Record<string, FieldData>;
+};
+
+// TODO: Remove table definition
+export const tableDefinition2 = {
+  blacklist: {
+    guild: "INTEGER",
+  },
   leveling: {
-    guild: "TEXT",
-    user: "TEXT",
+    guild: "INTEGER",
+    user: "INTEGER",
     levels: "INTEGER",
     exp: "INTEGER",
   },
+  levelRewards: {
+    guild: "INTEGER",
+    level: "INTEGER",
+    role: "INTEGER",
+  },
+  levelBlockedChannels: {
+    guild: "INTEGER",
+    channel: "INTEGER",
+  },
   moderation: {
-    guild: "TEXT",
-    user: "TEXT",
-    type: "TEXT",
-    reason: "TEXT",
-    moderator: "TEXT",
-    public: "BOOL",
+
   },
   news: {
-    guild: "TEXT",
+    guild: "INTEGER",
+    id: "TEXT",
     title: "TEXT",
     body: "TEXT",
     imageURL: "TEXT",
@@ -30,16 +44,19 @@ export const tableDefinition = {
     authorPFP: "TEXT",
     createdAt: "TIMESTAMP",
     updatedAt: "TIMESTAMP",
-    messageID: "TEXT",
+    messageID: "INTEGER",
+  },
+  newsPresets: {
+    guild: "INTEGER",
+    value: "TEXT",
+    name: "TEXT",
+    role: "INTEGER",
+    channel: "INTEGER",
   },
   serverboard: {
-    guild: "TEXT",
+    guild: "INTEGER",
     shown: "BOOL",
     invite: "TEXT",
   },
-  settings: {
-    guild: "TEXT",
-    key: "TEXT",
-    value: "TEXT",
-  },
+  settings: {},
 } satisfies Record<string, Record<string, FieldData>>;

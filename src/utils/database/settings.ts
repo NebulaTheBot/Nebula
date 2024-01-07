@@ -1,12 +1,29 @@
-import { database } from ".";
-import { FieldData } from "./types";
+// TODO: Add more settings
+
+import { getDatabase } from ".";
+import { FieldData, TableDefinition } from "./types";
+
+// Define table structure
+const tableDefinition: TableDefinition = {
+  name: "settings",
+  definition: {
+    guild: "INTEGER",
+    key: "TEXT",
+    value: "TEXT",
+  },
+};
 
 // Define type of settings
 const settingsDefinition = {
+  "custometics.pingedGif": "BOOL",
   "leveling.enabled": "BOOL",
-  "leveling.channel": "TEXT",
-  "leveling.reward": "JSON",
+  "leveling.channel": "INTEGER",
+  "log.channel": "INTEGER",
+  "serverboard.inviteLink": "TEXT",
+  "serverboard.shown": "BOOL",
 } satisfies Record<string, FieldData>;
+
+const database = getDatabase(tableDefinition);
 
 const getQuery = database.query(
   "SELECT * FROM settings WHERE guild = $1 AND key = $2;",
@@ -14,10 +31,10 @@ const getQuery = database.query(
 export function get(
   guild: string,
   key: keyof typeof settingsDefinition,
-): ValueOfSetting<typeof key> | null {
+): TypeOfKey<typeof key> | null {
   let res = getQuery.all(guild, key) as string[];
   if (res.length == 0) return null;
-  if (settingsDefinition[key] == "TEXT") return res[0];
+  if (settingsDefinition[key] == "TEXT") return res[0] as string;
   return JSON.parse(res[0]);
 }
 
@@ -27,21 +44,16 @@ let setQuery = database.query(
 export function set(
   guild: string,
   key: keyof typeof settingsDefinition,
-  value: ValueOfSetting<typeof key>,
+  value: TypeOfKey<typeof key>,
 ) {
   setQuery.run(guild, key, JSON.stringify(value));
 }
 
 // Utility type
-type ValueOfSetting<T extends keyof typeof settingsDefinition> =
-  (typeof settingsDefinition)[T] extends "BOOL"
-    ? boolean
-    : T extends "INTEGER" | "FLOAT"
-      ? number
-      : T extends "TEXT"
-        ? string
-        : T extends "TIMESTAMP"
-          ? Date
-          : T extends "JSON"
-            ? any
-            : never;
+type TypeOfKey<T extends keyof typeof settingsDefinition> = {
+  BOOL: boolean;
+  INTEGER: number;
+  FLOAT: number;
+  TEXT: string;
+  TIMESTAMP: Date;
+}[(typeof settingsDefinition)[T]];

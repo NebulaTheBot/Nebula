@@ -1,13 +1,14 @@
 import { Database } from "bun:sqlite";
-import { tableDefinition } from "./types";
+import { TableDefinition } from "./types";
 
 // Get (or create) SQLite database
-export const database = new Database("data.db", { create: true });
+const database = new Database("data.db", { create: true });
 
-// Create tables if not exist
-for (let [tableNames, definitions] of Object.entries(tableDefinition)) {
-  const defStr = Object.entries(definitions)
-    .map((field) => Object.entries(field).join(" "))
+export function getDatabase(definition: TableDefinition) {
+  // Create table if not exist
+  const defStr = Object.entries(definition.definition)
+    .map(([field, type]) => field.concat(" ", type))
     .join(", ");
-  database.run(`CREATE TABLE IF NOT EXISTS ${tableNames} (${defStr});`);
+  database.run(`CREATE TABLE IF NOT EXISTS ${definition.name} (${defStr});`);
+  return database;
 }
