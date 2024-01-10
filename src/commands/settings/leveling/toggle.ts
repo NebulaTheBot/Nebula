@@ -1,10 +1,11 @@
 import {
-  SlashCommandSubcommandBuilder, EmbedBuilder,
+  SlashCommandSubcommandBuilder,
+  EmbedBuilder,
   type ChatInputCommandInteraction,
   PermissionsBitField,
 } from "discord.js";
 import { genColor } from "../../../utils/colorGen.js";
-import database from "../../../utils/database.js";
+import { get, set } from "../../../utils/database/settings.js";
 import errorEmbed from "../../../utils/embeds/errorEmbed.js";
 
 export default class Toggle {
@@ -16,27 +17,32 @@ export default class Toggle {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const db = await database();
+    if (!interaction.guildId || !interaction.guild) return;
 
-    const enabled = await db.table("settings")?.get(`${interaction.guild.id}.leveling.enabled`).then(
-      (enabled) => !!enabled
-    ).catch(() => false);
-    await db.table("settings").set(`${interaction.guild.id}.leveling.enabled`, !enabled);
-
-    const user = (await interaction.guild.members.me.fetch())
-    if (!user.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
+    const member = interaction.guild.members.cache.get(interaction.user.id);
+    if (!member?.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
       return await interaction.followUp({
-        embeds: [errorEmbed("You need **Manage Server** permissions to toggle leveling.")]
+        embeds: [
+          errorEmbed(
+            "You need **Manage Server** permissions to set a channel.",
+          ),
+        ],
       });
     }
+
+    const enabled = get(interaction.guildId, "leveling.enabled");
+
+    set(interaction.guildId, "leveling.enabled", !enabled);
 
     await interaction.followUp({
       embeds: [
         new EmbedBuilder()
           .setTitle("✅ • Leveling toggled!")
-          .setDescription(`Leveling is now ${enabled ? "disabled" : "enabled"}.`)
-          .setColor(genColor(100))
-      ]
+          .setDescription(
+            `Leveling is now ${enabled ? "disabled" : "enabled"}.`,
+          )
+          .setColor(genColor(100)),
+      ],
     });
   }
 }

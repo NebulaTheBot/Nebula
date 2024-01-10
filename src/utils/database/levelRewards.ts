@@ -7,8 +7,8 @@ const tableDefinition = {
   name: "levelRewards",
   definition: {
     guild: "INTEGER",
-    level: "INTEGER",
     role: "INTEGER",
+    level: "INTEGER",
   },
 } satisfies TableDefinition;
 
@@ -19,19 +19,29 @@ export function get(guildID: string) {
   return getQuery.all(guildID) as TypeOfDefinition<typeof tableDefinition>[];
 }
 
-const test = get("");
-
 const addQuery = database.query(
-  "INSERT INTO levelRewards (guild, level, role) VALUES (?1, ?2, ?3);",
+  "INSERT INTO levelRewards (guild, role, level) VALUES (?1, ?2, ?3);",
 );
-export function add(guildID: string, level: number, role: number) {
+export function add(guildID: string, role: number | string, level: number) {
   return addQuery.all(guildID, level, role) as TypeOfDefinition<
     typeof tableDefinition
   >[];
 }
 
-export function updateLevel(guildID: string, level: number, role: number) {}
+const updateQuery = database.query(
+  "UPDATE levelRewards SET level = $3 WHERE guild = $1 AND role = $2",
+);
+export function updateLevel(
+  guildID: string,
+  role: number | string,
+  level: number,
+) {
+  updateQuery.run(guildID, role, level);
+}
 
-export function updateRole(guildID: string, level: number, role: number) {}
-
-export function remove(guildID: string, level: number, role: number) {}
+const removeQuery = database.query(
+  "DELETE FROM levelRewards WHERE guild = $1 AND role = $2",
+);
+export function remove(guildID: number | string, role: number | string) {
+  removeQuery.run(guildID, role);
+}

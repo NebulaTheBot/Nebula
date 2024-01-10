@@ -1,16 +1,23 @@
 import {
-  SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
+  SlashCommandSubcommandBuilder,
+  EmbedBuilder,
+  PermissionsBitField,
   type ChatInputCommandInteraction,
   Role,
 } from "discord.js";
 import { genColor } from "../../../utils/colorGen.js";
-import {get as getLevelRewards} from "../../../utils/database/levelRewards.js";
+import {
+  add,
+  get as getLevelRewards,
+  remove,
+  updateLevel,
+} from "../../../utils/database/levelRewards.js";
 import errorEmbed from "../../../utils/embeds/errorEmbed.js";
 
 export type Reward = {
-  roleId: string,
-  level: number,
-}
+  roleId: string;
+  level: number;
+};
 
 export default class Rewards {
   data: SlashCommandSubcommandBuilder;
@@ -18,105 +25,163 @@ export default class Rewards {
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("rewards")
-      .setDescription("Sets/gets reward roles for each level -> No options = shows.")
-      .addNumberOption(option => option
-        .setName("level")
-        .setDescription("The level to set the reward role for. When set without role option => deletes reward.")
+      .setDescription("Sets/gets reward roles for leveling")
+      .addRoleOption((option) =>
+        option
+          .setName("role")
+          .setDescription("The targeted reward role, leave blank for lookup."),
       )
-      .addRoleOption(option => option
-        .setName("role")
-        .setDescription("The role that should be awarded for the level => leaving empty = deletes reward for specified level.")
+      .addNumberOption((option) =>
+        option
+          .setName("level")
+          .setDescription(
+            "Set the level requirement for this role. 0 => remove. blank => lookup.",
+          ),
       );
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-
-    const inputLevel = interaction.options.getNumber("level", false) as number | null;
+    if (!interaction.guild || !interaction.guildId) return;
+    const inputLevel = interaction.options.getNumber("level", false) as
+      | number
+      | null;
     const inputRole = interaction.options.getRole("role", false) as Role | null;
 
-    if (!inputLevel && !inputRole) {
-      // List the rewards
-      const rewards = this.getRewards();
+    const rewards = this.getRewards(interaction.guildId);
+
+    if (!inputRole) {
       if (rewards.length == 0) {
         return await interaction.followUp({
-          embeds: [errorEmbed("There are no rewards set for this server.")]
+          embeds: [errorEmbed("There are no rewards set for this server.")],
         });
       }
 
-      const rewardsEmbed = new EmbedBuilder()
-        .setTitle("🎁 • Rewards")
-        .setDescription("Here are the rewards set for this server.")
-        .setColor(genColor(100));
-
-      for (const { roleId, level } of rewards) {
-        if (!roleId) continue;
-        rewardsEmbed.addFields([{
-          name: `Level ${level}`,
-          value: `<@&${roleId}>`,
-        }]);
+      // List all the rewards
+      if (!inputLevel) {
+        const rewardsEmbed = new EmbedBuilder()
+          .setTitle("🎁 • Rewards")
+          .setDescription("Here are the rewards set for this server.")
+          .setColor(genColor(100));
+        for (const { roleId, level } of rewards) {
+          if (!roleId) continue;
+          rewardsEmbed.addFields([
+            {
+              name: `Level ${level}`,
+              value: `<@&${roleId}>`,
+            },
+          ]);
+        }
+        return await interaction.followUp({
+          embeds: [rewardsEmbed],
+        });
       }
 
-      return await interaction.followUp({
-        embeds: [rewardsEmbed]
-      });
-    } else if (inputLevel && !inputRole) {
-      // Delete a reward
+      // Get reward of a level
       const level = Number(inputLevel);
-      const rewards = await this.getRewards(interaction.guild.id).then(rewards => rewards.sort((a, b) => a?.level - b?.level)) as Reward[];
-      if (rewards.length == 0) {
-        return await interaction.followUp({
-          embeds: [errorEmbed("There are no rewards set for this server.")]
-        });
-      }
 
-      const reward = rewards.find(reward => reward?.level == level);
+      const reward = rewards.find((reward) => reward.level == level);
       if (!reward) {
         return await interaction.followUp({
-          embeds: [errorEmbed(`There is no reward set for level ${level}.`)]
+          embeds: [errorEmbed(`There is no reward set for level ${level}.`)],
         });
       }
 
-      const newRewards = rewards.filter(reward => reward.level != level);
-      await settingsTable?.set(`${interaction.guild.id}.leveling.rewards`, newRewards).catch(() => []);
-
       return await interaction.followUp({
-        embeds: [new EmbedBuilder()
-          .setTitle("🎁 • Rewards")
-          .setDescription(`Deleted the reward for level ${level}.`)
-          .setColor(genColor(100))
-        ]
+        embeds: [
+          new EmbedBuilder()
+            .setTitle("🎁 • Rewards for Lv. " + level)
+            .setDescription(
+              `This level has been linked to <@&${reward.roleId}>`,
+            )
+            .setColor(genColor(100)),
+        ],
       });
     }
 
-    // Set a reward
+    const reward = rewards.find((reward) => reward.roleId == inputRole.id);
+
+    // Get level of a role
+    if (!inputLevel) {
+      if (rewards.length == 0) {
+        return await interaction.followUp({
+          embeds: [errorEmbed("There are no rewards set for this server.")],
+        });
+      }
+      if (!reward) {
+        return await interaction.followUp({
+          embeds: [errorEmbed("This role is not yet linked to any level.")],
+        });
+      }
+      return await interaction.followUp({
+        embeds: [
+          new EmbedBuilder()
+            .setTitle(`🎁 • Rewards for <@&${reward.roleId}>`)
+            .setDescription(
+              "This level has been linked to level " + reward.level,
+            )
+            .setColor(genColor(100)),
+        ],
+      });
+    }
+
+    // Permission check
+    const user = interaction.guild.members.cache.get(interaction.user.id);
+    if (!user) return;
+    if (!user.permissions.has(PermissionsBitField.Flags.Administrator))
+      return await interaction.followUp({
+        embeds: [errorEmbed("You don't have permission to change rewards.")],
+      });
+
     const level = Number(inputLevel);
-    const role = await interaction.guild.roles.fetch(String(inputRole?.id)).catch(() => null);
+    if (level < 0) {
+      return await interaction.followUp({
+        embeds: [errorEmbed("You can't set a reward for a negative level.")],
+      });
+    }
+
+    // Remove reward
+    if (level == 0) {
+      if (!reward)
+        return await interaction.followUp({
+          embeds: [errorEmbed("This role is not yet linked to any level.")],
+        });
+      remove(interaction.guildId, reward.roleId);
+      return await interaction.followUp({
+        embeds: [
+          new EmbedBuilder()
+            .setTitle(`🎁 • Reward removed`)
+            .setDescription(
+              `<@&${reward.roleId}> will no longer be given out as a leveling reward.`,
+            )
+            .setColor(genColor(100)),
+        ],
+      });
+    }
+
+    if (reward) {
+      updateLevel(interaction.guildId, reward.roleId, level);
+    }
+
+    const role = await interaction.guild.roles
+      .fetch(String(inputRole?.id))
+      .catch(() => null);
 
     if (!role) {
       return await interaction.followUp({
-        embeds: [errorEmbed("That role doesn't exist or couldn't be loaded.")]
+        embeds: [errorEmbed("That role doesn't exist or couldn't be loaded.")],
       });
     }
 
+    // Safety check on the rewarded role
     const permissions = role?.permissions as PermissionsBitField;
-    if (level < 0) {
-      return await interaction.followUp({
-        embeds: [errorEmbed("You can't set a reward for a negative level.")]
-      });
-    }
-    if (level == 0) {
-      return await interaction.followUp({
-        embeds: [errorEmbed("You can't set a reward for level 0.")]
-      });
-    }
     if (role.position >= interaction.guild.members.me.roles.highest.position) {
       return await interaction.followUp({
-        embeds: [errorEmbed("That role is above mine.")]
+        embeds: [errorEmbed("That role is above mine.")],
       });
     }
     if (role?.name?.includes("everyone")) {
       return await interaction.followUp({
-        embeds: [errorEmbed("I can't give out the @everyone role.")]
+        embeds: [errorEmbed("I can't give out the @everyone role.")],
       });
     }
     if (
@@ -131,28 +196,30 @@ export default class Rewards {
       permissions.has(PermissionsBitField.Flags.ManageNicknames)
     ) {
       return await interaction.followUp({
-        embeds: [errorEmbed("I can't give out a role with dangerous permissions.")]
+        embeds: [
+          errorEmbed("I can't give out a role with dangerous permissions."),
+        ],
       });
     }
 
-    const rewards = await this.getRewards(interaction.guildId);
-    const newRewards = rewards.filter(reward => reward.level != level);
-    newRewards.push({
-      roleId: role?.id,
-      level: level
-    });
-    await settingsTable?.set(`${interaction.guild.id}.leveling.rewards`, newRewards).catch(() => "");
+    add(interaction.guildId, role.id, level);
 
     return await interaction.followUp({
-      embeds: [new EmbedBuilder()
-        .setTitle("🎁 • Rewards")
-        .setDescription(`Set the reward for level ${level} to <@&${role?.id}>.`)
-        .setColor(genColor(100))
-      ]
+      embeds: [
+        new EmbedBuilder()
+          .setTitle("🎁 • Rewards")
+          .setDescription(
+            `Set the reward for level ${level} to <@&${role?.id}>.`,
+          )
+          .setColor(genColor(100)),
+      ],
     });
   }
 
   getRewards(guildId: string): Reward[] {
-      return getLevelRewards(guildId).map((val)=>({level: val.level, roleId: val.role.toString()}))
+    return getLevelRewards(guildId).map((val) => ({
+      level: val.level,
+      roleId: val.role.toString(),
+    }));
   }
 }
