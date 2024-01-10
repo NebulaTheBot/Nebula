@@ -14,14 +14,21 @@ const tableDefinition = {
 
 const database = getDatabase(tableDefinition);
 
-const getQuery = database.query("SELECT * FROM ratings WHERE guild = $1;");
+const getQuery = database.query("SELECT * FROM levelRewards WHERE guild = $1;");
 export function get(guildID: string) {
   return getQuery.all(guildID) as TypeOfDefinition<typeof tableDefinition>[];
 }
 
-const test = get("")
+const test = get("");
 
-export function add(guildID: string, level: number, role: number) {}
+const addQuery = database.query(
+  "INSERT INTO levelRewards (guild, level, role) VALUES (?1, ?2, ?3);",
+);
+export function add(guildID: string, level: number, role: number) {
+  return addQuery.all(guildID, level, role) as TypeOfDefinition<
+    typeof tableDefinition
+  >[];
+}
 
 export function updateLevel(guildID: string, level: number, role: number) {}
 

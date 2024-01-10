@@ -15,7 +15,6 @@ const tableDefinition = {
 
 // Define type of settings
 const settingsDefinition = {
-  "custometics.pingedGif": "BOOL",
   "leveling.enabled": "BOOL",
   "leveling.channel": "INTEGER",
   "leveling.persistence": "BOOL",
@@ -48,10 +47,10 @@ export function get<K extends keyof typeof settingsDefinition>(
 let setQuery = database.query(
   "UPDATE settings SET value = $3 WHERE guild = $1 AND key = $2;",
 );
-export function set(
+export function set<K extends keyof typeof settingsDefinition>(
   guild: string,
-  key: keyof typeof settingsDefinition,
-  value: TypeOfKey<typeof key>,
+  key: K,
+  value: TypeOfKey<K>,
 ) {
   setQuery.run(guild, key, JSON.stringify(value));
 }

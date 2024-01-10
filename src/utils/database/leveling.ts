@@ -14,7 +14,7 @@ const tableDefinition = {
 const database = getDatabase(tableDefinition);
 
 const getQuery = database.query(
-  "SELECT * FROM blacklist WHERE guild = $1 AND user = $2;",
+  "SELECT * FROM leveling WHERE guild = $1 AND user = $2;",
 );
 export function get(guildID: string, userID: string): [number, number] {
   const res = getQuery.all(guildID, userID) as TypeOfDefinition<
@@ -24,8 +24,8 @@ export function get(guildID: string, userID: string): [number, number] {
   return [res[0].level, res[0].exp];
 }
 
-const setQuery = database.query("");
-const insertQuery = database.query("");
+const setQuery = database.query("UPDATE leveling SET level = $3, exp = $4 WHERE guild = $1 AND user = $2;");
+const insertQuery = database.query("INSERT INTO leveling (guild, user, level, exp) VALUES (?1, ?2, ?3, ?4);");
 export function set(
   guildID: string | number,
   userID: string,

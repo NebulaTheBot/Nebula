@@ -2,16 +2,14 @@ import { SlashCommandBuilder, SlashCommandSubcommandGroupBuilder, Guild, type Cl
 import { pathToFileURL } from "url";
 import { join } from "path";
 import { readdirSync } from "fs";
-import database, { getSettingsTable } from "../utils/database.js";
-import { QuickDB } from "quick.db";
+import {get as getDisabledCmds} from "../utils/database/disabledCommands";
 
 const COMMANDS_PATH = join(process.cwd(), "src", "commands");
 export default class Commands {
   client: Client;
   commands: any[] = [];
-  db: QuickDB<any>;
 
-  constructor(client?: Client) {
+  constructor(client: Client) {
     this.client = client;
   }
 
@@ -99,17 +97,13 @@ export default class Commands {
 
   // Register the commands for all guilds
   async registerCommands(): Promise<any[]> {
-    const db = await database();
     await this.loadCommands();
-    const settingsTable = await getSettingsTable(db);
     const guilds = this.client.guilds.cache;
 
     // Adding the commands to the guilds
     console.log("Adding commands to guilds...");
     for (const guildID of guilds.keys()) {
-      const disabledCommands = await settingsTable?.get(`${guildID}.disabledCommands`).then(
-        (disabledCommands: string[]) => disabledCommands as string[] ?? [] as string[]
-      ).catch(() => [] as string[]);
+      const disabledCommands = getDisabledCmds(guildID)
       if (disabledCommands.length > 0) await this.loadCommands(...disabledCommands);
       await guilds.get(guildID)?.commands.set(this.commands);
     }

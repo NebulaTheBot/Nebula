@@ -4,9 +4,8 @@ import {
   Role,
 } from "discord.js";
 import { genColor } from "../../../utils/colorGen.js";
+import {get as getLevelRewards} from "../../../utils/database/levelRewards.js";
 import errorEmbed from "../../../utils/embeds/errorEmbed.js";
-import { getSettingsTable } from "../../../utils/database.js";
-import { QuickDB } from "quick.db";
 
 export type Reward = {
   roleId: string,
@@ -15,10 +14,8 @@ export type Reward = {
 
 export default class Rewards {
   data: SlashCommandSubcommandBuilder;
-  db: QuickDB<any>;
 
-  constructor(db?: QuickDB<any>) {
-    this.db = db;
+  constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("rewards")
       .setDescription("Sets/gets reward roles for each level -> No options = shows.")
@@ -33,15 +30,13 @@ export default class Rewards {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const db = this.db;
-    const settingsTable = await getSettingsTable(db);
 
-    const inputLevel = interaction.options.getNumber("level", false);
+    const inputLevel = interaction.options.getNumber("level", false) as number | null;
     const inputRole = interaction.options.getRole("role", false) as Role | null;
 
     if (!inputLevel && !inputRole) {
       // List the rewards
-      const rewards = await this.getRewards(interaction.guild.id).then(rewards => rewards.sort((a, b) => a.level - b.level)) as Reward[];
+      const rewards = this.getRewards();
       if (rewards.length == 0) {
         return await interaction.followUp({
           embeds: [errorEmbed("There are no rewards set for this server.")]
@@ -140,7 +135,7 @@ export default class Rewards {
       });
     }
 
-    const rewards = await this.getRewards(interaction.guild.id).then(rewards => rewards.sort((a, b) => a?.level - b?.level)) as Reward[];
+    const rewards = await this.getRewards(interaction.guildId);
     const newRewards = rewards.filter(reward => reward.level != level);
     newRewards.push({
       roleId: role?.id,
@@ -157,16 +152,7 @@ export default class Rewards {
     });
   }
 
-  async getRewards(guildId: string): Promise<Reward[]> {
-    const settingsTable = await getSettingsTable(this.db);
-    const rewards = new Promise((resolve, reject) => {
-      settingsTable?.get(`${guildId}.leveling.rewards`).then(rewards => {
-        if (!rewards) return resolve([]);
-        resolve(rewards);
-      }).catch(() => {
-        resolve([]);
-      });
-    });
-    return rewards as Promise<Reward[]>;
+  getRewards(guildId: string): Reward[] {
+      return getLevelRewards(guildId).map((val)=>({level: val.level, roleId: val.role.toString()}))
   }
 }

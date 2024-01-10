@@ -1,69 +1,64 @@
 import {
-  SlashCommandSubcommandBuilder, EmbedBuilder,
+  SlashCommandSubcommandBuilder,
+  EmbedBuilder,
   type ChatInputCommandInteraction,
+  User,
 } from "discord.js";
 import { genColor } from "../../../utils/colorGen.js";
+import { set as setLevel } from "../../../utils/database/leveling.js";
+import {get as getLevelRewards} from "../../../utils/database/levelRewards.js";
 import errorEmbed from "../../../utils/embeds/errorEmbed.js";
-import { getLevelingTable, getSettingsTable } from "../../../utils/database.js";
-import { QuickDB } from "quick.db";
 import { Reward } from "./rewards.js";
 
 export default class Set {
   data: SlashCommandSubcommandBuilder;
-  db: QuickDB<any>;
 
-  constructor(db?: QuickDB<any>) {
-    this.db = db;
+  constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("set")
       .setDescription("Sets the levels for a user.")
-      .addUserOption(option => option
-        .setName("user")
-        .setDescription("The user to set the levels for.")
-        .setRequired(true)
+      .addUserOption((option) =>
+        option
+          .setName("user")
+          .setDescription("The user to set the levels for.")
+          .setRequired(true),
       )
-      .addNumberOption(option => option
-        .setName("levels")
-        .setDescription("The amount of levels to set the user to.")
-        .setRequired(true)
+      .addNumberOption((option) =>
+        option
+          .setName("levels")
+          .setDescription("The amount of levels to set the user to.")
+          .setRequired(true),
       );
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const db = this.db;
-    const levelingTable = await getLevelingTable(db);
-    const settingsTable = await getSettingsTable(db);
+    if (!interaction.guildId || !interaction.guild) return;
 
-    const target = interaction.options.getUser("user", true);
-    const level = interaction.options.getNumber("levels", true);
+    const target: User = interaction.options.getUser("user", true);
+    const level: number = interaction.options.getNumber("levels", true);
 
     if (level < 0) {
       return await interaction.followUp({
-        embeds: [errorEmbed("You can't set a user's levels to a negative number.")]
+        embeds: [
+          errorEmbed("You can't set a user's levels to a negative number."),
+        ],
       });
     }
 
-    await levelingTable.set(`${interaction.guild.id}.${target.id}`, {
-      levels: level,
-      exp: 0
-    }).catch(() => "");
+    setLevel(interaction.guildId, target.id, level, 0);
 
-    const levelRewards = await settingsTable?.get(`${interaction.guild.id}.leveling.rewards`).then(
-      (data) => {
-        if (!data) return [] as Reward[];
-        return data as Reward[] ?? [] as Reward[];
-      }
-    ).catch(() => [] as Reward[]);
+    const levelRewards = getLevelRewards(interaction.guildId)
     const members = await interaction.guild.members.fetch();
-    for (const { level: rewardLevel, roleId } of levelRewards) {
-      const role = interaction.guild.roles.cache.get(roleId);
+    for (const { level: rewardLevel, role } of levelRewards) {
+      const roleFetched = interaction.guild.roles.cache.get(role.toString());
+      if (!roleFetched) continue;
 
       if (level >= rewardLevel) {
-        await members.get(target.id)?.roles.add(role);
+        await members.get(target.id)?.roles.add(roleFetched);
         continue;
       }
 
-      await members.get(target.id)?.roles.remove(role);
+      await members.get(target.id)?.roles.remove(roleFetched);
     }
 
     await interaction.followUp({
@@ -71,8 +66,8 @@ export default class Set {
         new EmbedBuilder()
           .setTitle("✅ • Levels set!")
           .setDescription(`Set ${target}'s levels to ${level}.`)
-          .setColor(genColor(100))
-      ]
+          .setColor(genColor(100)),
+      ],
     });
   }
 }
