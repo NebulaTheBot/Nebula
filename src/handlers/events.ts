@@ -14,7 +14,7 @@ export default class Events {
       const eventsPath = join(process.cwd(), "src", "events");
 
       for (const eventFile of readdirSync(eventsPath)) {
-        if (!eventFile.endsWith("js")) continue;
+        if (!eventFile.endsWith("ts")) continue;
 
         const event = await import(pathToFileURL(join(eventsPath, eventFile)).toString());
         const clientEvent = this.client.on(event.default.name, new event.default.event(this.client).run);

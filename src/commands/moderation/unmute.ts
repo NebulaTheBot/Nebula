@@ -1,10 +1,10 @@
 import {
   SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
-  type ChatInputCommandInteraction, TextChannel, DMChannel,
-  Channel, ChannelType
+  TextChannel, DMChannel, ChannelType,
+  type Channel, type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen.js";
-import errorEmbed from "../../utils/embeds/errorEmbed.js";
+import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
 import { getSettingsTable } from "../../utils/database.js";
 import { QuickDB } from "quick.db";
 
@@ -25,54 +25,56 @@ export default class Unmute {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const user = interaction.options.getUser("user");
     const members = interaction.guild.members.cache;
-    const member = members.get(interaction.member.user.id);
-    const selectedMember = members.get(user.id);
-    const name = selectedMember.nickname ?? user.username;
+    if (!members.get(interaction.member.user.id).permissions.has(PermissionsBitField.Flags.MuteMembers))
+      return await interaction.followUp({
+        embeds: [errorEmbed("You need the **Mute Members** permission to execute this command.")]
+      });
 
-    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;;
-    let unmuteEmbed = new EmbedBuilder()
+    const user = interaction.options.getUser("user");
+    const embed = new EmbedBuilder()
+      .setAuthor({ name: `• ${members.get(user.id).nickname ?? user.username}`, iconURL: user.displayAvatarURL() })
       .setTitle(`✅ • Unmuted ${user.username}`)
       .setDescription([
         `**Moderator**: <@${interaction.user.id}>`,
         `**Date**: <t:${Math.floor(Date.now() / 1000)}:f>`
       ].join("\n"))
-      .setAuthor({ name: `• ${name}`, iconURL: user.displayAvatarURL() })
       .setThumbnail(user.displayAvatarURL())
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
+
     const embedDM = new EmbedBuilder()
+      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setTitle(`🤝 • You were unmuted`)
       .setDescription([
         `**Moderator**: ${interaction.user.username}`,
         `**Date**: <t:${Math.floor(Date.now() / 1000)}:f>`
       ].join("\n"))
       .setThumbnail(user.displayAvatarURL())
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
-    if (!member.permissions.has(PermissionsBitField.Flags.MuteMembers))
-      return await interaction.followUp({ embeds: [errorEmbed("You need the **Mute Members** permission to execute this command.")] });
+    const logChannel = await (await getSettingsTable(this.db))
+      ?.get(`${interaction.guild.id}.logChannel`)
+      .then((channel: string | null) => channel)
+      .catch(() => null);
 
-    const db = this.db;
-    const settingsTable = await getSettingsTable(db);
-    const logChannel = await settingsTable?.get(`${interaction.guild.id}.logChannel`).then(
-      (channel: string | null) => channel
-    ).catch(() => null);
     if (logChannel) {
-      const channel = await interaction.guild.channels.cache.get(logChannel).fetch().then(
-        (channel: Channel) => {
+      const channel = await interaction.guild.channels.cache
+        .get(logChannel)
+        .fetch()
+        .then((channel: Channel) => {
           if (channel.type != ChannelType.GuildText) return null;
           return channel as TextChannel;
-        }
-      ).catch(() => null);
-      if (channel) await channel.send({ embeds: [unmuteEmbed] });
+        })
+        .catch(() => null);
+
+      if (channel) await channel.send({ embeds: [embed] });
     }
 
+    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
     if (dmChannel) await dmChannel.send({ embeds: [embedDM] });
-    await selectedMember.edit({ communicationDisabledUntil: null });
-    await interaction.followUp({ embeds: [unmuteEmbed] });
+    await members.get(user.id).edit({ communicationDisabledUntil: null });
+    await interaction.followUp({ embeds: [embed] });
   }
 }

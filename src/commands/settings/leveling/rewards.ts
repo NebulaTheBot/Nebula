@@ -1,10 +1,9 @@
 import {
   SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
-  type ChatInputCommandInteraction,
-  Role,
+  Role, type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../../utils/colorGen.js";
-import errorEmbed from "../../../utils/embeds/errorEmbed.js";
+import { errorEmbed } from "../../../utils/embeds/errorEmbed.js";
 import { getSettingsTable } from "../../../utils/database.js";
 import { QuickDB } from "quick.db";
 
@@ -35,18 +34,15 @@ export default class Rewards {
   async run(interaction: ChatInputCommandInteraction) {
     const db = this.db;
     const settingsTable = await getSettingsTable(db);
-
-    const inputLevel = interaction.options.getNumber("level", false);
+    const level = interaction.options.getNumber("level", false);
     const inputRole = interaction.options.getRole("role", false) as Role | null;
 
-    if (!inputLevel && !inputRole) {
-      // List the rewards
+    if (!level && !inputRole) {
       const rewards = await this.getRewards(interaction.guild.id).then(rewards => rewards.sort((a, b) => a.level - b.level)) as Reward[];
-      if (rewards.length == 0) {
-        return await interaction.followUp({
-          embeds: [errorEmbed("There are no rewards set for this server.")]
-        });
-      }
+
+      if (rewards.length == 0) return await interaction.followUp({
+        embeds: [errorEmbed("There are no rewards set for this server.")]
+      });
 
       const rewardsEmbed = new EmbedBuilder()
         .setTitle("🎁 • Rewards")
@@ -55,31 +51,20 @@ export default class Rewards {
 
       for (const { roleId, level } of rewards) {
         if (!roleId) continue;
-        rewardsEmbed.addFields([{
-          name: `Level ${level}`,
-          value: `<@&${roleId}>`,
-        }]);
+        rewardsEmbed.addFields({ name: `Level ${level}`, value: `<@&${roleId}>` });
       }
 
-      return await interaction.followUp({
-        embeds: [rewardsEmbed]
-      });
-    } else if (inputLevel && !inputRole) {
-      // Delete a reward
-      const level = Number(inputLevel);
+      return await interaction.followUp({ embeds: [rewardsEmbed] });
+    } else if (level && !inputRole) {
       const rewards = await this.getRewards(interaction.guild.id).then(rewards => rewards.sort((a, b) => a?.level - b?.level)) as Reward[];
-      if (rewards.length == 0) {
-        return await interaction.followUp({
-          embeds: [errorEmbed("There are no rewards set for this server.")]
-        });
-      }
 
-      const reward = rewards.find(reward => reward?.level == level);
-      if (!reward) {
-        return await interaction.followUp({
-          embeds: [errorEmbed(`There is no reward set for level ${level}.`)]
-        });
-      }
+      if (rewards.length == 0) return await interaction.followUp({
+        embeds: [errorEmbed("There are no rewards set for this server.")]
+      });
+
+      if (!rewards.find(reward => reward?.level == level)) return await interaction.followUp({
+        embeds: [errorEmbed(`There is no reward set for level ${level}.`)]
+      });
 
       const newRewards = rewards.filter(reward => reward.level != level);
       await settingsTable?.set(`${interaction.guild.id}.leveling.rewards`, newRewards).catch(() => []);
@@ -93,37 +78,29 @@ export default class Rewards {
       });
     }
 
-    // Set a reward
-    const level = Number(inputLevel);
     const role = await interaction.guild.roles.fetch(String(inputRole?.id)).catch(() => null);
-
-    if (!role) {
-      return await interaction.followUp({
-        embeds: [errorEmbed("That role doesn't exist or couldn't be loaded.")]
-      });
-    }
-
     const permissions = role?.permissions as PermissionsBitField;
-    if (level < 0) {
-      return await interaction.followUp({
-        embeds: [errorEmbed("You can't set a reward for a negative level.")]
-      });
-    }
-    if (level == 0) {
-      return await interaction.followUp({
-        embeds: [errorEmbed("You can't set a reward for level 0.")]
-      });
-    }
-    if (role.position >= interaction.guild.members.me.roles.highest.position) {
-      return await interaction.followUp({
-        embeds: [errorEmbed("That role is above mine.")]
-      });
-    }
-    if (role?.name?.includes("everyone")) {
-      return await interaction.followUp({
-        embeds: [errorEmbed("I can't give out the @everyone role.")]
-      });
-    }
+
+    if (!role) return await interaction.followUp({
+      embeds: [errorEmbed("That role doesn't exist or couldn't be loaded.")]
+    });
+
+    if (level < 0) return await interaction.followUp({
+      embeds: [errorEmbed("You can't set a reward for a negative level.")]
+    });
+
+    if (level == 0) return await interaction.followUp({
+      embeds: [errorEmbed("You can't set a reward for level 0.")]
+    });
+
+    if (role.position >= interaction.guild.members.me.roles.highest.position) return await interaction.followUp({
+      embeds: [errorEmbed("That role is above mine.")]
+    });
+
+    if (role?.name?.includes("everyone")) return await interaction.followUp({
+      embeds: [errorEmbed("I can't give out the @everyone role.")]
+    });
+
     if (
       permissions.has(PermissionsBitField.Flags.Administrator) ||
       permissions.has(PermissionsBitField.Flags.ManageRoles) ||
@@ -134,11 +111,9 @@ export default class Rewards {
       permissions.has(PermissionsBitField.Flags.ManageMessages) ||
       permissions.has(PermissionsBitField.Flags.ManageThreads) ||
       permissions.has(PermissionsBitField.Flags.ManageNicknames)
-    ) {
-      return await interaction.followUp({
-        embeds: [errorEmbed("I can't give out a role with dangerous permissions.")]
-      });
-    }
+    ) return await interaction.followUp({
+      embeds: [errorEmbed("I can't give out a role with dangerous permissions.")]
+    });
 
     const rewards = await this.getRewards(interaction.guild.id).then(rewards => rewards.sort((a, b) => a?.level - b?.level)) as Reward[];
     const newRewards = rewards.filter(reward => reward.level != level);
@@ -159,14 +134,14 @@ export default class Rewards {
 
   async getRewards(guildId: string): Promise<Reward[]> {
     const settingsTable = await getSettingsTable(this.db);
-    const rewards = new Promise((resolve, reject) => {
-      settingsTable?.get(`${guildId}.leveling.rewards`).then(rewards => {
+    const rewards = new Promise(resolve => settingsTable
+      ?.get(`${guildId}.leveling.rewards`)
+      .then(rewards => {
         if (!rewards) return resolve([]);
         resolve(rewards);
-      }).catch(() => {
-        resolve([]);
-      });
-    });
+      })
+      .catch(() => resolve([])));
+
     return rewards as Promise<Reward[]>;
   }
 }

@@ -18,7 +18,6 @@ const client = new Client({
 
 client.on("ready", async () => {
   new Events(client);
-  console.log("Starting all commands.");
   await new Commands(client).registerCommands();
   console.log("ちーっす！");
 });

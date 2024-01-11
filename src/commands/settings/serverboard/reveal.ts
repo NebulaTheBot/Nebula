@@ -3,8 +3,8 @@ import {
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../../utils/colorGen.js";
-import errorEmbed from "../../../utils/embeds/errorEmbed.js";
-import database, { getServerboardTable } from "../../../utils/database.js";
+import { errorEmbed } from "../../../utils/embeds/errorEmbed.js";
+import { getServerboardTable } from "../../../utils/database.js";
 import { QuickDB } from "quick.db";
 
 export default class Reveal {

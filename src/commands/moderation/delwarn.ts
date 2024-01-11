@@ -1,30 +1,31 @@
 import {
   SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
   TextChannel, DMChannel, ChannelType,
-  type Channel, type ChatInputCommandInteraction
+  type Channel, type ChatInputCommandInteraction 
 } from "discord.js";
 import { genColor } from "../../utils/colorGen.js";
 import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
 import { QuickDB } from "quick.db";
 import { getModerationTable, getSettingsTable } from "../../utils/database.js";
 
-export default class Warn {
+export default class Delwarn {
   data: SlashCommandSubcommandBuilder;
   db: QuickDB<any>;
 
   constructor(db: QuickDB<any>) {
     this.db = db;
     this.data = new SlashCommandSubcommandBuilder()
-      .setName("warn")
-      .setDescription("Warns a user.")
+      .setName("delwarn")
+      .setDescription("Removes a warning from a user.")
       .addUserOption(user => user
         .setName("user")
-        .setDescription("The user that you want to warn.")
+        .setDescription("The user that you want to free from the warning.")
         .setRequired(true)
       )
-      .addStringOption(string => string
-        .setName("reason")
-        .setDescription("The reason for the warn.")
+      .addNumberOption(string => string
+        .setName("id")
+        .setDescription("The id of the warn.")
+        .setRequired(true)
       );
   }
 
@@ -34,34 +35,37 @@ export default class Warn {
     const member = members.get(interaction.member.user.id);
     const selectedMember = members.get(user.id);
     const name = selectedMember.nickname ?? user.username;
+    const id = interaction.options.getNumber("id", true);
+    const warns = await (await getModerationTable(this.db))
+      ?.get(`${interaction.guild.id}.${user.id}.warns`)
+      .then(warns => warns as any[] ?? [])
+      .catch(() => []);
+    const newWarns = warns.filter(warn => warn.id !== id);
 
     if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) return await interaction.followUp({
       embeds: [errorEmbed("You need the **Moderate Members** permission to execute this command.")]
     });
 
-    if (selectedMember === member) return await interaction.followUp({ embeds: [errorEmbed("You can't warn yourself.")] });
+    if (selectedMember === member) return await interaction.followUp({ embeds: [errorEmbed("You can't remove a warn from yourself.")] });
+
+    if (newWarns.length === warns.length) return await interaction.followUp({
+      embeds: [errorEmbed(`There is no warn with the id of ${id}.`)]
+    });
 
     if (!selectedMember.manageable) return await interaction.followUp({
-      embeds: [errorEmbed(`You can't warn ${name}, because they have a higher role position than Nebula.`)]
+      embeds: [errorEmbed(`You can't unwarn ${name}, because they have a higher role position than Nebula.`)]
     });
 
     if (member.roles.highest.position < selectedMember.roles.highest.position) return await interaction.followUp({
-      embeds: [errorEmbed(`You can't warn ${name}, because they have a higher role position than you.`)]
+      embeds: [errorEmbed(`You can't unwarn ${name}, because they have a higher role position than you.`)]
     });
-
-    const newWarn = {
-      id: Date.now(),
-      userId: user.id,
-      moderator: member.id,
-      reason: interaction.options.getString("reason") ?? "No reason provided"
-    };
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`✅ • Warned ${user.username}`)
+      .setTitle(`✅ • Removed warning`)
       .setDescription([
         `**Moderator**: <@${member.id}>`,
-        `**Reason**: ${interaction.options.getString("reason") ?? "No reason provided"}`
+        `**Original reason**: ${newWarns.find(warn => warn.id === id)?.reason ?? "No reason provided"}`
       ].join("\n"))
       .setThumbnail(user.displayAvatarURL())
       .setFooter({ text: `User ID: ${user.id}` })
@@ -69,10 +73,10 @@ export default class Warn {
 
     const embedDM = new EmbedBuilder()
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle("⚠️ • You were warned")
+      .setTitle(`🤝 • Your warning was removed`)
       .setDescription([
-        `**Moderator**: <@${member.id}>`,
-        `**Reason**: ${interaction.options.getString("reason") ?? "No reason provided"}`
+        `**Moderator**: ${member.user.username}`,
+        `**Original reason**: ${newWarns.find(warn => warn.id === id)?.reason ?? "No reason provided"}`
       ].join("\n"))
       .setThumbnail(user.displayAvatarURL())
       .setFooter({ text: `User ID: ${user.id}` })
@@ -90,14 +94,15 @@ export default class Warn {
         .then((channel: Channel) => {
           if (channel.type != ChannelType.GuildText) return null;
           return channel as TextChannel;
-        }).catch(() => null);
+        })
+        .catch(() => null);
 
       if (channel) await channel.send({ embeds: [embed] });
     }
 
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
     if (dmChannel) await dmChannel.send({ embeds: [embedDM] });
-    await (await getModerationTable(this.db))?.push(`${interaction.guild.id}.${user.id}.warns`, newWarn);
+    await (await getModerationTable(this.db))?.set(`${interaction.guild.id}.${user.id}.warns`, newWarns);
     await interaction.followUp({ embeds: [embed] });
   }
 }

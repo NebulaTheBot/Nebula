@@ -5,7 +5,7 @@ import {
 import { genColor } from "../../../utils/colorGen.js";
 import Commands from "../../../handlers/commands.js";
 import { getSettingsTable } from "../../../utils/database.js";
-import errorEmbed from "../../../utils/embeds/errorEmbed.js";
+import { errorEmbed } from "../../../utils/embeds/errorEmbed.js";
 import { QuickDB } from "quick.db";
 
 export default class Toggle {
@@ -34,9 +34,10 @@ export default class Toggle {
     const commandPath = interaction.options.getString("command", true);
     let [commandName, subcommandName, subcommandGroupName] = commandPath.split(" ");
     commandName = commandName.replace("/", "");
-    const disabledCommands = await settingsTable?.get(`${interaction.guild.id}.disabledCommands`).then(
-      (disabledCommands) => disabledCommands as any[] ?? []
-    ).catch(() => []);
+    const disabledCommands = await settingsTable
+      ?.get(`${interaction.guild.id}.disabledCommands`)
+      .then(disabledCommands => disabledCommands as any[] ?? [])
+      .catch(() => []);
 
     const hasCommand = (name: string, subcommand?: string, subcommandGroup?: string) => {
       return commands.commands.some(command =>
@@ -54,14 +55,13 @@ export default class Toggle {
       ? disabledCommands.filter((cmd) => cmd !== commandName)
       : [...disabledCommands, commandName];
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild))
-      return await interaction.followUp({
-        embeds: [errorEmbed("You need the **Manage Server** permission to enable commands.")],
-      });
+    if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return await interaction.followUp({
+      embeds: [errorEmbed("You need the **Manage Server** permission to enable commands.")],
+    });
 
-    if (!hasCommand(commandName, subcommandName, subcommandGroupName)) {
-      return await interaction.followUp({ embeds: [errorEmbed("The specified command doesn't exist.")] });
-    }
+    if (!hasCommand(commandName, subcommandName, subcommandGroupName)) return await interaction.followUp({
+      embeds: [errorEmbed("The specified command doesn't exist.")]
+    });
 
     const embed = new EmbedBuilder()
       .setTitle(`⌚ • ${isEnabled ? "Disabling" : "Enabling"} ${commandPath}.`)

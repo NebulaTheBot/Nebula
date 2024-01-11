@@ -1,5 +1,5 @@
 import { DMChannel, EmbedBuilder, Guild } from "discord.js";
-import database, { getNewsTable } from "./database.js";
+import { database, getNewsTable } from "./database.js";
 import { genColor } from "./colorGen.js";
 
 export type News = {
@@ -13,12 +13,12 @@ export type News = {
   messageId?: string
 }
 
-export default async function sendSubscribedNews(guild: Guild, news: News) {
+export async function sendSubscribedNews(guild: Guild, news: News) {
   const db = await database();
   const newsTable = await getNewsTable(db);
 
   const subscriptions = await newsTable.get(`${guild.id}.subscriptions`).then(
-    (subscriptions) => subscriptions as string[] ?? [] as string[]
+    subscriptions => subscriptions as string[] ?? [] as string[]
   ).catch(() => [] as string[]);
   const members = await guild.members.fetch();
   const subscribed = members.filter((member) => subscriptions.includes(member.id));

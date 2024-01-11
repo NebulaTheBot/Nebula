@@ -1,5 +1,5 @@
 import type { Message } from "discord.js";
-import randomise from "../../utils/randomise.js";
+import { randomise } from "../../utils/randomise.js";
 
 export default class WhoPinged {
   async run(message: Message) {

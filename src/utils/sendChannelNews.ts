@@ -2,7 +2,7 @@ import {
   EmbedBuilder, Guild, Role,
   TextChannel
 } from "discord.js";
-import database, { getNewsTable } from "./database.js";
+import { database, getNewsTable } from "./database.js";
 import { genColor } from "./colorGen.js";
 
 export type News = {
@@ -16,12 +16,12 @@ export type News = {
   messageId?: string
 }
 
-export default async function sendChannelNews(guild: Guild, news: News, id: string) {
+export async function sendChannelNews(guild: Guild, news: News, id: string) {
   const db = await database();
   const newsTable = await getNewsTable(db);
 
   const subscribedChannel = await newsTable.get(`${guild.id}.channel`).then(
-    (channel) => channel as { channelId: string | null, roleId: string | null }
+    channel => channel as { channelId: string | null, roleId: string | null }
   ).catch(() => {
     return {
       channelId: null as string | null,

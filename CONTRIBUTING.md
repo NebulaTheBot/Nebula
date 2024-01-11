@@ -18,7 +18,7 @@
 We use MySQL for the database. You need to set one up to be able to run the bot.
 
 - Create a database file called `json.db`
-- It is recommended to create a specific user for Nebula only. See [the docs](https://dev.mysql.com/doc/refman/8.0/en/creating-accounts.html) for more information
+- It is recommended to create a specific user for Nebula only. See [the docs](https://dev.mysql.com/doc/refman/8.0/en/creating-accounts.html) for more information.
 
 ### Setting up .env
 - Copy the `example.env` file and replace the content with your own credentials inside a file called `.env`.
