@@ -1,3 +1,4 @@
+// TODO: SQLite Migration
 import {
   PermissionsBitField, EmbedBuilder, SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction, TextChannel, DMChannel,

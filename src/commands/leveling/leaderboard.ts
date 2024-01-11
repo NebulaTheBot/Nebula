@@ -1,3 +1,4 @@
+// TODO: SQLite Migration
 import { SlashCommandSubcommandBuilder, EmbedBuilder, type ChatInputCommandInteraction } from "discord.js";
 import { genColor } from "../../utils/colorGen.js";
 import { getLevelingTable, getSettingsTable } from "../../utils/database.js";

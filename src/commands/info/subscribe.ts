@@ -1,3 +1,4 @@
+// TODO: SQLite Migration
 import {
   SlashCommandSubcommandBuilder, EmbedBuilder, type ChatInputCommandInteraction, DMChannel
 } from "discord.js";

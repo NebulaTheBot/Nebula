@@ -1,3 +1,4 @@
+// TODO: SQLite Migration
 import {
   ColorResolvable,
   SlashCommandSubcommandBuilder,
@@ -7,10 +8,8 @@ import {
 import { genColor, genRGBColor } from "../../utils/colorGen.js";
 import Vibrant from "node-vibrant";
 import sharp from "sharp";
-import { getLevelingTable, getSettingsTable } from "../../utils/database.js";
 import { BASE_EXP_FOR_NEW_LEVEL, DIFFICULTY_MULTIPLIER } from "../../events/leveling.js";
 import errorEmbed from "../../utils/embeds/errorEmbed.js";
-import { QuickDB } from "quick.db";
 import { Reward } from "../settings/leveling/rewards.js";
 
 export default class Level {
