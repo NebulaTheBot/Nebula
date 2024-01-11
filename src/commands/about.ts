@@ -25,7 +25,7 @@ export default class About {
         {
           name: "📃 • General",
           value: [
-            "**Version** 0.2, *Dasshubodo update*",
+            "**Version** 0.1",
             `**${guilds.size}** guild${guilds.size === 1 ? "" : "s"} • **${shards}** shard${shards === 1 ? "" : "s"}`
           ].join("\n")
         },
