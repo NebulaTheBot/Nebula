@@ -2,9 +2,9 @@ import {
   EmbedBuilder, type DMChannel, type Client,
   type Guild
 } from "discord.js";
-import { genColor } from "../utils/colorGen.js";
-import { randomise } from "../utils/randomise.js";
-import Commands from "../handlers/commands.js";
+import { genColor } from "../utils/colorGen";
+import { randomise } from "../utils/randomise";
+import Commands from "../handlers/commands";
 
 export default {
   name: "guildCreate",

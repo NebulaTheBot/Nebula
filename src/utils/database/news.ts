@@ -14,13 +14,17 @@ const definition = {
     updatedAt: "TIMESTAMP",
     messageID: "INTEGER",
     categoryID: "TEXT",
-    id: "TEXT",
-  },
+    id: "TEXT"
+  }
 } satisfies TableDefinition;
 
 const database = getDatabase(definition);
-
 const addQuery = database.query("");
+const listAllQuery = database.query("SELECT * FROM news WHERE guild = $1;");
+const listCategoryQuery = database.query("SELECT * FROM news WHERE guild = $1 AND categoryID = $2;");
+const updateQuery = database.query("UPDATE news SET title = $2, body = $3, imageURL = $4 WHERE id = $1");
+const deleteQuery = database.query("DELETE FROM news WHERE id = $1");
+
 export function addNews(
   guildID: number | string,
   title: string,
@@ -29,7 +33,7 @@ export function addNews(
   author: string,
   authorPFP: string,
   messageID: string | number,
-  categoryID: string,
+  categoryID: string
 ) {
   addQuery.run(
     guildID,
@@ -42,37 +46,22 @@ export function addNews(
     0,
     messageID,
     categoryID,
-    crypto.randomUUID(),
+    crypto.randomUUID()
   );
 }
 
-const listAllQuery = database.query("SELECT * FROM news WHERE guild = $1;");
 export function listAllNews(guildID: string | number) {
   return listAllQuery.all(guildID) as TypeOfDefinition<typeof definition>[];
 }
 
-const listCategoryQuery = database.query(
-  "SELECT * FROM news WHERE guild = $1 AND categoryID = $2;",
-);
 export function listCategoryNews(guildID: string | number, categoryID: string) {
-  return listCategoryQuery.all(guildID, guildID) as TypeOfDefinition<
-    typeof definition
-  >[];
+  return listCategoryQuery.all(guildID, categoryID) as TypeOfDefinition<typeof definition>[];
 }
 
-const updateQuery = database.query(
-  "UPDATE news SET title = $2, body = $3, imageURL = $4 WHERE id = $1",
-);
-export function updateNews(
-  id: string,
-  title: string,
-  body: string,
-  imageURL: string,
-) {
+export function updateNews(id: string, title: string, body: string, imageURL: string) {
   updateQuery.run(id, title, body, imageURL);
 }
 
-const deleteQuery = database.query("DELETE FROM news WHERE id = $1");
 export function deleteNews(id: string) {
   deleteQuery.run(id);
 }

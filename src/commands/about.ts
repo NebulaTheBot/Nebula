@@ -1,6 +1,6 @@
 import { SlashCommandSubcommandBuilder, EmbedBuilder, type ChatInputCommandInteraction } from "discord.js";
-import { genColor } from "../utils/colorGen.js";
-import { randomise } from "../utils/randomise.js";
+import { genColor } from "../utils/colorGen";
+import { randomise } from "../utils/randomise";
 
 export default class About {
   data: SlashCommandSubcommandBuilder;
@@ -15,7 +15,7 @@ export default class About {
   async run(interaction: ChatInputCommandInteraction) {
     const client = interaction.client;
     const guilds = client.guilds.cache;
-    const shards = client.shard.count;
+    const shards = client.shard?.count;
     const hearts = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
 
     const embed = new EmbedBuilder()

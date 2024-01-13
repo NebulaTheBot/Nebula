@@ -19,9 +19,9 @@ export default class Leaderboard {
     const settingsTable = await getSettingsTable(this.db);
     const levelingTable = await getLevelingTable(this.db);
 
-    // return await interaction.followUp({
-    //   embeds: [errorEmbed("This command is under maintenance.")]
-    // });
+    return await interaction.followUp({
+      embeds: [errorEmbed("This command is under maintenance.")]
+    });
 
     const levelEnabled = await settingsTable?.get(`${interaction.guild.id}.leveling.enabled`).catch(() => { });
     const levels = await levelingTable?.get(`${interaction.guild.id}`).catch(() => { });

@@ -28,10 +28,10 @@ export function genColor(hue: number) {
  * @param b Blue.
  * @returns Color in HEX.
  */
-export function genRGBColor(r, g, b) {
-  r = r.toString(16);
-  g = g.toString(16);
-  b = b.toString(16);
+export function genRGBColor(r: string | any[], g: string | any[], b: string | any[]) {
+  r = r.toString();
+  g = g.toString();
+  b = b.toString();
 
   if (r.length === 1) r = `0${r}`;
   if (g.length === 1) g = `0${g}`;

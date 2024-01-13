@@ -2,8 +2,7 @@ import {
   EmbedBuilder, Guild, Role,
   TextChannel
 } from "discord.js";
-import { database, getNewsTable } from "./database.js";
-import { genColor } from "./colorGen.js";
+import { genColor } from "./colorGen";
 
 export type News = {
   title: string
@@ -21,7 +20,7 @@ export async function sendChannelNews(guild: Guild, news: News, id: string) {
   const newsTable = await getNewsTable(db);
 
   const subscribedChannel = await newsTable.get(`${guild.id}.channel`).then(
-    channel => channel as { channelId: string | null, roleId: string | null }
+    (channel: { channelId: string | null; roleId: string | null; }) => channel as { channelId: string | null, roleId: string | null }
   ).catch(() => {
     return {
       channelId: null as string | null,
@@ -35,7 +34,7 @@ export async function sendChannelNews(guild: Guild, news: News, id: string) {
   if (!channelToSend) return;
 
   const role = subscribedChannel.roleId;
-  let roleToSend: Role | null;
+  let roleToSend: Role | undefined;
   if (role) roleToSend = guild.roles.cache.get(role);
 
   const newsEmbed = new EmbedBuilder()
@@ -47,7 +46,7 @@ export async function sendChannelNews(guild: Guild, news: News, id: string) {
     .setFooter({ text: `Latest news from ${guild.name}` })
     .setColor(genColor(200));
 
-  const message = await channelToSend.send({ embeds: [newsEmbed], content: roleToSend ? `<@&${roleToSend.id}>` : null });
+  const message = await channelToSend.send({ embeds: [newsEmbed], content: roleToSend ? `<@&${roleToSend.id}>` : undefined });
   await newsTable.set(`${guild.id}.news.${id}.messageId`, message.id);
   return;
 }

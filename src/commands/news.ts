@@ -2,7 +2,7 @@ import {
   SlashCommandSubcommandBuilder, EmbedBuilder, ActionRowBuilder,
   ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor } from "../utils/colorGen.js";
+import { genColor } from "../utils/colorGen";
 import { getNewsTable } from "../utils/database.js";
 import { QuickDB } from "quick.db";
 

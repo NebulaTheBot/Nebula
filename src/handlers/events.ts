@@ -17,7 +17,7 @@ export default class Events {
         if (!eventFile.endsWith("ts")) continue;
 
         const event = await import(pathToFileURL(join(eventsPath, eventFile)).toString());
-        const clientEvent = this.client.on(event.default.name, new event.default.event(this.client).run);
+        const clientEvent = client.on(event.default.name, new event.default.event(client).run);
 
         this.events.push({ name: event.default.name, event: clientEvent });
       }
