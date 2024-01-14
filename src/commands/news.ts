@@ -3,15 +3,12 @@ import {
   ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../utils/colorGen";
-import { getNewsTable } from "../utils/database.js";
-import { QuickDB } from "quick.db";
+import { listAllNews } from "../utils/database/news";
 
 export default class News {
   data: SlashCommandSubcommandBuilder;
-  db: QuickDB<any>;
 
-  constructor(db?: QuickDB<any>) {
-    this.db = db;
+  constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("news")
       .setDescription("The news of Nebula.")
@@ -23,17 +20,13 @@ export default class News {
 
   async run(interaction: ChatInputCommandInteraction) {
     let page = interaction.options.getNumber("page") ?? 1;
-    const news = await (await getNewsTable(this.db))
-      .get(`903852579837059113.news`) // News of the Nebula server
-      .then(news => news as any[] ?? [])
-      .catch(() => []);
+    const newsSorted = (Object.values(listAllNews("903852579837059113")) as any[])?.sort((a, b) => b.createdAt - a.createdAt);
 
-    const newsSorted = (Object.values(news) as any[])?.sort((a, b) => b.createdAt - a.createdAt);
     if (page > newsSorted.length) page = newsSorted.length;
     if (page < 1) page = 1;
 
     let currentNews = newsSorted[page - 1];
-    let newsEmbed = new EmbedBuilder()
+    let embed = new EmbedBuilder()
       .setAuthor({ name: currentNews.author, iconURL: currentNews.authorPfp ?? null })
       .setTitle(currentNews.title)
       .setDescription(currentNews.body)
@@ -53,25 +46,24 @@ export default class News {
         .setStyle(ButtonStyle.Primary)
     );
 
-    await interaction.followUp({ embeds: [newsEmbed], components: [row] });
+    await interaction.followUp({ embeds: [embed], components: [row] });
     interaction.channel
-      .createMessageComponentCollector({ filter: i => i.user.id === interaction.user.id, time: 60000 })
-      .on("collect", async i => {
-      if (!i.isButton()) return;
+      ?.createMessageComponentCollector({ filter: (i: { user: { id: string; }; }) => i.user.id === interaction.user.id, time: 60000 })
+      .on("collect", async (i: { isButton: () => any; customId: string; deferUpdate: () => any; }) => {
+        if (!i.isButton()) return;
+        if (i.customId === "left") {
+          page--;
+          if (page < 1) page = newsSorted.length;
+        } else if (i.customId === "right") {
+          page++;
+          if (page > newsSorted.length) page = 1;
+        }
 
-      if (i.customId === "left") {
-        page--;
-        if (page < 1) page = newsSorted.length;
-      } else if (i.customId === "right") {
-        page++;
-        if (page > newsSorted.length) page = 1;
-      }
+        currentNews = currentNews;
+        embed = embed;
 
-      currentNews = currentNews;
-      newsEmbed = newsEmbed;
-
-      await interaction.editReply({ embeds: [newsEmbed], components: [row] });
-      await i.deferUpdate();
-    });
+        await interaction.editReply({ embeds: [embed], components: [row] });
+        await i.deferUpdate();
+      });
   }
 }

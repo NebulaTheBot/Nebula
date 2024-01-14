@@ -1,5 +1,5 @@
 import type { Message } from "discord.js";
-import { randomise } from "../../utils/randomise.js";
+import { randomise } from "../../utils/randomise";
 
 export default class WhoPinged {
   async run(message: Message) {
@@ -12,7 +12,7 @@ export default class WhoPinged {
         "https://tenor.com/view/me-when-someone-pings-me-sad-cursed-emoji-crying-gif-22784322",
         "https://tenor.com/view/discord-triggered-notification-angry-dog-noises-dog-girl-gif-11710406",
         "https://tenor.com/view/tense-table-smash-mad-gif-13656077",
-        "https://tenor.com/view/yakuza-kazuma-kiryu-pissed-off-gif-14586175",
+        "https://tenor.com/view/yakuza-kazuma-kiryu-pissed-off-gif-14586175"
       ]);
 
       await message.channel.send(gifs);

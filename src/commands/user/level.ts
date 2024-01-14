@@ -1,16 +1,13 @@
 import { SlashCommandSubcommandBuilder, EmbedBuilder, type ChatInputCommandInteraction } from "discord.js";
-import { genColor } from "../../utils/colorGen.js";
-import { getLevelingTable, getSettingsTable } from "../../utils/database.js";
-import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
-import { QuickDB } from "quick.db";
-import { Reward } from "../settings/leveling/rewards.js";
+import { genColor } from "../../utils/colorGen";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { get as getLevelRewards } from "../../utils/database/levelRewards";
+import { get } from "../../utils/database/settings";
+import { getLevel, setLevel } from "../../utils/database/levelling";
 
 export default class Level {
   data: SlashCommandSubcommandBuilder;
-  db: QuickDB<any>;
-
-  constructor(db?: QuickDB<any>) {
-    this.db = db;
+  constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("level")
       .setDescription("Shows your (or another user's) level.")
@@ -21,89 +18,55 @@ export default class Level {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const db = this.db;
-    const settingsTable = await getSettingsTable(db);
-    const levelingTable = await getLevelingTable(db);
-
-    const user = interaction.options.getUser("user");
-    const member = interaction.member;
     const guild = interaction.guild;
-
-    const id = user ? user.id : member.user.id;
-    const selectedMember = guild.members.cache.filter(member => member.user.id === id).map(user => user)[0];
-    const avatarURL = selectedMember.displayAvatarURL();
-
-    const levelEnabled = await settingsTable
-      ?.get(`${guild.id}.leveling.enabled`)
-      .then(data => {
-        if (!data) return false;
-        return data;
-      })
-      .catch(() => false);
-
-    if (!levelEnabled) return await interaction.followUp({
+    if (!get(`${guild?.id}`, "levelling.enabled")) return await interaction.followUp({
       embeds: [errorEmbed("Leveling is disabled for this server.")]
     });
 
-    const { exp, levels } = await levelingTable
-      ?.get(`${guild.id}.${selectedMember.id}`)
-      .then(data => {
-        if (!data) return { exp: 0, level: 0 };
-        return { exp: parseInt(data.exp), levels: parseInt(data.levels) };
-      })
-      .catch(() => { return { exp: 0, levels: 0 } });
+    const user = interaction.options.getUser("user");
+    const id = user ? user.id : interaction.member?.user.id;
+    const selectedMember = guild?.members.cache.filter(member => member.user.id === id).map(user => user)[0];
+    const [guildExp, guildLevel] = getLevel(`${guild?.id}`, `${selectedMember?.id}`);
+    if (!guildExp && !guildLevel) setLevel(`${guild?.id}`, `${selectedMember?.id}`, 0, 0);
 
-    const formattedExp = exp?.toLocaleString("en-US");
-
-    if (!exp && !levels) await levelingTable.set(`${guild.id}.${selectedMember.id}`, { levels: 0, exp: 0 });
-
+    const avatarURL = selectedMember?.displayAvatarURL();
+    const formattedExp = guildExp?.toLocaleString("en-US");
+    const formattedExpUntilLevelup = Math.floor(100 * 1.25 * ((guildLevel ?? 0) + 1))?.toLocaleString("en-US");
     let rewards = [];
-    let nextReward = null;
-    const levelRewards = await settingsTable
-      ?.get(`${interaction.guild.id}.leveling.rewards`)
-      .then(data => {
-        if (!data) return [] as Reward[] ?? [] as Reward[];
-        return data as Reward[] ?? [] as Reward[];
-      })
-      .catch(() => [] as Reward[]);
+    let nextReward;
 
-    for (const { roleId, level } of levelRewards) {
-      const role = await interaction.guild.roles.fetch(roleId).catch(() => {});
-      const reward = { roleId, level };
-
-      if (levels < level) {
+    for (const { roleID, level } of getLevelRewards(`${guild?.id}`)) {
+      if (guildLevel < level) {
         if (nextReward) break;
-        nextReward = reward;
+        nextReward = { roleID, level };
         break;
       }
 
-      rewards.push(role);
+      rewards.push(await guild?.roles.fetch(roleID)?.catch(() => {}));
     }
 
-    const expUntilLevelup = Math.floor((2 * 50) * 1.25 * ((levels ?? 0) + 1));
-    const formattedExpUntilLevelup = expUntilLevelup?.toLocaleString("en-US");
-    const levelUpEmbed = new EmbedBuilder()
-      .setAuthor({ name: `•  ${selectedMember.user.username}`, iconURL: avatarURL })
+    const embed = new EmbedBuilder()
+      .setAuthor({ name: `•  ${selectedMember?.user.username}`, iconURL: avatarURL })
       .setFields(
         {
-          name: `⚡ • Level ${levels ?? 0}`,
+          name: `⚡ • Level ${guildLevel ?? 0}`,
           value: [
             `**Exp**: ${formattedExp ?? 0}/${formattedExpUntilLevelup} until level up`,
-            `**Next Level**: ${(levels ?? 0) + 1}`
+            `**Next Level**: ${(guildLevel ?? 0) + 1}`
           ].join("\n")
         },
         {
           name: `🎁 • ${rewards.length} Rewards`,
           value: [
-            `${rewards.length > 0 ? rewards.map(reward => `<@&${reward.id}>`).join(" ") : "No rewards unlocked"}`,
-            nextReward ? `**Upcoming reward**: <@&${nextReward.roleId}>` : "**Upcoming reward**: *Cricket, cricket, cricket* - Looks like you claimed everything!"
+            `${rewards.length > 0 ? rewards.map(reward => `<@&${reward?.id}>`).join(" ") : "No rewards unlocked"}`,
+            nextReward ? `**Upcoming reward**: <@&${nextReward.roleID}>` : "**Upcoming reward**: *Cricket, cricket, cricket* - Looks like you claimed everything!"
           ].join("\n")
         }
       )
-      .setThumbnail(avatarURL)
+      .setThumbnail(avatarURL || null)
       .setTimestamp()
       .setColor(genColor(200));
 
-    await interaction.followUp({ embeds: [levelUpEmbed] });
+    await interaction.followUp({ embeds: [embed] });
   }
 }

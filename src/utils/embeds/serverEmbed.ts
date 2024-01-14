@@ -1,6 +1,7 @@
 import { EmbedBuilder, type ColorResolvable, type Guild } from "discord.js";
-import { genColor, genRGBColor } from "../colorGen.js";
+import { genColor, genRGBColor } from "../colorGen";
 import { database, getServerboardTable } from "../database.js";
+import { get } from "../database/settings";
 import Vibrant from "node-vibrant";
 import sharp from "sharp";
 
@@ -24,12 +25,7 @@ export async function serverEmbed(options: Options) {
   const pages = options.pages;
   const guild = options.guild;
   const { premiumTier: boostTier, premiumSubscriptionCount: boostCount } = guild;
-
-  const invite = (await getServerboardTable(await database()))
-    ?.get(`${guild.id}.invite`)
-    .then(async invite => invite ? String(invite) : null)
-    .catch(() => null);
-
+  const invite = get(guild.id, "serverboard.inviteLink");
   const members = guild.members.cache;
   const boosters = members.filter(member => member.premiumSince);
   const onlineMembers = members.filter(member => ["online", "dnd", "idle"].includes(member.presence?.status)).size;
@@ -52,10 +48,10 @@ export async function serverEmbed(options: Options) {
     `**Created on** <t:${Math.round(guild.createdAt.valueOf() / 1000)}:D>`
   ];
   if (options.showSubs) generalValues.push(`**Subscribers**: ${options.subs}`);
-  if (options.showInvite && invite === null) generalValues.push(`**Invite link**: ${await invite}`);
+  if (options.showInvite && invite === null) generalValues.push(`**Invite link**: ${invite}`);
 
   const embed = new EmbedBuilder()
-    .setAuthor({ name: `${pages ? `#${page}  •  ` : ""}${guild.name}`, iconURL: guild.iconURL() })
+    .setAuthor({ name: `${pages ? `#${page}  •  ` : ""}${guild.name}`, iconURL: guild.iconURL() || undefined })
     .setDescription(guild.description ? guild.description : null)
     .setFields({ name: "📃 • General", value: generalValues.join("\n") })
     .setFooter({ text: `Server ID: ${guild.id}${pages ? ` • Page ${page}/${pages}` : ""}` })

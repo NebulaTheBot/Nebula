@@ -3,13 +3,11 @@ import {
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor, genRGBColor } from "../../utils/colorGen.js";
-import { QuickDB } from "quick.db";
 import Vibrant from "node-vibrant";
 import sharp from "sharp";
 
 export default class UserInfo {
   data: SlashCommandSubcommandBuilder;
-  db: QuickDB<any>;
 
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
@@ -23,18 +21,18 @@ export default class UserInfo {
 
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user");
-    const id = user ? user.id : interaction.member.user.id;
-    const selectedMember = interaction.guild.members.cache.filter(member => member.user.id === id).map(user => user)[0];
-    const selectedUser = selectedMember.user;
+    const id = user ? user.id : interaction.member?.user.id;
+    const selectedMember = interaction.guild?.members.cache.filter(member => member.user.id === id).map(user => user)[0];
+    const selectedUser = selectedMember?.user;
 
     let embed = new EmbedBuilder()
       .setAuthor({
-        name: `•  ${selectedMember.nickname == null ? selectedUser.username : selectedMember.nickname}${selectedUser.discriminator == "0" ? "" : `#${selectedUser.discriminator}`}`,
-        iconURL: selectedMember.displayAvatarURL()
+        name: `•  ${selectedMember?.nickname == null ? selectedUser?.username : selectedMember.nickname}${selectedUser?.discriminator == "0" ? "" : `#${selectedUser?.discriminator}`}`,
+        iconURL: selectedMember?.displayAvatarURL()
       })
       .setFields(
         {
-          name: selectedUser.bot === false ? "👤 • User info" : "🤖 • Bot info",
+          name: selectedUser?.bot === false ? "👤 • User info" : "🤖 • Bot info",
           value: [
             `**Username**: ${selectedUser.username}`,
             `**Display name**: ${selectedUser.displayName === selectedUser.username ? "*None*" : selectedUser.displayName}`,
@@ -43,7 +41,7 @@ export default class UserInfo {
         },
         {
           name: "👥 • Member info",
-          value: `**Joined on** <t:${Math.round(selectedMember.joinedAt.valueOf() / 1000)}:D>`,
+          value: `**Joined on** <t:${Math.round(selectedMember?.joinedAt?.valueOf() / 1000)}:D>`,
         }
       )
       .setFooter({ text: `User ID: ${selectedMember.id}` })

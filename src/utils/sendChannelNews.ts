@@ -37,7 +37,7 @@ export async function sendChannelNews(guild: Guild, news: News, id: string) {
   let roleToSend: Role | undefined;
   if (role) roleToSend = guild.roles.cache.get(role);
 
-  const newsEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setAuthor({ name: news.author, iconURL: news.authorPfp ?? null })
     .setTitle(news.title)
     .setDescription(news.body)
@@ -46,7 +46,7 @@ export async function sendChannelNews(guild: Guild, news: News, id: string) {
     .setFooter({ text: `Latest news from ${guild.name}` })
     .setColor(genColor(200));
 
-  const message = await channelToSend.send({ embeds: [newsEmbed], content: roleToSend ? `<@&${roleToSend.id}>` : undefined });
+  const message = await channelToSend.send({ embeds: [embed], content: roleToSend ? `<@&${roleToSend.id}>` : undefined });
   await newsTable.set(`${guild.id}.news.${id}.messageId`, message.id);
   return;
 }

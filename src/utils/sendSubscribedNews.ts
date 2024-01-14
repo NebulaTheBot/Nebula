@@ -20,8 +20,7 @@ export async function sendSubscribedNews(guild: Guild, news: News) {
   const subscribed = (await guild.members.fetch()).filter(member => subscriptions.includes(member.id));
   const memberDMs = (await Promise.all(subscribed.map(member => member.createDM().catch(() => null)))) as DMChannel[] | null;
   const memberDMsOpen = memberDMs?.filter(dm => dm !== null);
-
-  const newsEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setAuthor({ name: news.author, iconURL: news.authorPfp ?? null })
     .setTitle(news.title)
     .setDescription(news.body)
@@ -30,6 +29,6 @@ export async function sendSubscribedNews(guild: Guild, news: News) {
     .setFooter({ text: `Latest news from ${guild.name}` })
     .setColor(genColor(200));
 
-  await Promise.all(memberDMsOpen?.map(dm => dm.send({ embeds: [newsEmbed] }).catch(() => null)));
+  await Promise.all(memberDMsOpen?.map(dm => dm.send({ embeds: [embed] }).catch(() => null)));
   return;
 }

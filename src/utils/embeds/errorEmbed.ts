@@ -1,5 +1,5 @@
 import { EmbedBuilder } from "discord.js";
-import { genColor } from "../colorGen.js";
+import { genColor } from "../colorGen";
 
 /**
  * Sends the embed containing an error.

@@ -19,45 +19,31 @@ export default {
       if (guild?.id !== "903852579837059113") return;
       const eventsPath = join(process.cwd(), "src", "events", "easterEggs");
 
-      for (const easterEggFile of readdirSync(eventsPath)) {
-        const msg = await import(pathToFileURL(join(eventsPath, easterEggFile)).toString());
-        new msg.default().run(message, ...message.content);
-      }
+      for (const easterEggFile of readdirSync(eventsPath))
+        new (await import(pathToFileURL(join(eventsPath, easterEggFile)).toString())).default().run(message, ...message.content);
 
       // Levelling
       const levelChannelId = get(guild.id, "levelling.channel");
       if (!levelChannelId) return;
       if (!get(guild.id, "levelling.enabled")) return;
 
-      const expPerMessage = 2;
-      const baseExpForNewLevel = 2 * 50;
-      const difficultyMultiplier = 1.25;
-
-      const [exp, level] = getLevel(guild.id, author.id);
+      const [guildExp, guildLevel] = getLevel(guild.id, author.id);
       const [globalExp, globalLevel] = getLevel("0", author.id);
-      const expUntilLevelup = Math.floor(baseExpForNewLevel * difficultyMultiplier * (level + 1));
-      const newLevelData = { level: level ?? 0, exp: (exp ?? 0) + expPerMessage };
-      const newLevelDataGlobal = { level: globalLevel ?? 0, exp: (globalExp ?? 0) + expPerMessage };
+      const expUntilLevelup = Math.floor(100 * 1.25 * (guildLevel + 1));
 
-      if (!(exp >= expUntilLevelup - 1)) {
-        setLevel(0, author.id, newLevelDataGlobal.level, newLevelDataGlobal.exp);
-        return setLevel(guild.id, author.id, newLevelDataGlobal.level, newLevelDataGlobal.exp);
-      } else if (exp >= expUntilLevelup - 1) {
-        let leftOverExp = exp - expUntilLevelup;
+      if (!(guildExp >= expUntilLevelup - 1)) {
+        setLevel(0, author.id, globalLevel ?? 0, (globalExp ?? 0) + 2);
+        return setLevel(guild.id, author.id, globalLevel ?? 0, (globalExp ?? 0) + 2);
+      } else if (guildExp >= expUntilLevelup - 1) {
+        let leftOverExp = guildExp - expUntilLevelup;
         if (leftOverExp < 0) leftOverExp = 0;
-
-        newLevelData.level = level + 1;
-        newLevelData.exp = leftOverExp ?? 0;
-        setLevel(guild.id, author.id, newLevelData.level, newLevelData.exp);
+        setLevel(guild.id, author.id, guildLevel + 1, leftOverExp ?? 0);
       }
 
-      if (exp >= Math.floor(baseExpForNewLevel * difficultyMultiplier * (globalLevel + 1)) - 1) {
-        let leftOverExpGlobal = exp - expUntilLevelup;
-        if (leftOverExpGlobal < 0) leftOverExpGlobal = 0;
-
-        newLevelDataGlobal.level = level + 1;
-        newLevelDataGlobal.exp = leftOverExpGlobal + 1;
-        setLevel(0, author.id, newLevelDataGlobal.level, newLevelDataGlobal.exp);
+      if (guildExp >= Math.floor(100 * 1.25 * (globalLevel + 1)) - 1) {
+        let globalLeftOverExp = guildExp - expUntilLevelup;
+        if (globalLeftOverExp < 0) globalLeftOverExp = 0;
+        setLevel(0, author.id, guildLevel + 1, globalLeftOverExp + 1);
       }
 
       const embed = new EmbedBuilder()
@@ -65,8 +51,8 @@ export default {
         .setTitle("⚡ • Level Up!")
         .setDescription([
           `**Congratulations, ${author.displayName}**!`,
-          `You made it to **level ${level + 1}**`,
-          `You need ${Math.floor(baseExpForNewLevel * difficultyMultiplier * (level + 2))} EXP to level up again.`
+          `You made it to **level ${guildLevel + 1}**`,
+          `You need ${Math.floor(100 * 1.25 * (guildLevel + 2))} EXP to level up again.`
         ].join("\n"))
         .setThumbnail(author.avatarURL())
         .setTimestamp()
@@ -75,9 +61,10 @@ export default {
       (guild.channels.cache.get(`${levelChannelId}`) as TextChannel).send({ embeds: [embed], content: `<@${author.id}>` });
       for (const { level, roleID } of getLevelRewards(guild.id)) {
         const role = guild.roles.cache.get(`${roleID}`);
-        const authorRoles = (await guild.members.fetch()).get(author.id)?.roles;
+        if (!role) continue;
 
-        if (level >= level) {
+        const authorRoles = (await guild.members.fetch()).get(author.id)?.roles;
+        if (guildLevel >= level) {
           await authorRoles?.add(role);
           continue;
         }

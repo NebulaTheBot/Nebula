@@ -35,7 +35,7 @@ export default class About {
             "**Head developer**: Goos",
             "**Developers**: Golem64, Pigpot, ThatBOI",
             "**Designers**: ArtyH, Optix, proJM, Slider_on_the_black",
-            "**Translators**: Dimkauzh, Golem64, Optix, Sungi, SaFire, ThatBOI",
+            "**Translators**: Dimkauzh, Golem64, Optix, SaFire, ThatBOI",
             "And **YOU**, for using Nebula."
           ].join("\n")
         },

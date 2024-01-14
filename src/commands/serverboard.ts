@@ -2,8 +2,8 @@ import {
   SlashCommandSubcommandBuilder, ButtonBuilder, ActionRowBuilder,
   ButtonStyle, ButtonInteraction, type ChatInputCommandInteraction
 } from "discord.js";
-import { quickSort } from "../utils/quickSort.js";
-import { serverEmbed } from "../utils/embeds/serverEmbed.js";
+import { quickSort } from "../utils/quickSort";
+import { serverEmbed } from "../utils/embeds/serverEmbed";
 import { database, getNewsTable, getServerboardTable } from "../utils/database.js";
 import { QuickDB } from "quick.db";
 
@@ -49,7 +49,7 @@ export default class Serverboard {
     let guild = guildsSorted[page];
     let subs = await (await getNewsTable(this.db))
       ?.get(`${guild.id}.subscriptions`)
-      .then(subs => subs?.length > 0 ? subs as string[] : [] as string[])
+      .then((subs: string | any[]) => subs?.length > 0 ? subs as string[] : [] as string[])
       .catch(() => [] as string[]);
 
     let embed = await serverEmbed({
@@ -69,7 +69,7 @@ export default class Serverboard {
 
     await interaction.followUp({ embeds: [embed], components: [row] });
     interaction.channel
-      .createMessageComponentCollector({ filter: i => i.user.id === interaction.user.id, time: 60000 })
+      ?.createMessageComponentCollector({ filter: i => i.user.id === interaction.user.id, time: 60000 })
       .on("collect", async (interaction: ButtonInteraction) => {
         let subs;
 
@@ -78,12 +78,12 @@ export default class Serverboard {
           case "left":
             page--;
             if (page < 0) page = pages - 1;
-            subs = subscriptions.filter(sub => (sub.value as string[] ?? [] as string[]).includes(guild.id));
+            subs = subscriptions.filter((sub: { value: string[]; }) => (sub.value as string[] ?? [] as string[]).includes(guild.id));
             break;
           case "right":
             page++;
             if (page >= pages) page = 0;
-            subs = subscriptions.filter(sub => (sub.value as string[]).includes(guild.id));
+            subs = subscriptions.filter((sub: { value: string[]; }) => (sub.value as string[]).includes(guild.id));
             break;
         }
 
