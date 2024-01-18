@@ -41,26 +41,26 @@ export default class UserInfo {
         },
         {
           name: "👥 • Member info",
-          value: `**Joined on** <t:${Math.round(selectedMember?.joinedAt?.valueOf() / 1000)}:D>`,
+          value: `**Joined on** <t:${Math.round(selectedMember?.joinedAt?.valueOf()! / 1000)}:D>`,
         }
       )
-      .setFooter({ text: `User ID: ${selectedMember.id}` })
-      .setThumbnail(selectedMember.displayAvatarURL())
+      .setFooter({ text: `User ID: ${selectedMember?.id}` })
+      .setThumbnail(selectedMember?.displayAvatarURL()!)
       .setColor(genColor(200));
 
     try {
-      const imageBuffer = await (await fetch(selectedMember.displayAvatarURL())).arrayBuffer();
+      const imageBuffer = await (await fetch(selectedMember?.displayAvatarURL()!)).arrayBuffer();
       const image = sharp(imageBuffer).toFormat("jpg");
-      const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant;
-      embed.setColor(genRGBColor(r, g, b) as ColorResolvable);
+      const yes = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant;
+      embed.setColor(genRGBColor(yes?.r, yes?.g, yes?.b) as ColorResolvable);
     } catch { }
 
-    const guildRoles = interaction.guild.roles.cache.filter(role => selectedMember.roles.cache.has(role.id));
+    const guildRoles = interaction.guild?.roles.cache.filter(role => selectedMember?.roles.cache.has(role.id));
     const memberRoles = [...guildRoles].sort((role1, role2) => role2[1].position - role1[1].position);
     memberRoles.pop();
 
     if (memberRoles.length !== 0) embed.addFields({
-      name: `🎭 • ${guildRoles.filter(role => selectedMember.roles.cache.has(role.id)).size - 1} ${memberRoles.length === 1 ? "role" : "roles"}`,
+      name: `🎭 • ${guildRoles?.filter(role => selectedMember?.roles.cache.has(role.id)).size! - 1} ${memberRoles.length === 1 ? "role" : "roles"}`,
       value: `${memberRoles
         .slice(0, 5)
         .map(role => `<@&${role[1].id}>`)

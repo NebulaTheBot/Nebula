@@ -4,15 +4,10 @@ import {
 } from "discord.js";
 import { quickSort } from "../utils/quickSort";
 import { serverEmbed } from "../utils/embeds/serverEmbed";
-import { database, getNewsTable, getServerboardTable } from "../utils/database.js";
-import { QuickDB } from "quick.db";
 
 export default class Serverboard {
   data: SlashCommandSubcommandBuilder;
-  db: QuickDB<any>;
-
-  constructor(db?: QuickDB) {
-    this.db = db;
+  constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("serverboard")
       .setDescription("Shows the servers that have Nebula.")
@@ -41,9 +36,9 @@ export default class Serverboard {
       [[...Object.values(guildsMapped)]],
       0,
       Object.keys(guildsMapped).length - 1
-    )[1][0].reverse();
+    )[1]![0].reverse();
     const pages = guildsSorted.length;
-    const argPage = interaction.options.getNumber("page", false);
+    const argPage = interaction.options.getNumber("page", false)!;
     let page = (argPage - 1 <= 0 ? 0 : argPage - 1 > pages ? pages - 1 : argPage - 1) || 0;
 
     let guild = guildsSorted[page];

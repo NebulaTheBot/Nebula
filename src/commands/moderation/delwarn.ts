@@ -3,17 +3,14 @@ import {
   TextChannel, DMChannel, ChannelType,
   type Channel, type ChatInputCommandInteraction 
 } from "discord.js";
-import { genColor } from "../../utils/colorGen.js";
-import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
-import { QuickDB } from "quick.db";
-import { getModerationTable, getSettingsTable } from "../../utils/database.js";
+import { genColor } from "../../utils/colorGen";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { listUserModeration, removeModeration } from "../../utils/database/moderation";
+import { get } from "../../utils/database/settings";
 
 export default class Delwarn {
   data: SlashCommandSubcommandBuilder;
-  db: QuickDB<any>;
-
-  constructor(db: QuickDB<any>) {
-    this.db = db;
+  constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("delwarn")
       .setDescription("Removes a warning from a user.")
@@ -30,23 +27,23 @@ export default class Delwarn {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const user = interaction.options.getUser("user");
-    const members = interaction.guild.members.cache;
-    const member = members.get(interaction.member.user.id);
-    const selectedMember = members.get(user.id);
+    const user = interaction.options.getUser("user")!;
+    const guild = interaction.guild!;
+    const members = guild.members.cache!;
+    const member = members.get(interaction.member?.user.id!);
+    const selectedMember = members.get(user.id)!;
     const name = selectedMember.nickname ?? user.username;
     const id = interaction.options.getNumber("id", true);
-    const warns = await (await getModerationTable(this.db))
-      ?.get(`${interaction.guild.id}.${user.id}.warns`)
-      .then(warns => warns as any[] ?? [])
-      .catch(() => []);
-    const newWarns = warns.filter(warn => warn.id !== id);
+    const warns = listUserModeration(guild.id, user.id, "WARN");
+    const newWarns = warns.filter(warn => warn.id !== `${id}`);
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) return await interaction.followUp({
+    if (!member?.permissions.has(PermissionsBitField.Flags.ModerateMembers)) return await interaction.followUp({
       embeds: [errorEmbed("You need the **Moderate Members** permission to execute this command.")]
     });
 
-    if (selectedMember === member) return await interaction.followUp({ embeds: [errorEmbed("You can't remove a warn from yourself.")] });
+    if (selectedMember === member) return await interaction.followUp({
+      embeds: [errorEmbed("You can't remove a warn from yourself.")]
+    });
 
     if (newWarns.length === warns.length) return await interaction.followUp({
       embeds: [errorEmbed(`There is no warn with the id of ${id}.`)]
@@ -64,33 +61,18 @@ export default class Delwarn {
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setTitle(`✅ • Removed warning`)
       .setDescription([
-        `**Moderator**: <@${member.id}>`,
-        `**Original reason**: ${newWarns.find(warn => warn.id === id)?.reason ?? "No reason provided"}`
+        `**Moderator**: ${interaction.user.username}`,
+        `**Original reason**: ${newWarns.find(warn => warn.id === `${id}`)?.reason ?? "No reason provided"}`
       ].join("\n"))
       .setThumbnail(user.displayAvatarURL())
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
-    const embedDM = new EmbedBuilder()
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`🤝 • Your warning was removed`)
-      .setDescription([
-        `**Moderator**: ${member.user.username}`,
-        `**Original reason**: ${newWarns.find(warn => warn.id === id)?.reason ?? "No reason provided"}`
-      ].join("\n"))
-      .setThumbnail(user.displayAvatarURL())
-      .setFooter({ text: `User ID: ${user.id}` })
-      .setColor(genColor(100));
-
-    const logChannel = await (await getSettingsTable(this.db))
-      ?.get(`${interaction.guild.id}.logChannel`)
-      .then((channel: string | null) => channel)
-      .catch(() => null);
-
+    const logChannel = get(guild.id, "log.channel");
     if (logChannel) {
-      const channel = await interaction.guild.channels.cache
-        .get(logChannel)
-        .fetch()
+      const channel = await guild.channels.cache
+        .get(`${logChannel}`)
+        ?.fetch()
         .then((channel: Channel) => {
           if (channel.type != ChannelType.GuildText) return null;
           return channel as TextChannel;
@@ -101,8 +83,8 @@ export default class Delwarn {
     }
 
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel) await dmChannel.send({ embeds: [embedDM] });
-    await (await getModerationTable(this.db))?.set(`${interaction.guild.id}.${user.id}.warns`, newWarns);
+    if (dmChannel) await dmChannel.send({ embeds: [embed.setTitle("🤝 • Your warning was removed")] });
+    removeModeration(guild.id, `${id}`);
     await interaction.followUp({ embeds: [embed] });
   }
 }

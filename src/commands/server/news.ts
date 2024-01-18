@@ -2,15 +2,16 @@ import {
   SlashCommandSubcommandBuilder, EmbedBuilder, ActionRowBuilder,
   ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor } from "../utils/colorGen";
-import { listAllNews } from "../utils/database/news";
+import { genColor } from "../../utils/colorGen";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { listAllNews } from "../../utils/database/news";
 
 export default class News {
   data: SlashCommandSubcommandBuilder;
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("news")
-      .setDescription("View the news of Nebula.")
+      .setDescription("View the news of this server.")
       .addNumberOption(option => option
         .setName("page")
         .setDescription("The page of the news that you want to see.")
@@ -19,20 +20,24 @@ export default class News {
 
   async run(interaction: ChatInputCommandInteraction) {
     let page = interaction.options.getNumber("page") ?? 1;
-    const sortedNews = (Object.values(listAllNews("903852579837059113")) as any[])?.sort((a, b) => b.createdAt - a.createdAt);
+    const news = listAllNews(interaction.guild?.id!);
+    const sortedNews = (Object.values(news) as any[])?.sort((a, b) => b.createdAt - a.createdAt);
     let currentNews = sortedNews[page - 1];
 
+    if (!news || !sortedNews || sortedNews.length == 0) return await interaction.followUp({
+      embeds: [errorEmbed("No news found.\nAdmins can add news with the **/settings news add** command.")]
+    });
     if (page > sortedNews.length) page = sortedNews.length;
     if (page < 1) page = 1;
 
     let embed = new EmbedBuilder()
-      .setAuthor({ name: currentNews.author, iconURL: currentNews.authorPfp ?? null })
+      .setAuthor({ name: currentNews.author, iconURL: currentNews.authorPFP })
       .setTitle(currentNews.title)
       .setDescription(currentNews.body)
       .setImage(currentNews.imageURL || null)
       .setTimestamp(parseInt(currentNews.updatedAt))
       .setFooter({ text: `Page ${page} of ${sortedNews.length} • ID: ${currentNews.id}` })
-      .setColor(genColor(270));
+      .setColor(genColor(200));
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()

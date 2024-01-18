@@ -13,7 +13,7 @@ const tableDefinition = {
 
 const database = getDatabase(tableDefinition);
 const getQuery = database.query("SELECT * FROM levelling WHERE guild = $1 AND user = $2;");
-const setQuery = database.query("UPDATE leveling SET level = $3, exp = $4 WHERE guild = $1 AND user = $2;");
+const setQuery = database.query("UPDATE levelling SET level = $3, exp = $4 WHERE guild = $1 AND user = $2;");
 const insertQuery = database.query("INSERT INTO levelling (guild, user, level, exp) VALUES (?1, ?2, ?3, ?4);");
 
 export function getLevel(guildID: string, userID: string): [number, number] {

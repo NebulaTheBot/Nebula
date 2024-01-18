@@ -3,18 +3,14 @@ import {
   TextChannel, DMChannel, ChannelType,
   type Channel, type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor } from "../../utils/colorGen.js";
-import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
-import { QuickDB } from "quick.db";
-import { getSettingsTable } from "../../utils/database.js";
+import { genColor } from "../../utils/colorGen";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { get } from "../../utils/database/settings";
 
 export default class Ban {
   data: SlashCommandSubcommandBuilder;
   deferred: boolean = false;
-  db: QuickDB<any>;
-
-  constructor(db: QuickDB<any>) {
-    this.db = db;
+  constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("ban")
       .setDescription("Bans a user.")
@@ -30,10 +26,11 @@ export default class Ban {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const user = interaction.options.getUser("user");
-    const members = interaction.guild.members.cache;
-    const member = members.get(interaction.member.user.id);
-    const selectedMember = members.get(user.id);
+    const user = interaction.options.getUser("user")!;
+    const guild = interaction.guild!;
+    const members = guild.members.cache!;
+    const member = members.get(interaction.member?.user.id!)!;
+    const selectedMember = members.get(user.id)!;
     const name = selectedMember.nickname ?? user.username;
 
     if (!member.permissions.has(PermissionsBitField.Flags.BanMembers)) return await interaction.reply({
@@ -61,33 +58,18 @@ export default class Ban {
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setTitle(`✅ • Banned ${user.username}`)
       .setDescription([
-        `**Moderator**: <@${interaction.user.id}>`,
+        `**Moderator**: ${interaction.user.username}`,
         `**Reason**: ${reason ?? "No reason provided"}`
       ].join("\n"))
       .setThumbnail(user.displayAvatarURL())
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
-    const embedDM = new EmbedBuilder()
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`🔨 • You were banned`)
-      .setDescription([
-        `**Moderator**: ${interaction.user.username}`,
-        `**Reason**: ${reason ?? "No reason provided"}`
-      ].join("\n"))
-      .setThumbnail(user.displayAvatarURL())
-      .setFooter({ text: `User ID: ${user.id}` })
-      .setColor(genColor(0));
-
-    const logChannel = await (await getSettingsTable(this.db))
-      ?.get(`${interaction.guild.id}.logChannel`)
-      .then((channel: string | null) => channel ?? null)
-      .catch(() => null);
-
+    const logChannel = get(guild.id, "log.channel");
     if (logChannel) {
-      const channel = await interaction.guild.channels.cache
-        .get(logChannel)
-        .fetch()
+      const channel = await guild.channels.cache
+        .get(`${logChannel}`)
+        ?.fetch()
         .then((channel: Channel) => {
           if (channel.type != ChannelType.GuildText) return null;
           return channel as TextChannel;
@@ -98,7 +80,7 @@ export default class Ban {
     }
 
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel) await dmChannel.send({ embeds: [embedDM] });
+    if (dmChannel) await dmChannel.send({ embeds: [embed.setTitle("🔨 • You were banned").setColor(genColor(0))] });
     await selectedMember.ban({ reason: reason ?? undefined });
     await interaction.reply({ embeds: [embed] });
   }

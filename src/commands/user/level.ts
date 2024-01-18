@@ -30,7 +30,6 @@ export default class Level {
     if (!guildExp && !guildLevel) setLevel(`${guild?.id}`, `${selectedMember?.id}`, 0, 0);
 
     const avatarURL = selectedMember?.displayAvatarURL();
-    const formattedExp = guildExp?.toLocaleString("en-US");
     const formattedExpUntilLevelup = Math.floor(100 * 1.25 * ((guildLevel ?? 0) + 1))?.toLocaleString("en-US");
     let rewards = [];
     let nextReward;
@@ -42,7 +41,7 @@ export default class Level {
         break;
       }
 
-      rewards.push(await guild?.roles.fetch(roleID)?.catch(() => {}));
+      rewards.push(await guild?.roles.fetch(`${roleID}`)?.catch(() => {}));
     }
 
     const embed = new EmbedBuilder()
@@ -51,8 +50,8 @@ export default class Level {
         {
           name: `⚡ • Level ${guildLevel ?? 0}`,
           value: [
-            `**Exp**: ${formattedExp ?? 0}/${formattedExpUntilLevelup} until level up`,
-            `**Next Level**: ${(guildLevel ?? 0) + 1}`
+            `**${guildExp?.toLocaleString("en-US") ?? 0}/${formattedExpUntilLevelup}** EXP until level up`,
+            `**Next level**: ${(guildLevel ?? 0) + 1}`
           ].join("\n")
         },
         {

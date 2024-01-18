@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "bun-types": "0.8.1",
-    "typescript": "^5.2.2"
+    "typescript": "5.2.2"
   },
   "trustedDependencies": ["sharp"]
 }
