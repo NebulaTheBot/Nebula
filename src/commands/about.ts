@@ -4,7 +4,6 @@ import { randomise } from "../utils/randomise";
 
 export default class About {
   data: SlashCommandSubcommandBuilder;
-  deferred: boolean = false;
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("about")

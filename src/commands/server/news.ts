@@ -24,7 +24,7 @@ export default class News {
     const sortedNews = (Object.values(news) as any[])?.sort((a, b) => b.createdAt - a.createdAt);
     let currentNews = sortedNews[page - 1];
 
-    if (!news || !sortedNews || sortedNews.length == 0) return await interaction.followUp({
+    if (!news || !sortedNews || sortedNews.length == 0) return await interaction.reply({
       embeds: [errorEmbed("No news found.\nAdmins can add news with the **/settings news add** command.")]
     });
     if (page > sortedNews.length) page = sortedNews.length;
@@ -50,7 +50,7 @@ export default class News {
         .setStyle(ButtonStyle.Primary)
     );
 
-    await interaction.followUp({ embeds: [embed], components: [row] });
+    await interaction.reply({ embeds: [embed], components: [row] });
     interaction.channel
       ?.createMessageComponentCollector({ filter: i => i.user.id === interaction.user.id, time: 60000 })
       .on("collect", async i => {
@@ -67,7 +67,6 @@ export default class News {
         embed = embed;
 
         await interaction.editReply({ embeds: [embed], components: [row] });
-        await i.deferUpdate();
       });
   }
 }

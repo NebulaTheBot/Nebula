@@ -3,7 +3,7 @@ import { pathToFileURL } from "url";
 import { join } from "path";
 import { readdirSync } from "fs";
 import { genColor } from "../utils/colorGen";
-import { get } from "../utils/database/settings";
+import { getSetting } from "../utils/database/settings";
 import { getLevel, setLevel } from "../utils/database/levelling";
 import { get as getLevelRewards } from "../utils/database/levelRewards";
 
@@ -23,9 +23,9 @@ export default {
         new (await import(pathToFileURL(join(eventsPath, easterEggFile)).toString())).default().run(message, ...message.content);
 
       // Levelling
-      const levelChannelId = get(guild.id, "levelling.channel");
+      const levelChannelId = getSetting(guild.id, "levelling.channel");
       if (!levelChannelId) return;
-      if (!get(guild.id, "levelling.enabled")) return;
+      if (!getSetting(guild.id, "levelling.enabled")) return;
 
       const [guildExp, guildLevel] = getLevel(guild.id, author.id);
       const [globalExp, globalLevel] = getLevel("0", author.id);

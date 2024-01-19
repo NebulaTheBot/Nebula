@@ -3,17 +3,13 @@ import {
   TextChannel, DMChannel, ChannelType,
   type Channel, type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor } from "../../utils/colorGen.js";
-import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
-import { QuickDB } from "quick.db";
-import { getSettingsTable } from "../../utils/database.js";
+import { genColor } from "../../utils/colorGen";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { getSetting } from "../../utils/database/settings";
 
 export default class Kick {
   data: SlashCommandSubcommandBuilder;
-  db: QuickDB<any>;
-
-  constructor(db: QuickDB<any>) {
-    this.db = db;
+  constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("kick")
       .setDescription("Kicks a user.")
@@ -29,29 +25,28 @@ export default class Kick {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const user = interaction.options.getUser("user");
-    const members = interaction.guild.members.cache;
-    const member = members.get(interaction.member.user.id);
-    const selectedMember = members.get(user.id);
-    const name = selectedMember.nickname ?? user.username;
+    const user = interaction.options.getUser("user")!;
+    const guild = interaction.guild!;
+    const members = guild.members.cache!;
+    const member = members.get(interaction.member?.user.id!)!;
+    const target = members.get(user.id)!;
+    const name = target.nickname ?? user.username;
 
-    if (!member.permissions.has(PermissionsBitField.Flags.KickMembers)) return await interaction.followUp({
+    if (!member.permissions.has(PermissionsBitField.Flags.KickMembers)) return await interaction.reply({
       embeds: [errorEmbed("You need the **Kick Members** permission to execute this command.")]
     });
 
-    if (selectedMember === member) return await interaction.followUp({
-      embeds: [errorEmbed("You can't kick yourself.")]
-    });
+    if (target === member) return await interaction.reply({ embeds: [errorEmbed("You can't kick yourself.")] });
 
-    if (selectedMember.user.id === interaction.client.user.id) return await interaction.followUp({
+    if (target.user.id === interaction.client.user.id) return await interaction.reply({
       embeds: [errorEmbed("You can't kick Nebula.")]
     });
 
-    if (!selectedMember.manageable) return await interaction.followUp({
+    if (!target.manageable) return await interaction.reply({
       embeds: [errorEmbed(`You can't kick ${name}, because they have a higher role position than Nebula.`)]
     });
 
-    if (member.roles.highest.position < selectedMember.roles.highest.position) return await interaction.followUp({
+    if (member.roles.highest.position < target.roles.highest.position) return await interaction.reply({
       embeds: [errorEmbed(`You can't kick ${name}, because they have a higher role position than you.`)]
     });
 
@@ -60,34 +55,19 @@ export default class Kick {
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setTitle(`✅ • Kicked <@${user.id}>`)
       .setDescription([
-        `**Moderator**: <@${interaction.user.id}>`,
+        `**Moderator**: ${interaction.user.username}`,
         `**Reason**: ${reason ?? "No reason provided"}`
       ].join("\n"))
       .setThumbnail(user.displayAvatarURL())
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
-    const embedDM = new EmbedBuilder()
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`🥾 • You were kicked`)
-      .setDescription([
-        `**Moderator**: ${interaction.user.username}`,
-        `**Reason**: ${reason ?? "No reason provided"}`
-      ].join("\n"))
-      .setThumbnail(user.displayAvatarURL())
-      .setFooter({ text: `User ID: ${user.id}` })
-      .setColor(genColor(0));
-
-    const logChannel = await (await getSettingsTable(this.db))
-      ?.get(`${interaction.guild.id}.logChannel`)
-      .then((channel: string | null) => channel ?? null)
-      .catch(() => null);
-
+    const logChannel = getSetting(guild.id, "log.channel");
     if (logChannel) {
-      const channel = await interaction.guild.channels.cache
-        .get(logChannel)
-        .fetch()
-        .then((channel: Channel | null) => {
+      const channel = await guild.channels.cache
+        .get(`${logChannel}`)
+        ?.fetch()
+        .then((channel: Channel) => {
           if (channel.type != ChannelType.GuildText) return null;
           return channel as TextChannel;
         })
@@ -96,9 +76,9 @@ export default class Kick {
       if (channel) await channel.send({ embeds: [embed] });
     }
 
+    await target.kick(reason ?? undefined);
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel) await dmChannel.send({ embeds: [embedDM] });
-    await selectedMember.kick(reason ?? undefined);
-    await interaction.followUp({ embeds: [embed] });
+    if (dmChannel) await dmChannel.send({ embeds: [embed.setTitle("🥾 • You were kicked").setColor(genColor(0))] });
+    await interaction.reply({ embeds: [embed] });
   }
 }

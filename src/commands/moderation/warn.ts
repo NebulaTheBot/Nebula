@@ -3,17 +3,14 @@ import {
   TextChannel, DMChannel, ChannelType,
   type Channel, type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor } from "../../utils/colorGen.js";
-import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
-import { QuickDB } from "quick.db";
-import { getModerationTable, getSettingsTable } from "../../utils/database.js";
+import { genColor } from "../../utils/colorGen";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { getSetting } from "../../utils/database/settings";
+import { addModeration } from "../../utils/database/moderation";
 
 export default class Warn {
   data: SlashCommandSubcommandBuilder;
-  db: QuickDB<any>;
-
-  constructor(db: QuickDB<any>) {
-    this.db = db;
+  constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("warn")
       .setDescription("Warns a user.")
@@ -29,64 +26,48 @@ export default class Warn {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const user = interaction.options.getUser("user");
-    const members = interaction.guild.members.cache;
-    const member = members.get(interaction.member.user.id);
-    const selectedMember = members.get(user.id);
-    const name = selectedMember.nickname ?? user.username;
+    const user = interaction.options.getUser("user")!;
+    const guild = interaction.guild!;
+    const members = guild.members.cache;
+    const member = members.get(interaction.member?.user.id!)!;
+    const target = members.get(user.id)!;
+    const name = target.nickname ?? user.username;
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) return await interaction.followUp({
+    if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) return await interaction.reply({
       embeds: [errorEmbed("You need the **Moderate Members** permission to execute this command.")]
     });
 
-    if (selectedMember === member) return await interaction.followUp({ embeds: [errorEmbed("You can't warn yourself.")] });
+    if (target === member) return await interaction.reply({ embeds: [errorEmbed("You can't warn yourself.")] });
 
-    if (!selectedMember.manageable) return await interaction.followUp({
+    if (target.user.id === interaction.client.user.id) return await interaction.reply({
+      embeds: [errorEmbed("You can't warn Nebula.")]
+    });
+
+    if (!target.manageable) return await interaction.reply({
       embeds: [errorEmbed(`You can't warn ${name}, because they have a higher role position than Nebula.`)]
     });
 
-    if (member.roles.highest.position < selectedMember.roles.highest.position) return await interaction.followUp({
+    if (member.roles.highest.position < target.roles.highest.position) return await interaction.reply({
       embeds: [errorEmbed(`You can't warn ${name}, because they have a higher role position than you.`)]
     });
 
-    const newWarn = {
-      id: Date.now(),
-      userId: user.id,
-      moderator: member.id,
-      reason: interaction.options.getString("reason") ?? "No reason provided"
-    };
-
+    const reason = interaction.options.getString("reason");
     const embed = new EmbedBuilder()
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setTitle(`✅ • Warned ${user.username}`)
       .setDescription([
-        `**Moderator**: <@${member.id}>`,
-        `**Reason**: ${interaction.options.getString("reason") ?? "No reason provided"}`
+        `**Moderator**: ${interaction.user.username}`,
+        `**Reason**: ${reason ?? "No reason provided"}`
       ].join("\n"))
       .setThumbnail(user.displayAvatarURL())
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
-    const embedDM = new EmbedBuilder()
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle("⚠️ • You were warned")
-      .setDescription([
-        `**Moderator**: <@${member.id}>`,
-        `**Reason**: ${interaction.options.getString("reason") ?? "No reason provided"}`
-      ].join("\n"))
-      .setThumbnail(user.displayAvatarURL())
-      .setFooter({ text: `User ID: ${user.id}` })
-      .setColor(genColor(100));
-
-    const logChannel = await (await getSettingsTable(this.db))
-      ?.get(`${interaction.guild.id}.logChannel`)
-      .then((channel: string | null) => channel)
-      .catch(() => null);
-
+    const logChannel = getSetting(guild.id, "log.channel");
     if (logChannel) {
-      const channel = await interaction.guild.channels.cache
-        .get(logChannel)
-        .fetch()
+      const channel = await guild.channels.cache
+        .get(`${logChannel}`)
+        ?.fetch()
         .then((channel: Channel) => {
           if (channel.type != ChannelType.GuildText) return null;
           return channel as TextChannel;
@@ -95,9 +76,9 @@ export default class Warn {
       if (channel) await channel.send({ embeds: [embed] });
     }
 
+    addModeration(guild.id, user.id, "WARN", member.id, reason ?? undefined);
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel) await dmChannel.send({ embeds: [embedDM] });
-    await (await getModerationTable(this.db))?.push(`${interaction.guild.id}.${user.id}.warns`, newWarn);
-    await interaction.followUp({ embeds: [embed] });
+    if (dmChannel) await dmChannel.send({ embeds: [embed.setTitle("⚠️ • You were warned").setColor(genColor(0))] });
+    await interaction.reply({ embeds: [embed] });
   }
 }

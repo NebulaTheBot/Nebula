@@ -23,17 +23,22 @@ const settingsDefinition = {
 export const settingKeys = Object.keys(settingsDefinition) as (keyof typeof settingsDefinition)[];
 const database = getDatabase(tableDefinition);
 const getQuery = database.query("SELECT * FROM settings WHERE guild = $1 AND key = $2;");
+const listPublicQuery = database.query("SELECT * FROM settings WHERE serverboard.shown = TRUE;");
 const setQuery = database.query("UPDATE settings SET value = $3 WHERE guild = $1 AND key = $2;");
 
-export function get<K extends keyof typeof settingsDefinition>(guild: string, key: K): TypeOfKey<K> | null {
+export function getSetting<K extends keyof typeof settingsDefinition>(guild: string, key: K): TypeOfKey<K> | null {
   let res = getQuery.all(guild, key) as TypeOfDefinition<typeof tableDefinition>[];
   if (res.length == 0) return null;
   if (settingsDefinition[key] == "TEXT") return res[0].value as TypeOfKey<K>;
   return JSON.parse(res[0].value);
 }
 
-export function set<K extends keyof typeof settingsDefinition>(guild: string, key: K, value: TypeOfKey<K>) {
+export function setSetting<K extends keyof typeof settingsDefinition>(guild: string, key: K, value: TypeOfKey<K>) {
   setQuery.run(guild, key, JSON.stringify(value));
+}
+
+export function listPublicServers() {
+  return (listPublicQuery.all() as TypeOfDefinition<typeof tableDefinition>[]).map(entry => (entry.guild));
 }
 
 // Utility type

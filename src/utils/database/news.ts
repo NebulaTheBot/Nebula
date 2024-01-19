@@ -19,7 +19,7 @@ const definition = {
 } satisfies TableDefinition;
 
 const database = getDatabase(definition);
-const addQuery = database.query("");
+const addQuery = database.query("INSERT INTO news (guild, title, body, imageURL, author, authorPFP, createdAt, updatedAt, messageID, categoryID, id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11);");
 const listAllQuery = database.query("SELECT * FROM news WHERE guild = $1;");
 const listCategoryQuery = database.query("SELECT * FROM news WHERE guild = $1 AND categoryID = $2;");
 const updateQuery = database.query("UPDATE news SET title = $2, body = $3, imageURL = $4 WHERE id = $1");

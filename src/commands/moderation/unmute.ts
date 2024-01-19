@@ -3,17 +3,13 @@ import {
   TextChannel, DMChannel, ChannelType,
   type Channel, type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor } from "../../utils/colorGen.js";
-import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
-import { getSettingsTable } from "../../utils/database.js";
-import { QuickDB } from "quick.db";
+import { genColor } from "../../utils/colorGen";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { getSetting } from "../../utils/database/settings";
 
 export default class Unmute {
   data: SlashCommandSubcommandBuilder;
-  db: QuickDB<any>;
-
-  constructor(db: QuickDB<any>) {
-    this.db = db;
+  constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("unmute")
       .setDescription("Unmutes a user.")
@@ -25,27 +21,21 @@ export default class Unmute {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const members = interaction.guild.members.cache;
-    if (!members.get(interaction.member.user.id).permissions.has(PermissionsBitField.Flags.MuteMembers))
-      return await interaction.followUp({
+    const guild = interaction.guild!;
+    const members = guild.members.cache!;
+    if (!members.get(interaction.member!.user.id)!.permissions.has(PermissionsBitField.Flags.MuteMembers))
+      return await interaction.reply({
         embeds: [errorEmbed("You need the **Mute Members** permission to execute this command.")]
       });
 
-    const user = interaction.options.getUser("user");
-    const embed = new EmbedBuilder()
-      .setAuthor({ name: `• ${members.get(user.id).nickname ?? user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`✅ • Unmuted ${user.username}`)
-      .setDescription([
-        `**Moderator**: <@${interaction.user.id}>`,
-        `**Date**: <t:${Math.floor(Date.now() / 1000)}:f>`
-      ].join("\n"))
-      .setThumbnail(user.displayAvatarURL())
-      .setFooter({ text: `User ID: ${user.id}` })
-      .setColor(genColor(100));
+    const user = interaction.options.getUser("user")!;
+    if (members.get(user.id)?.communicationDisabledUntil === null) return await interaction.reply({
+      embeds: [errorEmbed("You can't unmute this user because they were never muted.")]
+    });
 
-    const embedDM = new EmbedBuilder()
+    const embed = new EmbedBuilder()
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`🤝 • You were unmuted`)
+      .setTitle(`✅ • Unmuted ${user.username}`)
       .setDescription([
         `**Moderator**: ${interaction.user.username}`,
         `**Date**: <t:${Math.floor(Date.now() / 1000)}:f>`
@@ -54,15 +44,11 @@ export default class Unmute {
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
-    const logChannel = await (await getSettingsTable(this.db))
-      ?.get(`${interaction.guild.id}.logChannel`)
-      .then((channel: string | null) => channel)
-      .catch(() => null);
-
+    const logChannel = getSetting(guild.id, "log.channel");
     if (logChannel) {
-      const channel = await interaction.guild.channels.cache
-        .get(logChannel)
-        .fetch()
+      const channel = await guild.channels.cache
+        .get(`${logChannel}`)
+        ?.fetch()
         .then((channel: Channel) => {
           if (channel.type != ChannelType.GuildText) return null;
           return channel as TextChannel;
@@ -72,9 +58,9 @@ export default class Unmute {
       if (channel) await channel.send({ embeds: [embed] });
     }
 
+    await members.get(user.id)!.edit({ communicationDisabledUntil: null });
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel) await dmChannel.send({ embeds: [embedDM] });
-    await members.get(user.id).edit({ communicationDisabledUntil: null });
-    await interaction.followUp({ embeds: [embed] });
+    if (dmChannel) await dmChannel.send({ embeds: [embed.setTitle("🤝 • You were unmuted")] });
+    await interaction.reply({ embeds: [embed] });
   }
 }

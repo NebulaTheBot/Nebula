@@ -4,6 +4,7 @@ import {
 } from "discord.js";
 import { quickSort } from "../utils/quickSort";
 import { serverEmbed } from "../utils/embeds/serverEmbed";
+import { listPublicServers } from "../utils/database/settings";
 
 export default class Serverboard {
   data: SlashCommandSubcommandBuilder;
@@ -19,15 +20,10 @@ export default class Serverboard {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guildsMapped = {};
-    const shownGuilds = (await (await getServerboardTable(this.db)).all().catch(() => [])) as any[];
+    const shownGuilds = listPublicServers();
 
-    for (const guild of interaction.client.guilds.cache.values()) {
-      const shownVal = shownGuilds?.find(shown => shown?.id == guild.id)?.value?.shown;
-      const isShown = shownVal == null ? null : shownVal;
-
-      if (isShown == false) continue;
-      if (isShown == null && guild?.rulesChannelId != null) continue;
-
+    for (const shownGuild of shownGuilds) {
+      const guild = interaction.client.guilds.cache.find(guild => (guild.id == shownGuilds))
       guildsMapped[guild.memberCount + ":" + guild.id] = guild;
     }
 

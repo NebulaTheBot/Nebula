@@ -29,7 +29,7 @@ export default {
       if (interaction.isChatInputCommand()) {
         const command = await getCommand(interaction, interaction.options);
         if (!command) return;
-        if (command?.deferred ?? true) await interaction.deferReply();
+        if (command.deferred === true) await interaction.deferReply();
         command.run(interaction);
       } else if (interaction.isAutocomplete()) {
         const command = await getCommand(interaction, interaction.options);

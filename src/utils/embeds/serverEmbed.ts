@@ -1,7 +1,6 @@
 import { EmbedBuilder, type ColorResolvable, type Guild } from "discord.js";
 import { genColor, genRGBColor } from "../colorGen";
-import { database, getServerboardTable } from "../database.js";
-import { get } from "../database/settings";
+import { getSetting } from "../database/settings";
 import Vibrant from "node-vibrant";
 import sharp from "sharp";
 
@@ -25,10 +24,10 @@ export async function serverEmbed(options: Options) {
   const pages = options.pages;
   const guild = options.guild;
   const { premiumTier: boostTier, premiumSubscriptionCount: boostCount } = guild;
-  const invite = get(guild.id, "serverboard.inviteLink");
+  const invite = getSetting(guild.id, "serverboard.inviteLink");
   const members = guild.members.cache;
   const boosters = members.filter(member => member.premiumSince);
-  const onlineMembers = members.filter(member => ["online", "dnd", "idle"].includes(member.presence?.status)).size;
+  const onlineMembers = members.filter(member => ["online", "dnd", "idle"].includes(member.presence?.status!)).size;
   const bots = members.filter(member => member.user.bot);
   const formattedUserCount = (guild.memberCount - bots.size)?.toLocaleString("en-US");
 
@@ -59,9 +58,9 @@ export async function serverEmbed(options: Options) {
     .setColor(genColor(200));
 
   try {
-    const imageBuffer = await (await fetch(guild.iconURL())).arrayBuffer();
+    const imageBuffer = await (await fetch(guild.iconURL()!)).arrayBuffer();
     const image = sharp(imageBuffer).toFormat("jpg");
-    const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant;
+    const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant!;
     embed.setColor(genRGBColor(r, g, b) as ColorResolvable);
   } catch {}
 

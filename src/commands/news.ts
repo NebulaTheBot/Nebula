@@ -45,7 +45,7 @@ export default class News {
         .setStyle(ButtonStyle.Primary)
     );
 
-    await interaction.followUp({ embeds: [embed], components: [row] });
+    await interaction.reply({ embeds: [embed], components: [row] });
     interaction.channel
       ?.createMessageComponentCollector({ filter: i => i.user.id === interaction.user.id, time: 60000 })
       .on("collect", async i => {
@@ -62,7 +62,6 @@ export default class News {
         embed = embed;
 
         await interaction.editReply({ embeds: [embed], components: [row] });
-        await i.deferUpdate();
       });
   }
 }

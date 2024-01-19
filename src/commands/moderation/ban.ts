@@ -5,11 +5,10 @@ import {
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
-import { get } from "../../utils/database/settings";
+import { getSetting } from "../../utils/database/settings";
 
 export default class Ban {
   data: SlashCommandSubcommandBuilder;
-  deferred: boolean = false;
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("ban")
@@ -28,28 +27,26 @@ export default class Ban {
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user")!;
     const guild = interaction.guild!;
-    const members = guild.members.cache!;
+    const members = guild.members.cache;
     const member = members.get(interaction.member?.user.id!)!;
-    const selectedMember = members.get(user.id)!;
-    const name = selectedMember.nickname ?? user.username;
+    const target = members.get(user.id)!;
+    const name = target.nickname ?? user.username;
 
     if (!member.permissions.has(PermissionsBitField.Flags.BanMembers)) return await interaction.reply({
       embeds: [errorEmbed("You need the **Ban Members** permission to execute this command.")]
     });
 
-    if (selectedMember === member) return await interaction.reply({
-      embeds: [errorEmbed("You can't ban yourself.")]
-    });
+    if (target === member) return await interaction.reply({ embeds: [errorEmbed("You can't ban yourself.")] });
 
-    if (selectedMember.user.id === interaction.client.user.id) return await interaction.reply({
+    if (target.user.id === interaction.client.user.id) return await interaction.reply({
       embeds: [errorEmbed("You can't ban Nebula.")]
     });
 
-    if (!selectedMember.manageable) return await interaction.reply({
+    if (!target.manageable) return await interaction.reply({
       embeds: [errorEmbed(`You can't ban ${name}, because they have a higher role position than Nebula.`)]
     });
 
-    if (member.roles.highest.position < selectedMember.roles.highest.position) return await interaction.reply({
+    if (member.roles.highest.position < target.roles.highest.position) return await interaction.reply({
       embeds: [errorEmbed(`You can't ban ${name}, because they have a higher role position than you.`)]
     });
 
@@ -65,7 +62,7 @@ export default class Ban {
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
-    const logChannel = get(guild.id, "log.channel");
+    const logChannel = getSetting(guild.id, "log.channel");
     if (logChannel) {
       const channel = await guild.channels.cache
         .get(`${logChannel}`)
@@ -79,9 +76,9 @@ export default class Ban {
       if (channel) await channel.send({ embeds: [embed] });
     }
 
+    await target.ban({ reason: reason ?? undefined });
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
     if (dmChannel) await dmChannel.send({ embeds: [embed.setTitle("🔨 • You were banned").setColor(genColor(0))] });
-    await selectedMember.ban({ reason: reason ?? undefined });
     await interaction.reply({ embeds: [embed] });
   }
 }

@@ -2,23 +2,13 @@ import {
   SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
   type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor } from "../../utils/colorGen.js";
-import { QuickDB } from "quick.db";
-import { getModerationTable } from "../../utils/database.js";
-import { errorEmbed } from "../../utils/embeds/errorEmbed.js";
-
-type Warn = {
-  id: number;
-  moderator: string;
-  reason: string;
-}
+import { genColor } from "../../utils/colorGen";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { listUserModeration } from "../../utils/database/moderation";
 
 export default class Warns {
   data: SlashCommandSubcommandBuilder;
-  db: QuickDB<any>;
-
-  constructor(db: QuickDB<any>) {
-    this.db = db;
+  constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("warns")
       .setDescription("Warns of a user.")
@@ -30,21 +20,14 @@ export default class Warns {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const member = interaction.guild.members.cache.get(interaction.member.user.id);
+    const guild = interaction.guild!;
+    if (!(guild.members.cache.get(interaction.member?.user.id!))?.permissions.has(PermissionsBitField.Flags.ModerateMembers))
+      return await interaction.reply({
+        embeds: [errorEmbed("You need the **Moderate Members** permission to execute this command.")]
+      });
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) return await interaction.followUp({
-      embeds: [errorEmbed("You need the **Moderate Members** permission to execute this command.")]
-    });
-
-    const user = interaction.options.getUser("user");
-    const warns = await (await getModerationTable(this.db))
-      .get(`${interaction.guild.id}.${user.id}.warns`)
-      .then(warns => {
-        if (!warns) return [] as Warn[];
-        return warns as Warn[] ?? [] as Warn[];
-      })
-      .catch(() => [] as Warn[]);
-
+    const user = interaction.options.getUser("user")!;
+    const warns = listUserModeration(guild.id, user.id, "WARN");
     const embed = new EmbedBuilder()
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setTitle(`✅ • Warns of ${user.username}`)
@@ -54,7 +37,7 @@ export default class Warns {
           value: [
             `**Moderator**: <@${warn.moderator}>`,
             `**Reason**: ${warn.reason}`,
-            `**Date**: <t:${Math.floor(warn.id / 1000)}:f>`,
+            `**Date**: <t:${Math.floor(warn.timestamp.getTime() / 1000)}:>` 
           ].join("\n")
         };
       }) : [{ name: "No warns", value: "This user has no warns." }])
@@ -62,6 +45,6 @@ export default class Warns {
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
-    await interaction.followUp({ embeds: [embed] });
+    await interaction.reply({ embeds: [embed] });
   }
 }

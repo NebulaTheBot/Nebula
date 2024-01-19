@@ -1,5 +1,5 @@
 import { SlashCommandSubcommandBuilder, type ChatInputCommandInteraction } from "discord.js";
-import { serverEmbed } from "../../utils/embeds/serverEmbed.js";
+import { serverEmbed } from "../../utils/embeds/serverEmbed";
 
 export default class ServerInfo {
   data: SlashCommandSubcommandBuilder;
@@ -11,6 +11,6 @@ export default class ServerInfo {
 
   async run(interaction: ChatInputCommandInteraction) {
     const embed = await serverEmbed({ guild: interaction.guild!, roles: true });
-    await interaction.followUp({ embeds: [embed] });
+    await interaction.reply({ embeds: [embed] });
   }
 }
