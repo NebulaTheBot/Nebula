@@ -22,8 +22,9 @@ const settingsDefinition = {
 
 export const settingKeys = Object.keys(settingsDefinition) as (keyof typeof settingsDefinition)[];
 const database = getDatabase(tableDefinition);
+
 const getQuery = database.query("SELECT * FROM settings WHERE guild = $1 AND key = $2;");
-const listPublicQuery = database.query("SELECT * FROM settings WHERE serverboard.shown = TRUE;");
+const listPublicQuery = database.query("SELECT * FROM settings WHERE key = 'serverboard.shown' AND value = 'true';");
 const setQuery = database.query("UPDATE settings SET value = $3 WHERE guild = $1 AND key = $2;");
 
 export function getSetting<K extends keyof typeof settingsDefinition>(guild: string, key: K): TypeOfKey<K> | null {
