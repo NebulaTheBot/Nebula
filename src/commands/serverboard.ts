@@ -6,6 +6,7 @@ import {
 import { quickSort } from "../utils/quickSort";
 import { serverEmbed } from "../utils/embeds/serverEmbed";
 import { listPublicServers } from "../utils/database/settings";
+import {errorEmbed} from "../utils/embeds/errorEmbed";
 
 export default class Serverboard {
   data: SlashCommandSubcommandBuilder;
@@ -26,13 +27,15 @@ export default class Serverboard {
       guildsMapped[`${guild.memberCount}:${guild.id}`] = guild;
     }
 
+    if (Object.keys(guildsMapped).length == 0)
+      return interaction.reply({"embeds": [errorEmbed("No public server found")]})
+
     const guildsSorted = quickSort(
       [...Object.keys(guildsMapped).map(i => Number(i.split(":")[0]))],
       [[...Object.values(guildsMapped)]],
       0,
       Object.keys(guildsMapped).length - 1
     )[1]![0].reverse();
-    console.log(guildsSorted);
 
     const pages = guildsSorted.length;
     const argPage = interaction.options.getNumber("page", false)!;
