@@ -20,7 +20,7 @@ export default class Leaderboard {
       return exp.reduce((a, b) => a + b);
     };
 
-    if (!levelEnabled) return await interaction.followUp({
+    if (!levelEnabled) return await interaction.reply({
       embeds: [errorEmbed("Leveling is disabled for this server.")]
     });
 

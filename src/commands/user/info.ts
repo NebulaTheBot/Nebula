@@ -52,7 +52,7 @@ export default class UserInfo {
       const image = sharp(imageBuffer).toFormat("jpg");
       const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant!;
       embed.setColor(genRGBColor(r, g, b) as ColorResolvable);
-    } catch { }
+    } catch {}
 
     const guildRoles = interaction.guild?.roles.cache.filter(role => target.roles.cache.has(role.id))!;
     const memberRoles = [...guildRoles].sort((role1, role2) => role2[1].position - role1[1].position);

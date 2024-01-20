@@ -10,8 +10,6 @@ type Options = {
   showInvite?: boolean
   page?: number
   pages?: number
-  showSubs?: boolean
-  subs?: number
 };
 
 /**
@@ -46,7 +44,6 @@ export async function serverEmbed(options: Options) {
     `**Owned by** ${(await guild.fetchOwner()).user.displayName}`,
     `**Created on** <t:${Math.round(guild.createdAt.valueOf() / 1000)}:D>`
   ];
-  if (options.showSubs) generalValues.push(`**Subscribers**: ${options.subs}`);
   if (options.showInvite && invite === null) generalValues.push(`**Invite link**: ${invite}`);
 
   const embed = new EmbedBuilder()

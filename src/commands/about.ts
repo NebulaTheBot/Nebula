@@ -22,7 +22,7 @@ export default class About {
           name: "📃 • General",
           value: [
             "**Version** 0.1, *Dasshubodo update*",
-            `**${guilds.size}** guild${guilds.size === 1 ? "" : "s"} • **${shards}** shard${shards === 1 ? "" : "s"}`
+            `**${guilds.size}** guild${guilds.size === 1 ? "" : "s"} ${shards == undefined ? "" : `• **${shards}** shard${shards === 1 ? "" : "s"}`}`
           ].join("\n")
         },
         {
