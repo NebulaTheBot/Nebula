@@ -37,7 +37,7 @@ export default class Warns {
           value: [
             `**Moderator**: <@${warn.moderator}>`,
             `**Reason**: ${warn.reason}`,
-            `**Date**: <t:${Math.floor(warn.timestamp.getTime() / 1000)}:>` 
+            `**Date**: <t:${Math.floor(warn.timestamp.getTime() / 1000)}:f>` 
           ].join("\n")
         };
       }) : [{ name: "No warns", value: "This user has no warns." }])

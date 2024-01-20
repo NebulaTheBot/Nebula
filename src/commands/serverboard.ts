@@ -1,6 +1,7 @@
 import {
   SlashCommandSubcommandBuilder, ButtonBuilder, ActionRowBuilder,
-  ButtonStyle, ButtonInteraction, type ChatInputCommandInteraction
+  ButtonStyle, ButtonInteraction, type Guild,
+  type ChatInputCommandInteraction
 } from "discord.js";
 import { quickSort } from "../utils/quickSort";
 import { serverEmbed } from "../utils/embeds/serverEmbed";
@@ -19,10 +20,10 @@ export default class Serverboard {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const guildsMapped = {};
+    const guildsMapped: Record<string, Guild> = {};
     for (const shownGuild of listPublicServers()) {
-      const guild = interaction.client.guilds.cache.find(guild => (guild.id == shownGuild));
-      guildsMapped[guild.memberCount + ":" + guild.id] = guild;
+      const guild = interaction.client.guilds.cache.find(guild => (guild.id === `${shownGuild}`))!;
+      guildsMapped[`${guild.memberCount}:${guild.id}`] = guild;
     }
 
     const guildsSorted = quickSort(
@@ -31,6 +32,7 @@ export default class Serverboard {
       0,
       Object.keys(guildsMapped).length - 1
     )[1]![0].reverse();
+    console.log(guildsSorted);
 
     const pages = guildsSorted.length;
     const argPage = interaction.options.getNumber("page", false)!;
@@ -62,10 +64,10 @@ export default class Serverboard {
             if (page >= pages) page = 0;
         }
 
-        guild = guildsSorted[page];
-        embed = await serverEmbed({ guild, page: page + 1, pages, showInvite: true });
+        guild = guild;
+        embed = embed;
 
-        i.message.edit({ embeds: [embed], components: [row] });
+        await interaction.editReply({ embeds: [embed], components: [row] });
       });
   }
 }
