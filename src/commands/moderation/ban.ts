@@ -30,7 +30,7 @@ export default class Ban {
     const members = guild.members.cache;
     const member = members.get(interaction.member?.user.id!)!;
     const target = members.get(user.id)!;
-    const name = target.nickname ?? user.username;
+    const name = user.displayName;
 
     if (!member.permissions.has(PermissionsBitField.Flags.BanMembers)) return await interaction.reply({
       embeds: [errorEmbed("You need the **Ban Members** permission to execute this command.")]
@@ -43,19 +43,19 @@ export default class Ban {
     });
 
     if (!target.manageable) return await interaction.reply({
-      embeds: [errorEmbed(`You can't ban ${name}, because they have a higher role position than Nebula.`)]
+      embeds: [errorEmbed(`You can't ban ${name}`, "The member has a higher role position than Nebula.")]
     });
 
     if (member.roles.highest.position < target.roles.highest.position) return await interaction.reply({
-      embeds: [errorEmbed(`You can't ban ${name}, because they have a higher role position than you.`)]
+      embeds: [errorEmbed(`You can't ban ${name}`, "The member has a higher role position than you.")]
     });
 
     const reason = interaction.options.getString("reason");
     const embed = new EmbedBuilder()
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`✅ • Banned ${user.username}`)
+      .setAuthor({ name: `• ${name}`, iconURL: user.displayAvatarURL() })
+      .setTitle(`✅ • Banned ${name}`)
       .setDescription([
-        `**Moderator**: ${interaction.user.username}`,
+        `**Moderator**: ${interaction.user.displayName}`,
         `**Reason**: ${reason ?? "No reason provided"}`
       ].join("\n"))
       .setThumbnail(user.displayAvatarURL())
