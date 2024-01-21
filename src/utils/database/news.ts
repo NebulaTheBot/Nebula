@@ -4,7 +4,7 @@ import { TableDefinition, TypeOfDefinition } from "./types";
 const definition = {
   name: "news",
   definition: {
-    guild: "INTEGER",
+    guild: "TEXT",
     title: "TEXT",
     body: "TEXT",
     imageURL: "TEXT",
@@ -12,7 +12,7 @@ const definition = {
     authorPFP: "TEXT",
     createdAt: "TIMESTAMP",
     updatedAt: "TIMESTAMP",
-    messageID: "INTEGER",
+    messageID: "TEXT",
     categoryID: "TEXT",
     id: "TEXT"
   }

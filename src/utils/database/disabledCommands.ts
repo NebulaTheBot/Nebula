@@ -4,7 +4,7 @@ import { TableDefinition, TypeOfDefinition } from "./types";
 const tableDefinition = {
   name: "disabledCommands",
   definition: {
-    guild: "INTEGER",
+    guild: "TEXT",
     command: "TEXT"
   }
 } satisfies TableDefinition;

@@ -4,11 +4,9 @@ import {
   ActionRowBuilder,
   ButtonStyle,
   ButtonInteraction,
-  type Guild,
   type ChatInputCommandInteraction,
   ComponentType,
 } from "discord.js";
-import { quickSort } from "../utils/quickSort";
 import { serverEmbed } from "../utils/embeds/serverEmbed";
 import { listPublicServers } from "../utils/database/settings";
 import { errorEmbed } from "../utils/embeds/errorEmbed";
@@ -25,38 +23,33 @@ export default class Serverboard {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const guildsMapped: Record<string, Guild> = {};
-    for (const shownGuild of listPublicServers()) {
-      const guild = interaction.client.guilds.cache.find(
-        (guild) => (guild.id = shownGuild + ""),
-      )!;
-      guildsMapped[`${guild.memberCount}:${guild.id}`] = guild;
-    }
+    const guildList = (
+      await Promise.all(
+        listPublicServers().map((id) =>
+          interaction.client.guilds.fetch(id),
+        ),
+      )
+    ).sort((a, b) => b.memberCount - a.memberCount);
 
-    if (Object.keys(guildsMapped).length == 0)
+    const pages = guildList.length;
+
+    if (pages == 0)
       return interaction.reply({
         embeds: [errorEmbed("No public server found")],
       });
 
-    const guildsSorted = quickSort(
-      [...Object.keys(guildsMapped).map((i) => Number(i.split(":")[0]))],
-      [[...Object.values(guildsMapped)]],
-      0,
-      Object.keys(guildsMapped).length - 1,
-    )[1]![0].reverse();
-
-    const pages = guildsSorted.length;
     const argPage = interaction.options.getNumber("page", false)!;
     let page =
       (argPage - 1 <= 0 ? 0 : argPage - 1 > pages ? pages - 1 : argPage - 1) ||
       0;
-    let guild = guildsSorted[page];
-    let embed = await serverEmbed({
-      guild,
-      page: page + 1,
-      pages,
-      showInvite: true,
-    });
+    async function getEmbed() {
+      return await serverEmbed({
+        guild: guildList[page],
+        page: page + 1,
+        pages,
+        showInvite: true,
+      });
+    }
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
@@ -70,10 +63,11 @@ export default class Serverboard {
     );
 
     const reply = await interaction.reply({
-      embeds: [embed],
+      embeds: [await getEmbed()],
       components: [row],
     });
-    reply.createMessageComponentCollector({
+    reply
+      .createMessageComponentCollector({
         componentType: ComponentType.Button,
         time: 60000,
       })
@@ -87,10 +81,8 @@ export default class Serverboard {
             if (page >= pages) page = 0;
         }
 
-        guild = guild;
-        embed = embed;
-
-        await interaction.editReply({ embeds: [embed], components: [row] });
+        await reply.edit({ embeds: [await getEmbed()], components: [row] });
+        i.update({});
       });
   }
 }

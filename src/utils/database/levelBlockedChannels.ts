@@ -4,8 +4,8 @@ import { TableDefinition, TypeOfDefinition } from "./types";
 const tableDefinition = {
   name: "levelBlockedChannels",
   definition: {
-    guild: "INTEGER",
-    channel: "INTEGER"
+    guild: "TEXT",
+    channel: "TEXT"
   }
 } satisfies TableDefinition;
 

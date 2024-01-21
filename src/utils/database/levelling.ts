@@ -4,8 +4,8 @@ import { TableDefinition, TypeOfDefinition } from "./types";
 const tableDefinition = {
   name: "levelling",
   definition: {
-    guild: "INTEGER",
-    user: "INTEGER",
+    guild: "TEXT",
+    user: "TEXT",
     level: "INTEGER",
     exp: "INTEGER"
   }

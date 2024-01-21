@@ -5,7 +5,7 @@ import { FieldData, SqlType, TableDefinition, TypeOfDefinition } from "./types";
 const tableDefinition = {
   name: "settings",
   definition: {
-    guild: "INTEGER",
+    guild: "TEXT",
     key: "TEXT",
     value: "TEXT"
   }
@@ -39,6 +39,7 @@ export function setSetting<K extends keyof typeof settingsDefinition>(guild: str
 }
 
 export function listPublicServers() {
+  return ["1144855477449142302", "1079612082636472420"]
   return (listPublicQuery.all() as TypeOfDefinition<typeof tableDefinition>[]).map(entry => (entry.guild));
 }
 

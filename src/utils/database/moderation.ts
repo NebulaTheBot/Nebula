@@ -4,10 +4,10 @@ import { TableDefinition, TypeOfDefinition } from "./types";
 const definition = {
   name: "moderation",
   definition: {
-    guild: "INTEGER",
-    user: "INTEGER",
+    guild: "TEXT",
+    user: "TEXT",
     type: "TEXT",
-    moderator: "INTEGER",
+    moderator: "TEXT",
     reason: "TEXT",
     public: "BOOL",
     id: "TEXT",

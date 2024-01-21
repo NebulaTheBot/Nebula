@@ -4,10 +4,10 @@ import { TableDefinition, TypeOfDefinition } from "./types";
 const definition = {
   name: "newsCategories",
   definition: {
-    guild: "INTEGER",
+    guild: "TEXT",
     name: "TEXT",
-    role: "INTEGER",
-    channel: "INTEGER",
+    role: "TEXT",
+    channel: "TEXT",
     id: "TEXT"
   }
 } satisfies TableDefinition;

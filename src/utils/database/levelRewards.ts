@@ -5,8 +5,8 @@ import { TableDefinition, TypeOfDefinition } from "./types";
 const tableDefinition = {
   name: "levelRewards",
   definition: {
-    guild: "INTEGER",
-    roleID: "INTEGER",
+    guild: "TEXT",
+    roleID: "TEXT",
     level: "INTEGER"
   }
 } satisfies TableDefinition;
