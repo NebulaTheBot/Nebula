@@ -24,9 +24,9 @@ export default class Serverboard {
       .sort((a, b) => b.memberCount - a.memberCount);
 
     const pages = guildList.length;
-    if (pages == 0) return interaction.reply({ embeds: [errorEmbed("No public server found.")] });
+    if (pages == 0) return interaction.reply({ embeds: [errorEmbed("No public server found", "By some magical miracle, all the servers using Nebula turned off their visibility. Use /server settings key:`serverboard.shown` value:`TRUE` to make your server publicly visible.")] });
 
-    const argPage = interaction.options.getNumber("page", false)!;
+    const argPage = interaction.options.get("page", false)!.value as number;
     let page = (argPage - 1 <= 0 ? 0 : argPage - 1 > pages ? pages - 1 : argPage - 1) || 0;
 
     async function getEmbed() {

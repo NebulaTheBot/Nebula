@@ -3,13 +3,18 @@ import { genColor } from "../colorGen";
 
 /**
  * Sends the embed containing an error.
- * @param error The error.
+ * @param title The error.
  * @param reason The reason of the error.
  * @returns Embed with the error description.
  */
-export function errorEmbed(error: string, reason: string) {
+export function errorEmbed(title: string, reason?: string) {
+
+  const content = [`**${title}**`]
+
+  if (reason != undefined) content.push(reason)
+
   return new EmbedBuilder()
-    .setTitle("❌ • Error!")
-    .setDescription([`**${error}**`, `Reason: ${reason}`].join("\n"))
+    .setTitle("❌ • Something went wrong!")
+    .setDescription(content.join("\n"))
     .setColor(genColor(0));
 }
