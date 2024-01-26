@@ -21,7 +21,7 @@ export default {
         .setDescription(
           [
             "Nebula is a multiplatform, multipurpose bot with the ability to add extensions to have additional features.",
-            "To manage the bot, log into the [dashboard](https://dash.nebulabot.org/). Alternatively, you can use the /settings command.",
+            "To manage the bot, use the /server settings command.",
             "Nebula is in an early stage of development. If you find bugs, please go to our [official server](https://discord.gg/7RdABJhQss) and report them."
           ].join("\n\n")
         )

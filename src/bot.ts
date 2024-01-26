@@ -4,7 +4,7 @@ import Events from "./handlers/events";
 
 const client = new Client({
   presence: {
-    activities: [{ name: "with the dashboard!", type: ActivityType.Playing }]
+    activities: [{ name: "with /settings!", type: ActivityType.Playing }]
   },
   intents: [
     "Guilds",
