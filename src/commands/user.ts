@@ -4,23 +4,27 @@ import {
   type ColorResolvable,
   type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor, genRGBColor } from "../../utils/colorGen";
+import { genColor, genRGBColor } from "../utils/colorGen";
+import { get as getLevelRewards } from "../utils/database/levelRewards";
+import { getSetting } from "../utils/database/settings";
+import { getLevel, setLevel } from "../utils/database/levelling";
 import Vibrant from "node-vibrant";
 import sharp from "sharp";
 
-export default class UserInfo {
+export default class User {
   data: SlashCommandSubcommandBuilder;
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
-      .setName("info")
+      .setName("user")
       .setDescription("Shows your (or another user's) info.")
       .addUserOption(user => user.setName("user").setDescription("Select the user."));
   }
 
   async run(interaction: ChatInputCommandInteraction) {
+    const guild = interaction.guild!;
     const user = interaction.options.getUser("user");
     const id = user ? user.id : interaction.member?.user.id;
-    const target = interaction.guild?.members.cache
+    const target = guild.members.cache
       .filter(member => member.user.id === id)
       .map(user => user)[0]!;
     const selectedUser = target.user!;
@@ -43,11 +47,13 @@ export default class UserInfo {
                 : selectedUser.displayName
             }`,
             `**Created on** <t:${Math.round(selectedUser.createdAt.valueOf() / 1000)}:D>`
-          ].join("\n")
+          ].join("\n"),
+          inline: true
         },
         {
           name: "👥 • Member info",
-          value: `**Joined on** <t:${Math.round(target.joinedAt?.valueOf()! / 1000)}:D>`
+          value: `**Joined on** <t:${Math.round(target.joinedAt?.valueOf()! / 1000)}:D>`,
+          inline: true
         }
       )
       .setFooter({ text: `User ID: ${target.id}` })
@@ -61,9 +67,41 @@ export default class UserInfo {
       embed.setColor(genRGBColor(r, g, b) as ColorResolvable);
     } catch {}
 
-    const guildRoles = interaction.guild?.roles.cache.filter(role =>
-      target.roles.cache.has(role.id)
-    )!;
+    if (getSetting(`${guild.id}`, "levelling.enabled")) {
+      const [guildExp, guildLevel] = getLevel(`${guild.id}`, `${target.id}`)!;
+      if (!guildExp && !guildLevel) setLevel(`${guild.id}`, `${target.id}`, 0, 0);
+
+      const formattedExpUntilLevelup = Math.floor(
+        100 * 1.25 * ((guildLevel ?? 0) + 1)
+      )?.toLocaleString("en-US");
+      let rewards = [];
+      let nextReward;
+
+      for (const { roleID, level } of getLevelRewards(`${guild.id}`)) {
+        if (guildLevel < level) {
+          if (nextReward) break;
+          nextReward = { roleID, level };
+          break;
+        }
+
+        rewards.push(await guild.roles.fetch(`${roleID}`)?.catch(() => {}));
+      }
+
+      embed.addFields({
+        name: `⚡ • Level ${guildLevel ?? 0}`,
+        value: [
+          `**${guildExp.toLocaleString("en-US") ?? 0}/${formattedExpUntilLevelup}** EXP`,
+          `**Next level**: ${(guildLevel ?? 0) + 1}`,
+          `${
+            rewards.length > 0
+              ? rewards.map(reward => `<@&${reward?.id}>`).join(" ")
+              : "*No rewards unlocked*"
+          }`
+        ].join("\n")
+      });
+    }
+
+    const guildRoles = guild.roles.cache.filter(role => target.roles.cache.has(role.id))!;
     const memberRoles = [...guildRoles].sort(
       (role1, role2) => role2[1].position - role1[1].position
     );

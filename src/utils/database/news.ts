@@ -13,19 +13,15 @@ const definition = {
     createdAt: "TIMESTAMP",
     updatedAt: "TIMESTAMP",
     messageID: "TEXT",
-    categoryID: "TEXT",
     id: "TEXT"
   }
 } satisfies TableDefinition;
 
 const database = getDatabase(definition);
 const addQuery = database.query(
-  "INSERT INTO news (guild, title, body, imageURL, author, authorPFP, createdAt, updatedAt, messageID, categoryID, id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11);"
+  "INSERT INTO news (guild, title, body, imageURL, author, authorPFP, createdAt, updatedAt, messageID, id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11);"
 );
 const listAllQuery = database.query("SELECT * FROM news WHERE guild = $1;");
-const listCategoryQuery = database.query(
-  "SELECT * FROM news WHERE guild = $1 AND categoryID = $2;"
-);
 const updateQuery = database.query(
   "UPDATE news SET title = $2, body = $3, imageURL = $4 WHERE id = $1"
 );
@@ -38,8 +34,7 @@ export function addNews(
   imageURL: string | null,
   author: string,
   authorPFP: string,
-  messageID: string | number,
-  categoryID: string
+  messageID: string | number
 ) {
   addQuery.run(
     guildID,
@@ -51,17 +46,12 @@ export function addNews(
     Date.now(),
     0,
     messageID,
-    categoryID,
     crypto.randomUUID()
   );
 }
 
 export function listAllNews(guildID: string | number) {
   return listAllQuery.all(guildID) as TypeOfDefinition<typeof definition>[];
-}
-
-export function listCategoryNews(guildID: string | number, categoryID: string) {
-  return listCategoryQuery.all(guildID, categoryID) as TypeOfDefinition<typeof definition>[];
 }
 
 export function updateNews(id: string, title: string, body: string, imageURL: string) {
