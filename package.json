@@ -8,7 +8,6 @@
   "version": "0.1.0",
   "main": "./src/bot.ts",
   "type": "module",
-  "prettier": "./.prettierrc",
   "scripts": {
     "start": "bun ./src/bot.ts"
   },

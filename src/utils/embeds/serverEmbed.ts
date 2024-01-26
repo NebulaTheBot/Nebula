@@ -23,7 +23,9 @@ export async function serverEmbed(options: Options) {
   const invite = getSetting(guild.id, "serverboard.inviteLink");
   const members = guild.members.cache;
   const boosters = members.filter(member => member.premiumSince);
-  const onlineMembers = members.filter(member => ["online", "dnd", "idle"].includes(member.presence?.status!)).size;
+  const onlineMembers = members.filter(member =>
+    ["online", "dnd", "idle"].includes(member.presence?.status!)
+  ).size;
   const bots = members.filter(member => member.user.bot);
   const formattedUserCount = (guild.memberCount - bots.size)?.toLocaleString("en-US");
 
@@ -33,7 +35,9 @@ export async function serverEmbed(options: Options) {
 
   const channels = guild.channels.cache;
   const channelSizes = {
-    text: channels.filter(channel => channel.type === 0 || channel.type === 15 || channel.type === 5).size,
+    text: channels.filter(
+      channel => channel.type === 0 || channel.type === 15 || channel.type === 5
+    ).size,
     voice: channels.filter(channel => channel.type === 2 || channel.type === 13).size,
     categories: channels.filter(channel => channel.type === 4).size
   };
@@ -91,7 +95,9 @@ export async function serverEmbed(options: Options) {
     {
       name: `🌟 • ${boostTier == 0 ? "No level" : `Level ${boostTier}`}`,
       value: [
-        `**${boostCount}**${boostTier === 0 ? "/2" : boostTier === 1 ? "/7" : boostTier === 2 ? "/14" : ""} boosts`,
+        `**${boostCount}**${
+          boostTier === 0 ? "/2" : boostTier === 1 ? "/7" : boostTier === 2 ? "/14" : ""
+        } boosts`,
         `**${boosters.size}** ${boosters.size === 1 ? "booster" : "boosters"}`
       ].join("\n"),
       inline: true

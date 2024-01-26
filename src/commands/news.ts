@@ -1,6 +1,10 @@
 import {
-  SlashCommandSubcommandBuilder, EmbedBuilder, ActionRowBuilder,
-  ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction
+  SlashCommandSubcommandBuilder,
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../utils/colorGen";
 import { listAllNews } from "../utils/database/news";
@@ -11,15 +15,16 @@ export default class News {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("news")
       .setDescription("View the news of Nebula.")
-      .addNumberOption(option => option
-        .setName("page")
-        .setDescription("The page of the news that you want to see.")
+      .addNumberOption(number =>
+        number.setName("page").setDescription("The page of the news that you want to see.")
       );
   }
 
   async run(interaction: ChatInputCommandInteraction) {
     let page = interaction.options.getNumber("page") ?? 1;
-    const sortedNews = (Object.values(listAllNews("903852579837059113")) as any[])?.sort((a, b) => b.createdAt - a.createdAt);
+    const sortedNews = (Object.values(listAllNews("903852579837059113")) as any[])?.sort(
+      (a, b) => b.createdAt - a.createdAt
+    );
     let currentNews = sortedNews[page - 1];
 
     if (page > sortedNews.length) page = sortedNews.length;
@@ -47,7 +52,10 @@ export default class News {
 
     await interaction.reply({ embeds: [embed], components: [row] });
     interaction.channel
-      ?.createMessageComponentCollector({ filter: i => i.user.id === interaction.user.id, time: 60000 })
+      ?.createMessageComponentCollector({
+        filter: i => i.user.id === interaction.user.id,
+        time: 60000
+      })
       .on("collect", async i => {
         if (!i.isButton()) return;
         if (i.customId === "left") {

@@ -1,5 +1,7 @@
 import {
-  SlashCommandSubcommandBuilder, EmbedBuilder, type ColorResolvable,
+  SlashCommandSubcommandBuilder,
+  EmbedBuilder,
+  type ColorResolvable,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor, genRGBColor } from "../../utils/colorGen";
@@ -12,21 +14,22 @@ export default class UserInfo {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("info")
       .setDescription("Shows your (or another user's) info.")
-      .addUserOption(option => option
-        .setName("user")
-        .setDescription("Select the user.")
-      );
+      .addUserOption(user => user.setName("user").setDescription("Select the user."));
   }
 
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user");
     const id = user ? user.id : interaction.member?.user.id;
-    const target = interaction.guild?.members.cache.filter(member => member.user.id === id).map(user => user)[0]!;
+    const target = interaction.guild?.members.cache
+      .filter(member => member.user.id === id)
+      .map(user => user)[0]!;
     const selectedUser = target.user!;
 
     let embed = new EmbedBuilder()
       .setAuthor({
-        name: `•  ${target.nickname == null ? selectedUser.username : target.nickname}${selectedUser.discriminator == "0" ? "" : `#${selectedUser.discriminator}`}`,
+        name: `•  ${target.nickname == null ? selectedUser.username : target.nickname}${
+          selectedUser.discriminator == "0" ? "" : `#${selectedUser.discriminator}`
+        }`,
         iconURL: target.displayAvatarURL()
       })
       .setFields(
@@ -34,13 +37,17 @@ export default class UserInfo {
           name: selectedUser?.bot === false ? "👤 • User info" : "🤖 • Bot info",
           value: [
             `**Username**: ${selectedUser.username}`,
-            `**Display name**: ${selectedUser.displayName === selectedUser.username ? "*None*" : selectedUser.displayName}`,
-            `**Created on** <t:${Math.round(selectedUser.createdAt.valueOf() / 1000)}:D>`,
-          ].join("\n"),
+            `**Display name**: ${
+              selectedUser.displayName === selectedUser.username
+                ? "*None*"
+                : selectedUser.displayName
+            }`,
+            `**Created on** <t:${Math.round(selectedUser.createdAt.valueOf() / 1000)}:D>`
+          ].join("\n")
         },
         {
           name: "👥 • Member info",
-          value: `**Joined on** <t:${Math.round(target.joinedAt?.valueOf()! / 1000)}:D>`,
+          value: `**Joined on** <t:${Math.round(target.joinedAt?.valueOf()! / 1000)}:D>`
         }
       )
       .setFooter({ text: `User ID: ${target.id}` })
@@ -54,17 +61,24 @@ export default class UserInfo {
       embed.setColor(genRGBColor(r, g, b) as ColorResolvable);
     } catch {}
 
-    const guildRoles = interaction.guild?.roles.cache.filter(role => target.roles.cache.has(role.id))!;
-    const memberRoles = [...guildRoles].sort((role1, role2) => role2[1].position - role1[1].position);
+    const guildRoles = interaction.guild?.roles.cache.filter(role =>
+      target.roles.cache.has(role.id)
+    )!;
+    const memberRoles = [...guildRoles].sort(
+      (role1, role2) => role2[1].position - role1[1].position
+    );
     memberRoles.pop();
 
-    if (memberRoles.length !== 0) embed.addFields({
-      name: `🎭 • ${guildRoles.filter(role => target.roles.cache.has(role.id)).size! - 1} ${memberRoles.length === 1 ? "role" : "roles"}`,
-      value: `${memberRoles
-        .slice(0, 5)
-        .map(role => `<@&${role[1].id}>`)
-        .join(", ")}${memberRoles.length > 5 ? ` **and ${memberRoles.length - 5} more**` : ""}`,
-    });
+    if (memberRoles.length !== 0)
+      embed.addFields({
+        name: `🎭 • ${guildRoles.filter(role => target.roles.cache.has(role.id)).size! - 1} ${
+          memberRoles.length === 1 ? "role" : "roles"
+        }`,
+        value: `${memberRoles
+          .slice(0, 5)
+          .map(role => `<@&${role[1].id}>`)
+          .join(", ")}${memberRoles.length > 5 ? ` **and ${memberRoles.length - 5} more**` : ""}`
+      });
 
     await interaction.reply({ embeds: [embed] });
   }

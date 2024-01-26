@@ -8,10 +8,8 @@ import { genColor } from "../colorGen";
  * @returns Embed with the error description.
  */
 export function errorEmbed(title: string, reason?: string) {
-
-  const content = [`**${title}**`]
-
-  if (reason != undefined) content.push(reason)
+  const content = [`**${title}**`];
+  if (reason != undefined) content.push(reason);
 
   return new EmbedBuilder()
     .setTitle("❌ • Something went wrong!")

@@ -1,6 +1,10 @@
 import {
-  SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
-  ChannelType, TextChannel, type Channel,
+  SlashCommandSubcommandBuilder,
+  EmbedBuilder,
+  PermissionsBitField,
+  ChannelType,
+  TextChannel,
+  type Channel,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
@@ -13,15 +17,23 @@ export default class Purge {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("purge")
       .setDescription("Purges messages.")
-      .addNumberOption(number => number
-        .setName("amount")
-        .setDescription("The amount of messages that you want to purge.")
-        .setRequired(true)
+      .addNumberOption(number =>
+        number
+          .setName("amount")
+          .setDescription("The amount of messages that you want to purge.")
+          .setRequired(true)
       )
-      .addChannelOption(channel => channel
-        .setName("channel")
-        .setDescription("The channel that you want to purge. Leave empty if you want to purge the current channel.")
-        .addChannelTypes(ChannelType.GuildText, ChannelType.PublicThread, ChannelType.PrivateThread)
+      .addChannelOption(channel =>
+        channel
+          .setName("channel")
+          .setDescription(
+            "The channel that you want to purge. Leave empty if you want to purge the current channel."
+          )
+          .addChannelTypes(
+            ChannelType.GuildText,
+            ChannelType.PublicThread,
+            ChannelType.PrivateThread
+          )
       );
   }
 
@@ -30,33 +42,43 @@ export default class Purge {
     const amount = interaction.options.getNumber("amount")!;
     const member = guild.members.cache.get(interaction.member?.user.id!)!;
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ManageMessages)) return await interaction.reply({
-      embeds: [errorEmbed("You need the **Manage Messages** permission to execute this command.")],
-    });
+    if (!member.permissions.has(PermissionsBitField.Flags.ManageMessages))
+      return await interaction.reply({
+        embeds: [errorEmbed("You need the **Manage Messages** permission to execute this command.")]
+      });
 
-    if (amount > 100) return await interaction.reply({
-      embeds: [errorEmbed("You can only purge up to 100 messages at a time.")],
-    });
+    if (amount > 100)
+      return await interaction.reply({
+        embeds: [errorEmbed("You can only purge up to 100 messages at a time.")]
+      });
 
-    if (amount < 1) return await interaction.reply({
-      embeds: [errorEmbed("You must purge at least 1 message.")],
-    });
+    if (amount < 1)
+      return await interaction.reply({
+        embeds: [errorEmbed("You must purge at least 1 message.")]
+      });
 
     const channelOption = interaction.options.getChannel("channel")!;
     const channel = guild.channels.cache.get(interaction.channel?.id ?? channelOption.id)!;
     const embed = new EmbedBuilder()
       .setTitle(`✅ • Purged ${amount} messages.`)
-      .setDescription([
-        `**Moderator**: ${interaction.user.username}`,
-        `**Channel**: ${channelOption ?? `<#${channel.id}>`}`,
-      ].join("\n"))
+      .setDescription(
+        [
+          `**Moderator**: ${interaction.user.username}`,
+          `**Channel**: ${channelOption ?? `<#${channel.id}>`}`
+        ].join("\n")
+      )
       .setColor(genColor(100));
 
-    if (channel.type === ChannelType.GuildText && ChannelType.PublicThread && ChannelType.PrivateThread) channel == interaction.channel
-      ? await channel.bulkDelete(amount + 1, true)
-      : await channel.bulkDelete(amount, true);
+    if (
+      channel.type === ChannelType.GuildText &&
+      ChannelType.PublicThread &&
+      ChannelType.PrivateThread
+    )
+      channel == interaction.channel
+        ? await channel.bulkDelete(amount + 1, true)
+        : await channel.bulkDelete(amount, true);
 
-    const logChannel = getSetting(guild.id, "log.channel");    
+    const logChannel = getSetting(guild.id, "log.channel");
     if (logChannel) {
       const channel = await guild.channels.cache
         .get(`${logChannel}`)

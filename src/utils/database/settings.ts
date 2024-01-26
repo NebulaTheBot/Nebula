@@ -7,8 +7,8 @@ const tableDefinition = {
   definition: {
     guild: "TEXT",
     key: "TEXT",
-    value: "TEXT",
-  },
+    value: "TEXT"
+  }
 } satisfies TableDefinition;
 
 export const settingsDefinition = {
@@ -17,34 +17,24 @@ export const settingsDefinition = {
   "levelling.persistence": "BOOL",
   "log.channel": "INTEGER",
   "serverboard.inviteLink": "TEXT",
-  "serverboard.shown": "BOOL",
+  "serverboard.shown": "BOOL"
 } satisfies Record<string, FieldData>;
 
-export const settingsKeys = Object.keys(
-  settingsDefinition,
-) as (keyof typeof settingsDefinition)[];
+export const settingsKeys = Object.keys(settingsDefinition) as (keyof typeof settingsDefinition)[];
 const database = getDatabase(tableDefinition);
 
-const getQuery = database.query(
-  "SELECT * FROM settings WHERE guild = $1 AND key = $2;",
-);
+const getQuery = database.query("SELECT * FROM settings WHERE guild = $1 AND key = $2;");
 const listPublicQuery = database.query(
-  "SELECT * FROM settings WHERE key = 'serverboard.shown' AND value = 'TRUE';",
+  "SELECT * FROM settings WHERE key = 'serverboard.shown' AND value = 'TRUE';"
 );
-const removeQuery = database.query(
-  "DELETE FROM settings WHERE guild = $1 AND key = $2;",
-);
-const insertQuery = database.query(
-  "INSERT INTO settings (guild, key, value) VALUES (?1, ?2, ?3);",
-);
+const removeQuery = database.query("DELETE FROM settings WHERE guild = $1 AND key = $2;");
+const insertQuery = database.query("INSERT INTO settings (guild, key, value) VALUES (?1, ?2, ?3);");
 
 export function getSetting<K extends keyof typeof settingsDefinition>(
   guild: string,
-  key: K,
+  key: K
 ): TypeOfKey<K> | null {
-  let res = getQuery.all(JSON.stringify(guild), key) as TypeOfDefinition<
-    typeof tableDefinition
-  >[];
+  let res = getQuery.all(JSON.stringify(guild), key) as TypeOfDefinition<typeof tableDefinition>[];
   if (res.length == 0) return null;
   switch (settingsDefinition[key]) {
     case "TEXT":
@@ -53,14 +43,14 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
       return (res[0].value == "TRUE") as TypeOfKey<K>;
     default:
       // TODO: Implement more data types
-      return "WIP";
+      return "WIP" as TypeOfKey<K>;
   }
 }
 
 export function setSetting<K extends keyof typeof settingsDefinition>(
   guild: string,
   key: K,
-  value: TypeOfKey<K>,
+  value: TypeOfKey<K>
 ) {
   const doInsert = getSetting(guild, key) == null;
   if (!doInsert) {
@@ -70,12 +60,10 @@ export function setSetting<K extends keyof typeof settingsDefinition>(
 }
 
 export function listPublicServers() {
-  return (
-    listPublicQuery.all() as TypeOfDefinition<typeof tableDefinition>[]
-  ).map((entry) => JSON.parse(entry.guild));
+  return (listPublicQuery.all() as TypeOfDefinition<typeof tableDefinition>[]).map(entry =>
+    JSON.parse(entry.guild)
+  );
 }
 
 // Utility type
-type TypeOfKey<T extends keyof typeof settingsDefinition> = SqlType<
-  (typeof settingsDefinition)[T]
->;
+type TypeOfKey<T extends keyof typeof settingsDefinition> = SqlType<(typeof settingsDefinition)[T]>;

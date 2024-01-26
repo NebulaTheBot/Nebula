@@ -7,10 +7,12 @@ export default class Bread {
 
     if (breadSplit[1] == null) return;
     if (
-      ((breadSplit[0].endsWith(" ") || breadSplit[0].endsWith("")) && breadSplit[1].startsWith(" ")) ||
+      ((breadSplit[0].endsWith(" ") || breadSplit[0].endsWith("")) &&
+        breadSplit[1].startsWith(" ")) ||
       message.content.toLowerCase() === "bread"
     ) {
-      if (Math.round(Math.random() * 100) <= 0.25) message.channel.send("https://tenor.com/bOMAb.gif");
+      if (Math.round(Math.random() * 100) <= 0.25)
+        message.channel.send("https://tenor.com/bOMAb.gif");
       else await multiReact(message, "🍞🇧🇷🇪🇦🇩👍");
     }
   }

@@ -12,15 +12,9 @@ export default {
   event: class MessageCreate {
     async run(message: Message) {
       const author = message.author;
-      const guild = message.guild;
+      const guild = message.guild!;
 
-      // Easter egg handler
       if (author.bot) return;
-      if (guild?.id !== "903852579837059113") return;
-      const eventsPath = join(process.cwd(), "src", "events", "easterEggs");
-
-      for (const easterEggFile of readdirSync(eventsPath))
-        new (await import(pathToFileURL(join(eventsPath, easterEggFile)).toString())).default().run(message, ...message.content);
 
       // Levelling
       const levelChannelId = getSetting(guild.id, "levelling.channel");
@@ -49,16 +43,21 @@ export default {
       const embed = new EmbedBuilder()
         .setAuthor({ name: author.displayName, iconURL: author.avatarURL() || undefined })
         .setTitle("⚡ • Level Up!")
-        .setDescription([
-          `**Congratulations, ${author.displayName}**!`,
-          `You made it to **level ${guildLevel + 1}**`,
-          `You need ${Math.floor(100 * 1.25 * (guildLevel + 2))} EXP to level up again.`
-        ].join("\n"))
+        .setDescription(
+          [
+            `**Congratulations, ${author.displayName}**!`,
+            `You made it to **level ${guildLevel + 1}**`,
+            `You need ${Math.floor(100 * 1.25 * (guildLevel + 2))} EXP to level up again.`
+          ].join("\n")
+        )
         .setThumbnail(author.avatarURL())
         .setTimestamp()
         .setColor(genColor(200));
 
-      (guild.channels.cache.get(`${levelChannelId}`) as TextChannel).send({ embeds: [embed], content: `<@${author.id}>` });
+      (guild.channels.cache.get(`${levelChannelId}`) as TextChannel).send({
+        embeds: [embed],
+        content: `<@${author.id}>`
+      });
       for (const { level, roleID } of getLevelRewards(guild.id)) {
         const role = guild.roles.cache.get(`${roleID}`);
         if (!role) continue;
@@ -71,6 +70,16 @@ export default {
 
         await authorRoles?.remove(role);
       }
+
+      // Easter egg handler
+      if (guild?.id !== "903852579837059113") return;
+      const eventsPath = join(process.cwd(), "src", "events", "easterEggs");
+
+      for (const easterEggFile of readdirSync(eventsPath))
+        new (await import(pathToFileURL(join(eventsPath, easterEggFile)).toString())).default().run(
+          message,
+          ...message.content
+        );
     }
   }
-}
+};

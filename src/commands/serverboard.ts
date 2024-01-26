@@ -1,6 +1,10 @@
 import {
-  SlashCommandSubcommandBuilder, ButtonBuilder, ActionRowBuilder,
-  ButtonStyle, ButtonInteraction, ComponentType,
+  SlashCommandSubcommandBuilder,
+  ButtonBuilder,
+  ActionRowBuilder,
+  ButtonStyle,
+  ButtonInteraction,
+  ComponentType,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { serverEmbed } from "../utils/embeds/serverEmbed";
@@ -13,20 +17,28 @@ export default class Serverboard {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("serverboard")
       .setDescription("Shows the servers that have Nebula.")
-      .addNumberOption(option => option
-        .setName("page")
-        .setDescription("The page you want to see.")
+      .addNumberOption(number =>
+        number.setName("page").setDescription("The page you want to see.")
       );
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const guildList = (await Promise.all(listPublicServers().map(id => interaction.client.guilds.fetch(id))))
-      .sort((a, b) => b.memberCount - a.memberCount);
+    const guildList = (
+      await Promise.all(listPublicServers().map(id => interaction.client.guilds.fetch(id)))
+    ).sort((a, b) => b.memberCount - a.memberCount);
 
     const pages = guildList.length;
-    if (pages == 0) return interaction.reply({ embeds: [errorEmbed("No public server found", "By some magical miracle, all the servers using Nebula turned off their visibility. Use /server settings key:`serverboard.shown` value:`TRUE` to make your server publicly visible.")] });
+    if (pages == 0)
+      return interaction.reply({
+        embeds: [
+          errorEmbed(
+            "No public server found",
+            "By some magical miracle, all the servers using Nebula turned off their visibility. Use /server settings key:`serverboard.shown` value:`TRUE` to make your server publicly visible."
+          )
+        ]
+      });
 
-    const argPage = interaction.options.get("page", false)!.value as number;
+    const argPage = interaction.options.get("page")?.value as number;
     let page = (argPage - 1 <= 0 ? 0 : argPage - 1 > pages ? pages - 1 : argPage - 1) || 0;
 
     async function getEmbed() {
@@ -41,7 +53,7 @@ export default class Serverboard {
       new ButtonBuilder()
         .setCustomId("right")
         .setEmoji("1137330125004869702")
-        .setStyle(ButtonStyle.Primary),
+        .setStyle(ButtonStyle.Primary)
     );
 
     const reply = await interaction.reply({ embeds: [await getEmbed()], components: [row] });

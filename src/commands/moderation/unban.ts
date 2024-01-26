@@ -1,7 +1,12 @@
 import {
-  PermissionsBitField, EmbedBuilder, SlashCommandSubcommandBuilder,
-  TextChannel, DMChannel, ChannelType,
-  type Channel, type ChatInputCommandInteraction
+  PermissionsBitField,
+  EmbedBuilder,
+  SlashCommandSubcommandBuilder,
+  TextChannel,
+  DMChannel,
+  ChannelType,
+  type Channel,
+  type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
@@ -13,26 +18,29 @@ export default class Unban {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("unban")
       .setDescription("Unbans a user.")
-      .addStringOption(string => string
-        .setName("id")
-        .setDescription("The ID of the user that you want to unban.")
-        .setRequired(true)
-    );
+      .addStringOption(string =>
+        string
+          .setName("id")
+          .setDescription("The ID of the user that you want to unban.")
+          .setRequired(true)
+      );
   }
 
   async run(interaction: ChatInputCommandInteraction) {
     const id = interaction.options.getString("id")!;
     const guild = interaction.guild!;
     const member = guild.members.cache.get(interaction.member?.user.id!)!;
-    const target = (guild.bans.cache.map(user => user.user)).filter(user => user.id === id)[0]!;
+    const target = guild.bans.cache.map(user => user.user).filter(user => user.id === id)[0]!;
 
-    if (!member.permissions.has(PermissionsBitField.Flags.BanMembers)) return await interaction.reply({
-      embeds: [errorEmbed("You need the **Ban Members** permission to execute this command.")]
-    });
+    if (!member.permissions.has(PermissionsBitField.Flags.BanMembers))
+      return await interaction.reply({
+        embeds: [errorEmbed("You need the **Ban Members** permission to execute this command.")]
+      });
 
-    if (target == undefined) return await interaction.reply({
-      embeds: [errorEmbed("You can't unban this user because they were never banned.")]
-    });
+    if (target == undefined)
+      return await interaction.reply({
+        embeds: [errorEmbed("You can't unban this user because they were never banned.")]
+      });
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: target.username, iconURL: target.displayAvatarURL() })

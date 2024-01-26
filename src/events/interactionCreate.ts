@@ -2,13 +2,22 @@ import type { CommandInteraction, Client, AutocompleteInteraction } from "discor
 import { pathToFileURL } from "url";
 import { join } from "path";
 
-async function getCommand(interaction: CommandInteraction | AutocompleteInteraction, options: any): Promise<any> {
+async function getCommand(
+  interaction: CommandInteraction | AutocompleteInteraction,
+  options: any
+): Promise<any> {
   const commandName = interaction.commandName;
   const subcommandName = options.getSubcommand(false);
   const commandGroupName = options.getSubcommandGroup(false);
   const commandImportPath = join(
     join(process.cwd(), "src", "commands"),
-    `${subcommandName ? `${commandName}/${commandGroupName ? `${commandGroupName}/${subcommandName}` : subcommandName}` : commandName}.ts`,
+    `${
+      subcommandName
+        ? `${commandName}/${
+            commandGroupName ? `${commandGroupName}/${subcommandName}` : subcommandName
+          }`
+        : commandName
+    }.ts`
   );
 
   return new (await import(pathToFileURL(commandImportPath).toString())).default();
@@ -38,5 +47,5 @@ export default {
         command.autocomplete(interaction);
       }
     }
-  },
+  }
 };

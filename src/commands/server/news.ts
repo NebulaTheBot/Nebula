@@ -1,6 +1,10 @@
 import {
-  SlashCommandSubcommandBuilder, EmbedBuilder, ActionRowBuilder,
-  ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction
+  SlashCommandSubcommandBuilder,
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
@@ -12,9 +16,8 @@ export default class News {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("news")
       .setDescription("View the news of this server.")
-      .addNumberOption(option => option
-        .setName("page")
-        .setDescription("The page of the news that you want to see.")
+      .addNumberOption(number =>
+        number.setName("page").setDescription("The page of the news that you want to see.")
       );
   }
 
@@ -24,9 +27,12 @@ export default class News {
     const sortedNews = (Object.values(news) as any[])?.sort((a, b) => b.createdAt - a.createdAt);
     let currentNews = sortedNews[page - 1];
 
-    if (!news || !sortedNews || sortedNews.length == 0) return await interaction.reply({
-      embeds: [errorEmbed("No news found.\nAdmins can add news with the **/settings news add** command.")]
-    });
+    if (!news || !sortedNews || sortedNews.length == 0)
+      return await interaction.reply({
+        embeds: [
+          errorEmbed("No news found.\nAdmins can add news with the **/settings news add** command.")
+        ]
+      });
     if (page > sortedNews.length) page = sortedNews.length;
     if (page < 1) page = 1;
 
@@ -52,7 +58,10 @@ export default class News {
 
     await interaction.reply({ embeds: [embed], components: [row] });
     interaction.channel
-      ?.createMessageComponentCollector({ filter: i => i.user.id === interaction.user.id, time: 60000 })
+      ?.createMessageComponentCollector({
+        filter: i => i.user.id === interaction.user.id,
+        time: 60000
+      })
       .on("collect", async i => {
         if (!i.isButton()) return;
         if (i.customId === "left") {

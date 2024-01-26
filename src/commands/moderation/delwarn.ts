@@ -1,7 +1,12 @@
 import {
-  SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
-  TextChannel, DMChannel, ChannelType,
-  type Channel, type ChatInputCommandInteraction 
+  SlashCommandSubcommandBuilder,
+  EmbedBuilder,
+  PermissionsBitField,
+  TextChannel,
+  DMChannel,
+  ChannelType,
+  type Channel,
+  type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
@@ -14,15 +19,14 @@ export default class Delwarn {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("delwarn")
       .setDescription("Removes a warning from a user.")
-      .addUserOption(user => user
-        .setName("user")
-        .setDescription("The user that you want to free from the warning.")
-        .setRequired(true)
+      .addUserOption(user =>
+        user
+          .setName("user")
+          .setDescription("The user that you want to free from the warning.")
+          .setRequired(true)
       )
-      .addNumberOption(string => string
-        .setName("id")
-        .setDescription("The id of the warn.")
-        .setRequired(true)
+      .addNumberOption(number =>
+        number.setName("id").setDescription("The id of the warn.").setRequired(true)
       );
   }
 
@@ -37,23 +41,40 @@ export default class Delwarn {
     const warns = listUserModeration(guild.id, user.id, "WARN");
     const newWarns = warns.filter(warn => warn.id !== `${id}`);
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) return await interaction.reply({
-      embeds: [errorEmbed("You need the **Moderate Members** permission to execute this command.")]
-    });
+    if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers))
+      return await interaction.reply({
+        embeds: [
+          errorEmbed("You need the **Moderate Members** permission to execute this command.")
+        ]
+      });
 
-    if (target === member) return await interaction.reply({ embeds: [errorEmbed("You can't remove a warn from yourself.")] });
+    if (target === member)
+      return await interaction.reply({
+        embeds: [errorEmbed("You can't remove a warn from yourself.")]
+      });
 
-    if (newWarns.length === warns.length) return await interaction.reply({
-      embeds: [errorEmbed(`There is no warn with the id of ${id}.`)]
-    });
+    if (newWarns.length === warns.length)
+      return await interaction.reply({
+        embeds: [errorEmbed(`There is no warn with the id of ${id}.`)]
+      });
 
-    if (!target.manageable) return await interaction.reply({
-      embeds: [errorEmbed(`You can't delete a warn from ${name}, because they have a higher role position than Nebula.`)]
-    });
+    if (!target.manageable)
+      return await interaction.reply({
+        embeds: [
+          errorEmbed(
+            `You can't delete a warn from ${name}, because they have a higher role position than Nebula.`
+          )
+        ]
+      });
 
-    if (member.roles.highest.position < target.roles.highest.position) return await interaction.reply({
-      embeds: [errorEmbed(`You can't delete a warn from ${name}, because they have a higher role position than you.`)]
-    });
+    if (member.roles.highest.position < target.roles.highest.position)
+      return await interaction.reply({
+        embeds: [
+          errorEmbed(
+            `You can't delete a warn from ${name}, because they have a higher role position than you.`
+          )
+        ]
+      });
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
@@ -79,7 +100,8 @@ export default class Delwarn {
 
     removeModeration(guild.id, `${id}`);
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel) await dmChannel.send({ embeds: [embed.setTitle("🤝 • Your warning was removed")] });
+    if (dmChannel)
+      await dmChannel.send({ embeds: [embed.setTitle("🤝 • Your warning was removed")] });
     await interaction.reply({ embeds: [embed] });
   }
 }

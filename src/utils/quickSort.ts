@@ -1,6 +1,11 @@
 type Corresponding = [...any[]] | null;
 
-function swap(sortItems: number[], corresponding: Corresponding, leftIndex: number, rightIndex: number) {
+function swap(
+  sortItems: number[],
+  corresponding: Corresponding,
+  leftIndex: number,
+  rightIndex: number
+) {
   let temp = sortItems[leftIndex];
   sortItems[leftIndex] = sortItems[rightIndex];
   sortItems[rightIndex] = temp;
@@ -47,7 +52,8 @@ export function quickSort(
   }
 
   if (sortItems.length > 1) {
-    if (leftIndex < leftPointer - 1) quickSort(sortItems, corresponding, leftIndex, leftPointer - 1);
+    if (leftIndex < leftPointer - 1)
+      quickSort(sortItems, corresponding, leftIndex, leftPointer - 1);
     if (leftPointer < rightIndex) quickSort(sortItems, corresponding, leftPointer, rightIndex);
   }
 

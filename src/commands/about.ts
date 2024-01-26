@@ -1,4 +1,8 @@
-import { SlashCommandSubcommandBuilder, EmbedBuilder, type ChatInputCommandInteraction } from "discord.js";
+import {
+  SlashCommandSubcommandBuilder,
+  EmbedBuilder,
+  type ChatInputCommandInteraction
+} from "discord.js";
 import { genColor } from "../utils/colorGen";
 import { randomise } from "../utils/randomise";
 
@@ -14,22 +18,27 @@ export default class About {
     const client = interaction.client;
     const guilds = client.guilds.cache;
     const shards = client.shard?.count;
+    const hearts = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
     const embed = new EmbedBuilder()
       .setAuthor({ name: "•  About", iconURL: client.user.displayAvatarURL() })
-      .setDescription("Nebula is a multiplatform, multipurpose bot with the ability to add extensions to have additional features.")
+      .setDescription(
+        "Nebula is a multiplatform, multipurpose bot with the ability to add extensions to have additional features."
+      )
       .setFields(
         {
           name: "📃 • General",
           value: [
-            "**Version** 0.1, *Dasshubodo update*",
-            `**${guilds.size}** guild${guilds.size === 1 ? "" : "s"} ${shards == undefined ? "" : `• **${shards}** shard${shards === 1 ? "" : "s"}`}`
+            "**Version** 0.1-pre",
+            `**${guilds.size}** guild${guilds.size === 1 ? "" : "s"} ${
+              shards == undefined ? "" : `• **${shards}** shard${shards === 1 ? "" : "s"}`
+            }`
           ].join("\n")
         },
         {
           name: "🌌 • Entities involved",
           value: [
             "**Head developer**: Goos",
-            "**Developers**: Golem64, Pigpot, ThatBOI",
+            "**Developers**: Froxcey, Golem64, Pigpot, ThatBOI",
             "**Designers**: ArtyH, Optix, proJM, Slider_on_the_black",
             "**Translators**: Dimkauzh, Golem64, Optix, SaFire, ThatBOI",
             "And **YOU**, for using Nebula."
@@ -37,10 +46,11 @@ export default class About {
         },
         {
           name: "🔗 • Links",
-          value: "[GitHub](https://www.github.com/NebulaTheBot)・[YouTube](https://www.youtube.com/@NebulaTheBot)・[Instagram](https://instagram.com/NebulaTheBot)・[Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social)・[Guilded](https://guilded.gg/Nebula)・[Revolt](https://rvlt.gg/28TS9aXy)"
+          value:
+            "[GitHub](https://www.github.com/NebulaTheBot)・[YouTube](https://www.youtube.com/@NebulaTheBot)・[Instagram](https://instagram.com/NebulaTheBot)・[Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social)・[Guilded](https://guilded.gg/Nebula)・[Revolt](https://rvlt.gg/28TS9aXy)"
         }
       )
-      .setFooter({ text: `Made by the Nebula team with ${randomise(["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"])}` })
+      .setFooter({ text: `Made by the Nebula team with ${randomise(hearts)}` })
       .setThumbnail(client.user.displayAvatarURL())
       .setColor(genColor(270));
 

@@ -17,9 +17,15 @@ const definition = {
 
 type modType = "MUTE" | "WARN" | "KICK" | "BAN";
 const database = getDatabase(definition);
-const addQuery = database.query("INSERT INTO moderation (guild, user, type, moderator, reason, public, id, timestamp) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);");
-const listUserQuery = database.query("SELECT * FROM moderation WHERE guild = $1 AND user = $2 AND type = $3;");
-const listModQuery = database.query("SELECT * FROM moderation WHERE guild = $1 AND moderator = $2;");
+const addQuery = database.query(
+  "INSERT INTO moderation (guild, user, type, moderator, reason, public, id, timestamp) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);"
+);
+const listUserQuery = database.query(
+  "SELECT * FROM moderation WHERE guild = $1 AND user = $2 AND type = $3;"
+);
+const listModQuery = database.query(
+  "SELECT * FROM moderation WHERE guild = $1 AND moderator = $2;"
+);
 const removeQuery = database.query("DELETE FROM moderation WHERE guild = $1 AND id = $2");
 
 export function addModeration(
@@ -35,7 +41,11 @@ export function addModeration(
   return id;
 }
 
-export function listUserModeration(guildID: number | string, userID: number | string, type: modType) {
+export function listUserModeration(
+  guildID: number | string,
+  userID: number | string,
+  type: modType
+) {
   return listUserQuery.all(guildID, userID, type) as TypeOfDefinition<typeof definition>[];
 }
 

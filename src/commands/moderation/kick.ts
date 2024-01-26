@@ -1,7 +1,12 @@
 import {
-  SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
-  TextChannel, DMChannel, ChannelType,
-  type Channel, type ChatInputCommandInteraction
+  SlashCommandSubcommandBuilder,
+  EmbedBuilder,
+  PermissionsBitField,
+  TextChannel,
+  DMChannel,
+  ChannelType,
+  type Channel,
+  type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
@@ -13,14 +18,11 @@ export default class Kick {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("kick")
       .setDescription("Kicks a user.")
-      .addUserOption(option => option
-        .setName("user")
-        .setDescription("The user that you want to kick.")
-        .setRequired(true)
+      .addUserOption(user =>
+        user.setName("user").setDescription("The user that you want to kick.").setRequired(true)
       )
-      .addStringOption(option => option
-        .setName("reason")
-        .setDescription("The reason for the kick.")
+      .addStringOption(string =>
+        string.setName("reason").setDescription("The reason for the kick.")
       );
   }
 
@@ -32,32 +34,45 @@ export default class Kick {
     const target = members.get(user.id)!;
     const name = target.nickname ?? user.username;
 
-    if (!member.permissions.has(PermissionsBitField.Flags.KickMembers)) return await interaction.reply({
-      embeds: [errorEmbed("You need the **Kick Members** permission to execute this command.")]
-    });
+    if (!member.permissions.has(PermissionsBitField.Flags.KickMembers))
+      return await interaction.reply({
+        embeds: [errorEmbed("You need the **Kick Members** permission to execute this command.")]
+      });
 
-    if (target === member) return await interaction.reply({ embeds: [errorEmbed("You can't kick yourself.")] });
+    if (target === member)
+      return await interaction.reply({ embeds: [errorEmbed("You can't kick yourself.")] });
 
-    if (target.user.id === interaction.client.user.id) return await interaction.reply({
-      embeds: [errorEmbed("You can't kick Nebula.")]
-    });
+    if (target.user.id === interaction.client.user.id)
+      return await interaction.reply({
+        embeds: [errorEmbed("You can't kick Nebula.")]
+      });
 
-    if (!target.manageable) return await interaction.reply({
-      embeds: [errorEmbed(`You can't kick ${name}, because they have a higher role position than Nebula.`)]
-    });
+    if (!target.manageable)
+      return await interaction.reply({
+        embeds: [
+          errorEmbed(
+            `You can't kick ${name}, because they have a higher role position than Nebula.`
+          )
+        ]
+      });
 
-    if (member.roles.highest.position < target.roles.highest.position) return await interaction.reply({
-      embeds: [errorEmbed(`You can't kick ${name}, because they have a higher role position than you.`)]
-    });
+    if (member.roles.highest.position < target.roles.highest.position)
+      return await interaction.reply({
+        embeds: [
+          errorEmbed(`You can't kick ${name}, because they have a higher role position than you.`)
+        ]
+      });
 
     const reason = interaction.options.getString("reason");
     const embed = new EmbedBuilder()
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
       .setTitle(`✅ • Kicked <@${user.id}>`)
-      .setDescription([
-        `**Moderator**: ${interaction.user.username}`,
-        `**Reason**: ${reason ?? "No reason provided"}`
-      ].join("\n"))
+      .setDescription(
+        [
+          `**Moderator**: ${interaction.user.username}`,
+          `**Reason**: ${reason ?? "No reason provided"}`
+        ].join("\n")
+      )
       .setThumbnail(user.displayAvatarURL())
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
@@ -78,7 +93,10 @@ export default class Kick {
 
     await target.kick(reason ?? undefined);
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel) await dmChannel.send({ embeds: [embed.setTitle("🥾 • You were kicked").setColor(genColor(0))] });
+    if (dmChannel)
+      await dmChannel.send({
+        embeds: [embed.setTitle("🥾 • You were kicked").setColor(genColor(0))]
+      });
     await interaction.reply({ embeds: [embed] });
   }
 }
