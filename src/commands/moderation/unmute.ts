@@ -32,13 +32,15 @@ export default class Unmute {
         .permissions.has(PermissionsBitField.Flags.MuteMembers)
     )
       return await interaction.reply({
-        embeds: [errorEmbed("You need the **Mute Members** permission to execute this command.")]
+        embeds: [
+          errorEmbed("You can't execute this command.", "You need the **Mute Members** permission.")
+        ]
       });
 
     const user = interaction.options.getUser("user")!;
     if (members.get(user.id)?.communicationDisabledUntil === null)
       return await interaction.reply({
-        embeds: [errorEmbed("You can't unmute this user because they were never muted.")]
+        embeds: [errorEmbed("You can't unmute this user.", "The user was never muted.")]
       });
 
     const embed = new EmbedBuilder()

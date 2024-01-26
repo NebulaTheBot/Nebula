@@ -28,7 +28,6 @@ export default {
   event: class InteractionCreate {
     commands: CommandInteraction;
     client: Client;
-
     constructor(cmds: CommandInteraction, client: Client) {
       this.commands = cmds;
       this.client = client;

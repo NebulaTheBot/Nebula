@@ -44,7 +44,10 @@ export default class Delwarn {
     if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers))
       return await interaction.reply({
         embeds: [
-          errorEmbed("You need the **Moderate Members** permission to execute this command.")
+          errorEmbed(
+            "You can't execute this command.",
+            "You need the **Moderate Members** permission."
+          )
         ]
       });
 
@@ -62,7 +65,8 @@ export default class Delwarn {
       return await interaction.reply({
         embeds: [
           errorEmbed(
-            `You can't delete a warn from ${name}, because they have a higher role position than Nebula.`
+            `You can't delete a warn from ${name}.`,
+            "The member has a higher role position than Nebula."
           )
         ]
       });
@@ -71,7 +75,8 @@ export default class Delwarn {
       return await interaction.reply({
         embeds: [
           errorEmbed(
-            `You can't delete a warn from ${name}, because they have a higher role position than you.`
+            `You can't delete a warn from ${name}`,
+            "The member has a higher role position than you."
           )
         ]
       });

@@ -34,12 +34,14 @@ export default class Unban {
 
     if (!member.permissions.has(PermissionsBitField.Flags.BanMembers))
       return await interaction.reply({
-        embeds: [errorEmbed("You need the **Ban Members** permission to execute this command.")]
+        embeds: [
+          errorEmbed("You can't execute this command.", "You need the **Ban Members** permission.")
+        ]
       });
 
     if (target == undefined)
       return await interaction.reply({
-        embeds: [errorEmbed("You can't unban this user because they were never banned.")]
+        embeds: [errorEmbed("You can't unban this user.", "The user was never banned.")]
       });
 
     const embed = new EmbedBuilder()

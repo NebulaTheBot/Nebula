@@ -44,7 +44,9 @@ export default class Mute {
 
     if (!member.permissions.has(PermissionsBitField.Flags.MuteMembers))
       return await interaction.reply({
-        embeds: [errorEmbed("You need the **Mute Members** permission to execute this command.")]
+        embeds: [
+          errorEmbed("You can't execute this command.", "You need the **Mute Members** permission.")
+        ]
       });
 
     if (target === member)
@@ -59,7 +61,8 @@ export default class Mute {
       return await interaction.reply({
         embeds: [
           errorEmbed(
-            `You can't mute ${name}, because they have a higher role position than Nebula.`
+            `You can't mute ${name}.`,
+            "The member has a higher role position than Nebula."
           )
         ]
       });
@@ -67,7 +70,7 @@ export default class Mute {
     if (member.roles.highest.position < target.roles.highest.position)
       return await interaction.reply({
         embeds: [
-          errorEmbed(`You can't mute ${name}, because they have a higher role position than you.`)
+          errorEmbed(`You can't mute ${name}.`, "The member has a higher role position than you.")
         ]
       });
 

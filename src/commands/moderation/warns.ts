@@ -28,7 +28,10 @@ export default class Warns {
     )
       return await interaction.reply({
         embeds: [
-          errorEmbed("You need the **Moderate Members** permission to execute this command.")
+          errorEmbed(
+            "You can't execute this command.",
+            "You need the **Moderate Members** permission."
+          )
         ]
       });
 

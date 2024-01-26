@@ -6,7 +6,6 @@ import { readdirSync } from "fs";
 export default class Events {
   client: Client;
   events: any[] = [];
-
   constructor(client: Client) {
     this.client = client;
 

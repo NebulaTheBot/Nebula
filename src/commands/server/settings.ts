@@ -3,7 +3,7 @@ import {
   InteractionType,
   EmbedBuilder,
   SlashCommandSubcommandBuilder,
-  type ChatInputCommandInteraction,
+  type ChatInputCommandInteraction
 } from "discord.js";
 import {
   getSetting,

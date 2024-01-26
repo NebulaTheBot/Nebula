@@ -36,15 +36,17 @@ export default class Ban {
 
     if (!member.permissions.has(PermissionsBitField.Flags.BanMembers))
       return await interaction.reply({
-        embeds: [errorEmbed("You can't execute this command.", "You need the **Ban Members** permission to execute this command.")]
+        embeds: [
+          errorEmbed("You can't execute this command.", "You need the **Ban Members** permission.")
+        ]
       });
 
     if (target === member)
-      return await interaction.reply({ embeds: [errorEmbed(`You can't ban ${name}.`, "The member is **you**.\n# WHY")] });
+      return await interaction.reply({ embeds: [errorEmbed("You can't ban yourself.")] });
 
     if (target.user.id === interaction.client.user.id)
       return await interaction.reply({
-        embeds: [errorEmbed(`You can't ban ${name}.`, "The member is Nebula (why do you want to ban Nebula D:)")]
+        embeds: [errorEmbed("You can't ban Nebula.")]
       });
 
     if (!target.manageable)

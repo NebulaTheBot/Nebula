@@ -14,7 +14,6 @@ const tableDefinition = {
 export const settingsDefinition = {
   "levelling.enabled": "BOOL",
   "levelling.channel": "INTEGER",
-  "levelling.persistence": "BOOL",
   "log.channel": "INTEGER",
   "serverboard.inviteLink": "TEXT",
   "serverboard.shown": "BOOL"

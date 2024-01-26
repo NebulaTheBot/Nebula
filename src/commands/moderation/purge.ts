@@ -44,7 +44,12 @@ export default class Purge {
 
     if (!member.permissions.has(PermissionsBitField.Flags.ManageMessages))
       return await interaction.reply({
-        embeds: [errorEmbed("You need the **Manage Messages** permission to execute this command.")]
+        embeds: [
+          errorEmbed(
+            "You can't execute this command",
+            "You need the **Manage Messages** permission."
+          )
+        ]
       });
 
     if (amount > 100)

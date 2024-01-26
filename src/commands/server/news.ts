@@ -30,7 +30,7 @@ export default class News {
     if (!news || !sortedNews || sortedNews.length == 0)
       return await interaction.reply({
         embeds: [
-          errorEmbed("No news found.\nAdmins can add news with the **/settings news add** command.")
+          errorEmbed("No news found.", "Admins can add news with the **/settings news add** command.")
         ]
       });
     if (page > sortedNews.length) page = sortedNews.length;

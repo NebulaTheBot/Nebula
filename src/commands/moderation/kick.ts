@@ -36,7 +36,9 @@ export default class Kick {
 
     if (!member.permissions.has(PermissionsBitField.Flags.KickMembers))
       return await interaction.reply({
-        embeds: [errorEmbed("You need the **Kick Members** permission to execute this command.")]
+        embeds: [
+          errorEmbed("You can't execute this command.", "You need the **Kick Members** permission.")
+        ]
       });
 
     if (target === member)
@@ -51,7 +53,8 @@ export default class Kick {
       return await interaction.reply({
         embeds: [
           errorEmbed(
-            `You can't kick ${name}, because they have a higher role position than Nebula.`
+            `You can't kick ${name}.`,
+            "The member has a higher role position than Nebula."
           )
         ]
       });
@@ -59,7 +62,7 @@ export default class Kick {
     if (member.roles.highest.position < target.roles.highest.position)
       return await interaction.reply({
         embeds: [
-          errorEmbed(`You can't kick ${name}, because they have a higher role position than you.`)
+          errorEmbed(`You can't kick ${name}.`, "The member has a higher role position than you.")
         ]
       });
 

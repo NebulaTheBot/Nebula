@@ -38,7 +38,10 @@ export default class Warn {
     if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers))
       return await interaction.reply({
         embeds: [
-          errorEmbed("You need the **Moderate Members** permission to execute this command.")
+          errorEmbed(
+            "You can't execute this command.",
+            "You need the **Moderate Members** permission."
+          )
         ]
       });
 
@@ -54,7 +57,8 @@ export default class Warn {
       return await interaction.reply({
         embeds: [
           errorEmbed(
-            `You can't warn ${name}, because they have a higher role position than Nebula.`
+            `You can't warn ${name}.`,
+            "The member has a higher role position than Nebula."
           )
         ]
       });
@@ -62,7 +66,7 @@ export default class Warn {
     if (member.roles.highest.position < target.roles.highest.position)
       return await interaction.reply({
         embeds: [
-          errorEmbed(`You can't warn ${name}, because they have a higher role position than you.`)
+          errorEmbed(`You can't warn ${name}.`, "The member has a higher role position than you.")
         ]
       });
 

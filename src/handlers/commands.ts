@@ -12,7 +12,6 @@ import { getDisabledCommands } from "../utils/database/disabledCommands";
 export default class Commands {
   client: Client;
   commands: any[] = [];
-
   constructor(client: Client) {
     this.client = client;
   }

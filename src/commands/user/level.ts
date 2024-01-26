@@ -22,7 +22,7 @@ export default class Level {
     const guild = interaction.guild!;
     if (!getSetting(`${guild.id}`, "levelling.enabled"))
       return await interaction.reply({
-        embeds: [errorEmbed("Leveling is disabled for this server.")]
+        embeds: [errorEmbed("Levelling is disabled for this server.")]
       });
 
     const user = interaction.options.getUser("user");
