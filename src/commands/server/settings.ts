@@ -59,7 +59,7 @@ export default class ServerInfo {
       ) {
         case "BOOL":
           interaction.respond(
-            ["TRUE", "FALSE"].map(choice => ({
+            ["true", "false"].map(choice => ({
               name: choice,
               value: choice
             }))

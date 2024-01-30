@@ -13,12 +13,7 @@ const tableDefinition = {
 
 const database = getDatabase(tableDefinition);
 const getQuery = database.query("SELECT * FROM levelRewards WHERE guild = $1;");
-const addQuery = database.query(
-  "INSERT INTO levelRewards (guild, roleID, level) VALUES (?1, ?2, ?3);"
-);
-const updateQuery = database.query(
-  "UPDATE levelRewards SET level = $3 WHERE guild = $1 AND roleID = $2"
-);
+const addQuery = database.query("INSERT INTO levelRewards (guild, roleID, level) VALUES (?1, ?2, ?3);");
 const removeQuery = database.query("DELETE FROM levelRewards WHERE guild = $1 AND roleID = $2");
 
 export function get(guildID: string) {
@@ -30,7 +25,8 @@ export function addReward(guildID: string, role: number | string, level: number)
 }
 
 export function updateReward(guildID: string, role: number | string, level: number) {
-  updateQuery.run(guildID, role, level);
+  removeQuery.run(guildID, role);
+  addQuery.all(guildID, level, role);
 }
 
 export function removeReward(guildID: number | string, role: number | string) {

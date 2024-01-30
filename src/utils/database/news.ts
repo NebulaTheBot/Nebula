@@ -50,11 +50,24 @@ export function addNews(
   );
 }
 
-export function listAllNews(guildID: string | number) {
+export function listAllNews(guildID: string) {
   return listAllQuery.all(guildID) as TypeOfDefinition<typeof definition>[];
 }
 
 export function updateNews(id: string, title: string, body: string, imageURL: string) {
+  const lastElem = deleteQuery.get(id) as TypeOfDefinition<typeof definition>;
+  addQuery.run(
+    lastElem.guild,
+    title,
+    body,
+    imageURL,
+    lastElem.author,
+    lastElem.authorPFP,
+    Date.now(),
+    0,
+    lastElem.messageID,
+    id 
+  );
   updateQuery.run(id, title, body, imageURL);
 }
 

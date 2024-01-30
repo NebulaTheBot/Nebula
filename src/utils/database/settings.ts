@@ -39,7 +39,7 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
     case "TEXT":
       return res[0].value as TypeOfKey<K>;
     case "BOOL":
-      return (res[0].value == "TRUE") as TypeOfKey<K>;
+      return (res[0].value == "true") as TypeOfKey<K>;
     default:
       // TODO: Implement more data types
       return "WIP" as TypeOfKey<K>;
