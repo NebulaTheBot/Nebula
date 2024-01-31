@@ -5,17 +5,13 @@ import {
   TextChannel,
   type ChatInputCommandInteraction
 } from "discord.js";
-import { getNewsTable } from "../../../utils/database.js";
-import { genColor } from "../../../utils/colorGen.js";
-import { errorEmbed } from "../../../utils/embeds/errorEmbed.js";
-import { QuickDB } from "quick.db";
+import { genColor } from "../../../utils/colorGen";
+import { errorEmbed } from "../../../utils/embeds/errorEmbed";
+import { deleteNews } from "../../../utils/database/news";
 
 export default class Remove {
   data: SlashCommandSubcommandBuilder;
-  db: QuickDB<any>;
-
-  constructor(db?: QuickDB<any>) {
-    this.db = db;
+  constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("remove")
       .setDescription("Removes news from your guild.")
@@ -28,19 +24,15 @@ export default class Remove {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const db = this.db;
-    const newsTable = await getNewsTable(db);
     const user = interaction.user;
-    const guild = interaction.guild;
-    const providedId = interaction.options.getString("id");
-    const member = guild.members.cache.get(user.id);
+    const guild = interaction.guild!;
+    const id = interaction.options.getString("id")!;
+    const member = guild.members.cache.get(user.id)!;
 
     if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild))
       return await interaction.followUp({
         embeds: [errorEmbed("You need **Manage Server** permissions to delete news.")]
       });
-
-    const embed = new EmbedBuilder().setTitle("✅ • News deleted!").setColor(genColor(100));
 
     const subscribedChannel = await newsTable
       ?.get(`${guild.id}.channel`)
@@ -49,9 +41,8 @@ export default class Remove {
         return { channelId: null, roleId: null };
       });
 
-    const news = await newsTable?.get(providedId).catch(() => null);
     if (!news)
-      return await interaction.followUp({
+      return await interaction.reply({
         embeds: [errorEmbed("The specified news doesn't exist.")]
       });
 
@@ -61,7 +52,9 @@ export default class Remove {
       .catch(() => null)) as TextChannel | null;
     if (newsChannel) await newsChannel?.messages.delete(messageId).catch(() => null);
 
-    await newsTable?.delete(`${guild.id}.news.${providedId}`).catch(() => null);
-    await interaction.followUp({ embeds: [embed] });
+    deleteNews(id);
+    await interaction.reply({
+      embeds: [new EmbedBuilder().setTitle("✅ • News deleted!").setColor(genColor(100))]
+    });
   }
 }

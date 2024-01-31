@@ -72,9 +72,8 @@ export default class Add {
 
     interaction.client.once("interactionCreate", async interaction => {
       if (!interaction.isModalSubmit()) return;
-      if (interaction.customId !== "addnews") return;
 
-      const imageURL = interaction.fields.getTextInputValue("imageurl") as string | undefined;
+      const imageURL = interaction.fields.getTextInputValue("imageurl");
       if (imageURL) {
         await interaction.reply({
           embeds: [errorEmbed("The image URL you provided is invalid.")]

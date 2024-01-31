@@ -19,7 +19,7 @@ const definition = {
 
 const database = getDatabase(definition);
 const addQuery = database.query(
-  "INSERT INTO news (guild, title, body, imageURL, author, authorPFP, createdAt, updatedAt, messageID, id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11);"
+  "INSERT INTO news (guild, title, body, imageURL, author, authorPFP, createdAt, updatedAt, messageID, id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10);"
 );
 const listAllQuery = database.query("SELECT * FROM news WHERE guild = $1;");
 const getIdQuery = database.query("SELECT * FROM news WHERE id = $1;");
@@ -59,7 +59,7 @@ export function get(id: string) {
   return getIdQuery.get(id) as TypeOfDefinition<typeof definition> | null;
 }
 
-export function updateNews(id: string, title: string, body: string, imageURL: string) {
+export function updateNews(id: string, title: string, body: string, imageURL: string | null) {
   const lastElem = deleteQuery.get(id) as TypeOfDefinition<typeof definition>;
   addQuery.run(
     lastElem.guild,
