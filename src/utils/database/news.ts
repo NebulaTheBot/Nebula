@@ -22,6 +22,7 @@ const addQuery = database.query(
   "INSERT INTO news (guild, title, body, imageURL, author, authorPFP, createdAt, updatedAt, messageID, id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11);"
 );
 const listAllQuery = database.query("SELECT * FROM news WHERE guild = $1;");
+const getIdQuery = database.query("SELECT * FROM news WHERE id = $1;");
 const updateQuery = database.query(
   "UPDATE news SET title = $2, body = $3, imageURL = $4 WHERE id = $1"
 );
@@ -54,6 +55,10 @@ export function listAllNews(guildID: string) {
   return listAllQuery.all(guildID) as TypeOfDefinition<typeof definition>[];
 }
 
+export function get(id: string) {
+  return getIdQuery.get(id) as TypeOfDefinition<typeof definition> | null;
+}
+
 export function updateNews(id: string, title: string, body: string, imageURL: string) {
   const lastElem = deleteQuery.get(id) as TypeOfDefinition<typeof definition>;
   addQuery.run(
@@ -66,7 +71,7 @@ export function updateNews(id: string, title: string, body: string, imageURL: st
     Date.now(),
     0,
     lastElem.messageID,
-    id 
+    id
   );
   updateQuery.run(id, title, body, imageURL);
 }
