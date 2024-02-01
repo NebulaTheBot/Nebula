@@ -13,13 +13,15 @@ const definition = {
     createdAt: "TIMESTAMP",
     updatedAt: "TIMESTAMP",
     messageID: "TEXT",
+    channelID: "TEXT",
+    roleID: "TEXT",
     id: "TEXT"
   }
 } satisfies TableDefinition;
 
 const database = getDatabase(definition);
 const addQuery = database.query(
-  "INSERT INTO news (guild, title, body, imageURL, author, authorPFP, createdAt, updatedAt, messageID, id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10);"
+  "INSERT INTO news (guild, title, body, imageURL, author, authorPFP, createdAt, updatedAt, messageID, channelID, roleID, id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12);"
 );
 const listAllQuery = database.query("SELECT * FROM news WHERE guild = $1;");
 const getIdQuery = database.query("SELECT * FROM news WHERE id = $1;");
@@ -35,7 +37,9 @@ export function addNews(
   imageURL: string | null,
   author: string,
   authorPFP: string,
-  messageID: string | number
+  messageID: string | number,
+  channelID: string | number,
+  roleID: string | number
 ) {
   addQuery.run(
     guildID,
@@ -47,6 +51,8 @@ export function addNews(
     Date.now(),
     0,
     messageID,
+    channelID,
+    roleID,
     crypto.randomUUID()
   );
 }
@@ -71,6 +77,8 @@ export function updateNews(id: string, title: string, body: string, imageURL: st
     Date.now(),
     0,
     lastElem.messageID,
+    lastElem.channelID,
+    lastElem.roleID,
     id
   );
   updateQuery.run(id, title, body, imageURL);

@@ -1,46 +1,24 @@
 import { EmbedBuilder, Guild, Role, TextChannel } from "discord.js";
 import { genColor } from "./colorGen";
+import { get } from "./database/news";
 
-export type News = {
-  title: string;
-  body: string;
-  imageURL: string;
-  author: string;
-  authorPfp: string;
-  createdAt: string;
-  updatedAt: string;
-  messageId?: string;
-};
+export async function sendChannelNews(guild: Guild, id: string) {
+  const news = get(id);
+  if (!news) return;
 
-export async function sendChannelNews(guild: Guild, news: News, id: string) {
-  const subscribedChannel = await newsTable
-    .get(`${guild.id}.channel`)
-    .then(
-      (channel: { channelId: string | null; roleId: string | null }) =>
-        channel as { channelId: string | null; roleId: string | null }
-    )
-    .catch(() => {
-      return {
-        channelId: null as string | null,
-        roleId: null as string | null
-      };
-    });
-
-  if (!subscribedChannel) return;
-  const channel = subscribedChannel.channelId;
-  const channelToSend = guild.channels.cache.get(channel) as TextChannel;
+  const channelToSend = guild.channels.cache.get(news.channelID) as TextChannel;
   if (!channelToSend) return;
 
-  const role = subscribedChannel.roleId;
+  const role = news.roleID;
   let roleToSend: Role | undefined;
   if (role) roleToSend = guild.roles.cache.get(role);
 
   const embed = new EmbedBuilder()
-    .setAuthor({ name: news.author, iconURL: news.authorPfp ?? null })
+    .setAuthor({ name: news.author, iconURL: news.authorPFP })
     .setTitle(news.title)
     .setDescription(news.body)
-    .setImage(news.imageURL || null)
-    .setTimestamp(parseInt(news.updatedAt))
+    .setImage(news.imageURL)
+    .setTimestamp(parseInt(news.updatedAt.toString()))
     .setFooter({ text: `Latest news from ${guild.name}` })
     .setColor(genColor(200));
 

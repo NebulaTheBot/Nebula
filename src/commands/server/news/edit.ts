@@ -32,14 +32,14 @@ export default class Edit {
         .guild!.members.cache.get(interaction.user.id)!
         .permissions.has(PermissionsBitField.Flags.ManageGuild)
     )
-      return await interaction.followUp({
+      return await interaction.reply({
         embeds: [errorEmbed("You need **Manage Server** permissions to add news.")]
       });
 
     const id = interaction.options.getString("id", true).trim();
     const news = get(id);
     if (!news)
-      return await interaction.followUp({
+      return await interaction.reply({
         embeds: [errorEmbed("The specified news doesn't exist.")]
       });
 

@@ -7,7 +7,7 @@ import {
 } from "discord.js";
 import { genColor } from "../../../utils/colorGen";
 import { errorEmbed } from "../../../utils/embeds/errorEmbed";
-import { deleteNews } from "../../../utils/database/news";
+import { deleteNews, get } from "../../../utils/database/news";
 
 export default class Remove {
   data: SlashCommandSubcommandBuilder;
@@ -30,26 +30,21 @@ export default class Remove {
     const member = guild.members.cache.get(user.id)!;
 
     if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild))
-      return await interaction.followUp({
+      return await interaction.reply({
         embeds: [errorEmbed("You need **Manage Server** permissions to delete news.")]
       });
 
-    const subscribedChannel = await newsTable
-      ?.get(`${guild.id}.channel`)
-      .then(channel => channel as { channelId: string; roleId: string })
-      .catch(() => {
-        return { channelId: null, roleId: null };
-      });
-
+    const news = get(id);
     if (!news)
       return await interaction.reply({
-        embeds: [errorEmbed("The specified news doesn't exist.")]
+        embeds: [errorEmbed("The specified news don't exist.")]
       });
 
-    const messageId = news?.messageId;
-    const newsChannel = (await interaction.guild.channels
-      .fetch(subscribedChannel?.channelId ?? "")
+    const messageId = news?.messageID;
+    const newsChannel = (await guild.channels
+      .fetch(news?.channelID ?? "")
       .catch(() => null)) as TextChannel | null;
+
     if (newsChannel) await newsChannel?.messages.delete(messageId).catch(() => null);
 
     deleteNews(id);

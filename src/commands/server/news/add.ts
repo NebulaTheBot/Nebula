@@ -69,7 +69,6 @@ export default class Add {
 
     newsModal.addComponents(firstActionRow, secondActionRow, thirdActionRow);
     await interaction.showModal(newsModal).catch(err => console.error(err));
-
     interaction.client.once("interactionCreate", async interaction => {
       if (!interaction.isModalSubmit()) return;
 
@@ -84,8 +83,8 @@ export default class Add {
       const id = crypto.randomUUID();
       const news = {
         id,
-        title: interaction.fields.getTextInputValue("title") as string,
-        body: interaction.fields.getTextInputValue("body") as string,
+        title: interaction.fields.getTextInputValue("title"),
+        body: interaction.fields.getTextInputValue("body"),
         imageURL,
         author: interaction.user.displayName,
         authorPfp: interaction.user.avatarURL(),
@@ -97,8 +96,8 @@ export default class Add {
       sendChannelNews(guild, news as unknown as News, id).catch(err => console.error(err));
       addNews(
         guild.id,
-        interaction.fields.getTextInputValue("title") as string,
-        interaction.fields.getTextInputValue("body") as string,
+        interaction.fields.getTextInputValue("title"),
+        interaction.fields.getTextInputValue("body"),
         imageURL!,
         interaction.user.displayName,
         interaction.user.avatarURL()!,
