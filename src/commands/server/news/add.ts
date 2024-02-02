@@ -10,7 +10,7 @@ import {
 } from "discord.js";
 import { genColor } from "../../../utils/colorGen";
 import { errorEmbed } from "../../../utils/embeds/errorEmbed";
-import { sendChannelNews, News } from "../../../utils/sendChannelNews";
+import { sendChannelNews } from "../../../utils/sendChannelNews";
 import { addNews } from "../../../utils/database/news";
 
 export default class Add {
@@ -80,20 +80,7 @@ export default class Add {
         return;
       }
 
-      const id = crypto.randomUUID();
-      const news = {
-        id,
-        title: interaction.fields.getTextInputValue("title"),
-        body: interaction.fields.getTextInputValue("body"),
-        imageURL,
-        author: interaction.user.displayName,
-        authorPfp: interaction.user.avatarURL(),
-        createdAt: Date.now().toString(),
-        updatedAt: Date.now().toString(),
-        messageId: null
-      };
-
-      sendChannelNews(guild, news as unknown as News, id).catch(err => console.error(err));
+      sendChannelNews(guild, crypto.randomUUID()).catch(err => console.error(err));
       addNews(
         guild.id,
         interaction.fields.getTextInputValue("title"),
@@ -101,6 +88,8 @@ export default class Add {
         imageURL!,
         interaction.user.displayName,
         interaction.user.avatarURL()!,
+        null!,
+        null!,
         null!
       );
       await interaction.reply({

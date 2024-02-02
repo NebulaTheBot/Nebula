@@ -7,6 +7,7 @@ import {
 } from "discord.js";
 import { genColor } from "../../../utils/colorGen";
 import { errorEmbed } from "../../../utils/embeds/errorEmbed";
+import { setSetting as set } from "../../../utils/database/settings";
 
 export default class Channel {
   data: SlashCommandSubcommandBuilder;
@@ -32,13 +33,13 @@ export default class Channel {
     const role = guild.roles.cache.get(roleOption?.id ?? "");
 
     if (!channelOption && !roleOption) {
-      await newsTable.delete(`${guild.id}.channel`);
+      set(guild.id, "news.channel", 0);
       return await interaction.reply({
         embeds: [new EmbedBuilder().setTitle("✅ • Removed news channel.")]
       });
     }
 
-    if (!interaction.memberPermissions.has(PermissionsBitField.Flags.ManageGuild)) {
+    if (!interaction.memberPermissions!.has(PermissionsBitField.Flags.ManageGuild)) {
       return await interaction.reply({
         embeds: [errorEmbed("You need **Manage Server** permissions to add news.")]
       });
@@ -56,8 +57,6 @@ export default class Channel {
 
     const embed = new EmbedBuilder().setTitle("✅ • News channel set!").setColor(genColor(100));
     if (role) embed.setDescription(`The role <@&${role.id}> will be pinged when news are sent.`);
-    await interaction.reply({
-      embeds: [new EmbedBuilder().setTitle("✅ • News channel set!").setColor(genColor(100))]
-    });
+    await interaction.reply({ embeds: [embed] });
   }
 }

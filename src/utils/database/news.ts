@@ -25,21 +25,18 @@ const addQuery = database.query(
 );
 const listAllQuery = database.query("SELECT * FROM news WHERE guild = $1;");
 const getIdQuery = database.query("SELECT * FROM news WHERE id = $1;");
-const updateQuery = database.query(
-  "UPDATE news SET title = $2, body = $3, imageURL = $4 WHERE id = $1"
-);
 const deleteQuery = database.query("DELETE FROM news WHERE id = $1");
 
 export function addNews(
-  guildID: number | string,
+  guildID: string,
   title: string,
   body: string,
   imageURL: string | null,
   author: string,
   authorPFP: string,
-  messageID: string | number,
-  channelID: string | number,
-  roleID: string | number
+  messageID: string,
+  channelID: string,
+  roleID: string
 ) {
   addQuery.run(
     guildID,
@@ -67,6 +64,7 @@ export function get(id: string) {
 
 export function updateNews(id: string, title: string, body: string, imageURL: string | null) {
   const lastElem = deleteQuery.get(id) as TypeOfDefinition<typeof definition>;
+  deleteQuery.run(id);
   addQuery.run(
     lastElem.guild,
     title,
@@ -81,7 +79,6 @@ export function updateNews(id: string, title: string, body: string, imageURL: st
     lastElem.roleID,
     id
   );
-  updateQuery.run(id, title, body, imageURL);
 }
 
 export function deleteNews(id: string) {

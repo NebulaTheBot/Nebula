@@ -15,13 +15,13 @@ export const settingsDefinition = {
   "levelling.enabled": "BOOL",
   "levelling.channel": "INTEGER",
   "log.channel": "INTEGER",
+  "news.channel": "INTEGER",
   "serverboard.inviteLink": "TEXT",
   "serverboard.shown": "BOOL"
 } satisfies Record<string, FieldData>;
 
 export const settingsKeys = Object.keys(settingsDefinition) as (keyof typeof settingsDefinition)[];
 const database = getDatabase(tableDefinition);
-
 const getQuery = database.query("SELECT * FROM settings WHERE guild = $1 AND key = $2;");
 const listPublicQuery = database.query(
   "SELECT * FROM settings WHERE key = 'serverboard.shown' AND value = 'TRUE';"
