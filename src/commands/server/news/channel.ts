@@ -33,7 +33,8 @@ export default class Channel {
     const role = guild.roles.cache.get(roleOption?.id ?? "");
 
     if (!channelOption && !roleOption) {
-      set(guild.id, "news.channel", 0);
+      set(guild.id, "news.channelID", "");
+      set(guild.id, "news.roleID", "");
       return await interaction.reply({
         embeds: [new EmbedBuilder().setTitle("✅ • Removed news channel.")]
       });
@@ -50,10 +51,8 @@ export default class Channel {
       });
     }
 
-    await newsTable.set(`${guild.id}.channel`, {
-      channelId: channel.id,
-      roleId: role?.id ?? ""
-    });
+    set(guild.id, "news.channelID", channel.id);
+    set(guild.id, "news.roleID", role?.id ?? "");
 
     const embed = new EmbedBuilder().setTitle("✅ • News channel set!").setColor(genColor(100));
     if (role) embed.setDescription(`The role <@&${role.id}> will be pinged when news are sent.`);

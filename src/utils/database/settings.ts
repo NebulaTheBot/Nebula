@@ -15,7 +15,8 @@ export const settingsDefinition = {
   "levelling.enabled": "BOOL",
   "levelling.channel": "INTEGER",
   "log.channel": "INTEGER",
-  "news.channel": "INTEGER",
+  "news.channelID": "TEXT",
+  "news.roleID": "TEXT",
   "serverboard.inviteLink": "TEXT",
   "serverboard.shown": "BOOL"
 } satisfies Record<string, FieldData>;
