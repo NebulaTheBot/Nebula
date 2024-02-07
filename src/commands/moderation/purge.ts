@@ -26,9 +26,7 @@ export default class Purge {
       .addChannelOption(channel =>
         channel
           .setName("channel")
-          .setDescription(
-            "The channel that you want to purge. Leave empty if you want to purge the current channel."
-          )
+          .setDescription("The channel that you want to purge.")
           .addChannelTypes(
             ChannelType.GuildText,
             ChannelType.PublicThread,

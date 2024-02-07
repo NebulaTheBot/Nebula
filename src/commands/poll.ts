@@ -1,15 +1,8 @@
 import {
-  SlashCommandSubcommandBuilder,
-  ButtonBuilder,
-  ActionRowBuilder,
-  ButtonStyle,
-  ButtonInteraction,
-  ComponentType,
   PermissionsBitField,
   ChannelType,
   EmbedBuilder,
   type ChatInputCommandInteraction,
-  type Channel,
   type TextChannel
 } from "discord.js";
 import { errorEmbed } from "../utils/embeds/errorEmbed";
@@ -17,31 +10,31 @@ import { genColor } from "../utils/colorGen";
 import { ExtendedSlashCommandSubcommandBuilder } from "../utils/extendedSlashCommandSubcommandBuilder";
 
 export default class Poll {
-  numberOfFields: number;
   data: ExtendedSlashCommandSubcommandBuilder;
   constructor() {
-    this.numberOfFields = 6;
     this.data = new ExtendedSlashCommandSubcommandBuilder()
       .setName("poll")
       .setDescription("Make a poll")
       .addStringOption(option =>
         option
           .setName("question")
-          .setDescription("What's the question you want to ask?")
+          .setDescription("The question that you want to ask.")
           .setRequired(true)
       )
       .addChannelOption(channel =>
         channel
           .setName("channel")
-          .setDescription("The channel to send the poll in")
+          .setDescription("The channel to send the poll in.")
           .setRequired(true)
+          .addChannelTypes(
+            ChannelType.GuildText,
+            ChannelType.PublicThread,
+            ChannelType.PrivateThread
+          )
       )
-      .genNumberFields("Option", this.numberOfFields, 2)
+      .genNumberFields("Option", 6, 2)
       .addAttachmentOption(option =>
-        option
-          .setName("image")
-          .setDescription("The image to appear at the bottom of the embed")
-          .setRequired(false)
+        option.setName("image").setDescription("The image that appears at the bottom of the embed.")
       );
   }
 
@@ -51,23 +44,18 @@ export default class Poll {
       return numEmojis[num];
     }
 
-    const question = interaction.options.getString("question");
-    const channel = interaction.options.getChannel("channel");
+    const channel = interaction.options.getChannel("channel") as TextChannel;
     const image = interaction.options.getAttachment("image")!;
+    const guild = interaction.guild!;
+    const member = guild.members.cache.get(interaction.member?.user.id!)!;
     let options: string[] = [];
 
-    const guild = interaction.guild!;
-    const members = guild.members.cache;
-    const member = members.get(interaction.member?.user.id!)!;
-
-    for (let i = 0; i < this.numberOfFields; i++) {
+    for (let i = 0; i < 6; i++) {
       const option = interaction.options.getString(`option${i + 1}`);
-      if (option) {
-        options.push(option);
-      }
+      if (option) options.push(option);
     }
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
+    if (!member.permissions.has(PermissionsBitField.Flags.ManageMessages))
       return await interaction.reply({
         embeds: [
           errorEmbed(
@@ -76,9 +64,8 @@ export default class Poll {
           )
         ]
       });
-    }
 
-    if (!interaction.guild?.members.me?.permissions.has(PermissionsBitField.Flags.SendMessages)) {
+    if (!interaction.guild?.members.me?.permissions.has(PermissionsBitField.Flags.SendMessages))
       return await interaction.reply({
         embeds: [
           errorEmbed(
@@ -86,51 +73,33 @@ export default class Poll {
           )
         ]
       });
-    }
 
-    let successEmbed = new EmbedBuilder()
-      .setTitle("✅  •  Poll has been created successfully")
+    const successEmbed = new EmbedBuilder()
+      .setTitle("✅ • Poll has been created successfully")
       .setDescription(`Poll is sent to ${channel}`)
-      .setColor(genColor(200));
+      .setColor(genColor(100));
 
     let embed = new EmbedBuilder()
       .setAuthor({
         name: `•  Poll by ${member.user.username}`,
         iconURL: member.user.displayAvatarURL()
       })
-      .setTitle(`📊  •  ${question}`)
+      .setTitle(`${interaction.options.getString("question")}`)
       .setFields(
         options.map((option, i) => {
           return {
             name: `Option ${convertNumEmoji(i)}`,
-            value: option,
-            inline: false
+            value: option
           };
         })
       )
       .setColor(genColor(200));
 
-    if (image) {
-      embed.setImage(image.url);
-    }
-
     await interaction.reply({ embeds: [successEmbed] });
-    const pollChannel = await guild.channels.cache
-      .get(`${channel}`)
-      ?.fetch()
-      .then((channel: Channel) => {
-        if (channel.type != ChannelType.GuildText) return null;
-        return channel as TextChannel;
-      })
-      .catch(() => null);
-    if (pollChannel) {
-      const pollMsg = await pollChannel.send({ embeds: [embed] });
-      console.log(`sent poll to ${pollChannel}:\n${pollMsg}`);
-      // TODO: rewrite multiReact to use an array instead of a stupid string
-      const optionEmojis = options.map((_, i) => convertNumEmoji(i));
-      for (const emoji of optionEmojis) {
-        await pollMsg.react(emoji); // Can't use multiReact here because number emojis are fucking stupid and Typescript is weird
-      }
-    }
+
+    if (image) embed.setImage(image.url);
+    await channel.send({ embeds: [embed] }).then(async message => {
+      for (const emoji of options.map((_, i) => convertNumEmoji(i))) await message.react(emoji);
+    });
   }
 }

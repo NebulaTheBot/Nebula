@@ -13,8 +13,18 @@ export default {
     async run(message: Message) {
       const author = message.author;
       const guild = message.guild!;
-
       if (author.bot) return;
+
+      // Easter egg handler
+      if (guild.id === "1079612082636472420") {
+        const eventsPath = join(process.cwd(), "src", "events", "easterEggs");
+
+        for (const easterEggFile of readdirSync(eventsPath))
+          new (await import(pathToFileURL(join(eventsPath, easterEggFile)).toString())).default().run(
+            message,
+            ...message.content
+          );
+      }
 
       // Levelling
       const levelChannelId = getSetting(guild.id, "levelling.channel");
@@ -70,16 +80,6 @@ export default {
 
         await authorRoles?.remove(role);
       }
-
-      // Easter egg handler
-      if (guild?.id !== "903852579837059113") return;
-      const eventsPath = join(process.cwd(), "src", "events", "easterEggs");
-
-      for (const easterEggFile of readdirSync(eventsPath))
-        new (await import(pathToFileURL(join(eventsPath, easterEggFile)).toString())).default().run(
-          message,
-          ...message.content
-        );
     }
   }
 };
