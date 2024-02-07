@@ -90,20 +90,35 @@ export default class Poll {
       .setColor(genColor(200));
 
     if (image) embed.setImage(image.url);
-    if (channel) {
-      const successEmbed = new EmbedBuilder()
-        .setTitle("✅ • Poll has been created successfully")
-        .setDescription(`Poll is sent to ${channel}`)
-        .setColor(genColor(100));
 
-      await interaction.reply({ embeds: [successEmbed] });
+    const successEmbed = new EmbedBuilder()
+      .setTitle("✅ • Poll has been created successfully")
+      .setDescription(`Poll is sent to ${channel ? channel : interaction.channel}`)
+      .setColor(genColor(100));
+    await interaction.reply({ embeds: [successEmbed] });
+
+    if (channel) {
       await channel.send({ embeds: [embed] }).then(async message => {
+        messageId = message.id;
         for (const emoji of options.map((_, i) => convertNumEmoji(i))) await message.react(emoji);
       });
     }
 
+    let messageId: string;
     await interaction.channel?.send({ embeds: [embed] }).then(async message => {
+      messageId = message.id;
       for (const emoji of options.map((_, i) => convertNumEmoji(i))) await message.react(emoji);
     });
+
+    interaction.client.on("messageReactionAdd", async (reaction, user) => {
+      if (!user.bot && reaction.message.id === messageId) {
+        const userReactions = reaction.message.reactions.cache.filter(reaction =>
+          reaction.users.cache.has(user.id)
+        );
+        if (userReactions.size > 1) await userReactions.last()?.remove();
+      }
+    });
+
+    return;
   }
 }
