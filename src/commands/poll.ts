@@ -21,20 +21,19 @@ export default class Poll {
           .setDescription("The question that you want to ask.")
           .setRequired(true)
       )
+      .genNumberFields("Option", 6, 2)
+      .addAttachmentOption(option =>
+        option.setName("image").setDescription("The image that appears at the bottom of the embed.")
+      )
       .addChannelOption(channel =>
         channel
           .setName("channel")
           .setDescription("The channel to send the poll in.")
-          .setRequired(true)
           .addChannelTypes(
             ChannelType.GuildText,
             ChannelType.PublicThread,
             ChannelType.PrivateThread
           )
-      )
-      .genNumberFields("Option", 6, 2)
-      .addAttachmentOption(option =>
-        option.setName("image").setDescription("The image that appears at the bottom of the embed.")
       );
   }
 
@@ -74,11 +73,6 @@ export default class Poll {
         ]
       });
 
-    const successEmbed = new EmbedBuilder()
-      .setTitle("✅ • Poll has been created successfully")
-      .setDescription(`Poll is sent to ${channel}`)
-      .setColor(genColor(100));
-
     let embed = new EmbedBuilder()
       .setAuthor({
         name: `•  Poll by ${member.user.username}`,
@@ -95,10 +89,20 @@ export default class Poll {
       )
       .setColor(genColor(200));
 
-    await interaction.reply({ embeds: [successEmbed] });
-
     if (image) embed.setImage(image.url);
-    await channel.send({ embeds: [embed] }).then(async message => {
+    if (channel) {
+      const successEmbed = new EmbedBuilder()
+        .setTitle("✅ • Poll has been created successfully")
+        .setDescription(`Poll is sent to ${channel}`)
+        .setColor(genColor(100));
+
+      await interaction.reply({ embeds: [successEmbed] });
+      await channel.send({ embeds: [embed] }).then(async message => {
+        for (const emoji of options.map((_, i) => convertNumEmoji(i))) await message.react(emoji);
+      });
+    }
+
+    await interaction.channel?.send({ embeds: [embed] }).then(async message => {
       for (const emoji of options.map((_, i) => convertNumEmoji(i))) await message.react(emoji);
     });
   }
