@@ -22,7 +22,7 @@ export default {
           [
             "Nebula is a multiplatform, multipurpose bot with the ability to add extensions to have additional features.",
             "To manage the bot, use the /server settings command.",
-            "Nebula is in an early stage of development. If you find bugs, please go to our [official server](https://discord.gg/7RdABJhQss) and report them."
+            "Nebula is in an early stage of development. If you find bugs, please go to our [official server](https://discord.gg/c6C25P4BuY) and report them."
           ].join("\n\n")
         )
         .setFooter({ text: `Made by the Nebula team with ${randomise(hearts)}` })
