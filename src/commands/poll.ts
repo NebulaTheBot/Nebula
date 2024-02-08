@@ -8,6 +8,7 @@ import {
 import { errorEmbed } from "../utils/embeds/errorEmbed";
 import { genColor } from "../utils/colorGen";
 import { ExtendedSlashCommandSubcommandBuilder } from "../utils/extendedSlashCommandSubcommandBuilder";
+import { addPoll } from "../utils/database/poll";
 
 export default class Poll {
   data: ExtendedSlashCommandSubcommandBuilder;
@@ -99,26 +100,13 @@ export default class Poll {
 
     if (channel) {
       await channel.send({ embeds: [embed] }).then(async message => {
-        messageId = message.id;
         for (const emoji of options.map((_, i) => convertNumEmoji(i))) await message.react(emoji);
       });
     }
 
-    let messageId: string;
-    await interaction.channel?.send({ embeds: [embed] }).then(async message => {
-      messageId = message.id;
+    return await interaction.channel?.send({ embeds: [embed] }).then(async message => {
       for (const emoji of options.map((_, i) => convertNumEmoji(i))) await message.react(emoji);
+      addPoll(interaction.guildId!, message.id);
     });
-
-    interaction.client.on("messageReactionAdd", async (reaction, user) => {
-      if (!user.bot && reaction.message.id === messageId) {
-        const userReactions = reaction.message.reactions.cache.filter(reaction =>
-          reaction.users.cache.has(user.id)
-        );
-        if (userReactions.size > 1) await userReactions.last()?.remove();
-      }
-    });
-
-    return;
   }
 }
