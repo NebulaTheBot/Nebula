@@ -56,23 +56,18 @@ export default class Poll {
     }
 
     if (!member.permissions.has(PermissionsBitField.Flags.ManageMessages))
-      return await interaction.reply({
-        embeds: [
-          errorEmbed(
-            "You can't execute this command.",
-            "You need the **Manage Messages** permission."
-          )
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "You need the **Manage Messages** permission."
+      );
 
     if (!interaction.guild?.members.me?.permissions.has(PermissionsBitField.Flags.SendMessages))
-      return await interaction.reply({
-        embeds: [
-          errorEmbed(
-            `Nebula can't execute this command.", "Nebula needs the **Send Messages** permission for ${channel}.`
-          )
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        "Nebula can't execute this command.",
+        `Nebula needs the **Send Messages** permission for ${channel}.`
+      );
 
     let embed = new EmbedBuilder()
       .setAuthor({
@@ -91,20 +86,19 @@ export default class Poll {
       .setColor(genColor(200));
 
     if (image) embed.setImage(image.url);
-
-    const successEmbed = new EmbedBuilder()
-      .setTitle("✅ • Poll has been created successfully")
-      .setDescription(`Poll is sent to ${channel ? channel : interaction.channel}`)
-      .setColor(genColor(100));
-    await interaction.reply({ embeds: [successEmbed] });
-
     if (channel) {
-      await channel.send({ embeds: [embed] }).then(async message => {
+      const successEmbed = new EmbedBuilder()
+        .setTitle("✅ • Poll has been created successfully")
+        .setDescription(`Poll is sent to ${channel}.`)
+        .setColor(genColor(100));
+
+      await interaction.reply({ embeds: [successEmbed] });
+      return await channel.send({ embeds: [embed] }).then(async message => {
         for (const emoji of options.map((_, i) => convertNumEmoji(i))) await message.react(emoji);
       });
     }
 
-    return await interaction.channel?.send({ embeds: [embed] }).then(async message => {
+    await interaction.reply({ embeds: [embed], fetchReply: true }).then(async message => {
       for (const emoji of options.map((_, i) => convertNumEmoji(i))) await message.react(emoji);
       addPoll(interaction.guildId!, message.id);
     });

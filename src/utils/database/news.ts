@@ -4,7 +4,7 @@ import { TableDefinition, TypeOfDefinition } from "./types";
 const definition = {
   name: "news",
   definition: {
-    guild: "TEXT",
+    guildID: "TEXT",
     title: "TEXT",
     body: "TEXT",
     imageURL: "TEXT",
@@ -20,14 +20,14 @@ const definition = {
 } satisfies TableDefinition;
 
 const database = getDatabase(definition);
-const addQuery = database.query(
-  "INSERT INTO news (guild, title, body, imageURL, author, authorPFP, createdAt, updatedAt, messageID, channelID, roleID, id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12);"
+const sendQuery = database.query(
+  "INSERT INTO news (guildID, title, body, imageURL, author, authorPFP, createdAt, updatedAt, messageID, channelID, roleID, id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12);"
 );
-const listAllQuery = database.query("SELECT * FROM news WHERE guild = $1;");
+const listAllQuery = database.query("SELECT * FROM news WHERE guildID = $1;");
 const getIdQuery = database.query("SELECT * FROM news WHERE id = $1;");
 const deleteQuery = database.query("DELETE FROM news WHERE id = $1");
 
-export function addNews(
+export function sendNews(
   guildID: string,
   title: string,
   body: string,
@@ -38,7 +38,7 @@ export function addNews(
   channelID: string,
   roleID: string
 ) {
-  addQuery.run(
+  sendQuery.run(
     guildID,
     title,
     body,
@@ -63,10 +63,10 @@ export function get(id: string) {
 }
 
 export function updateNews(id: string, title: string, body: string, imageURL: string | null) {
-  const lastElem = deleteQuery.get(id) as TypeOfDefinition<typeof definition>;
+  const lastElem = get(id)!;
   deleteQuery.run(id);
-  addQuery.run(
-    lastElem.guild,
+  sendQuery.run(
+    lastElem.guildID,
     title,
     body,
     imageURL,

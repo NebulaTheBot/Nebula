@@ -22,10 +22,8 @@ export async function sendChannelNews(guild: Guild, id: string) {
     .setFooter({ text: `Latest news from ${guild.name}` })
     .setColor(genColor(200));
 
-  const message = await channelToSend.send({
+  return await channelToSend.send({
     embeds: [embed],
     content: roleToSend ? `<@&${roleToSend.id}>` : undefined
   });
-  await newsTable.set(`${guild.id}.news.${id}.messageId`, message.id);
-  return;
 }

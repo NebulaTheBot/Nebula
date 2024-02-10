@@ -1,4 +1,4 @@
-import { Client, ActivityType } from "discord.js";
+import { Client, ActivityType, Partials } from "discord.js";
 import Commands from "./handlers/commands";
 import Events from "./handlers/events";
 
@@ -12,8 +12,10 @@ const client = new Client({
     "GuildMessages",
     "GuildEmojisAndStickers",
     "GuildPresences",
-    "MessageContent"
-  ]
+    "MessageContent",
+    "GuildMessageReactions"
+  ],
+  partials: [Partials.Message, Partials.Channel, Partials.Reaction]
 });
 
 client.on("ready", async () => {

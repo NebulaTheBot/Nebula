@@ -28,14 +28,12 @@ export default class View {
     let currentNews = sortedNews[page - 1];
 
     if (!news || !sortedNews || sortedNews.length == 0)
-      return await interaction.reply({
-        embeds: [
-          errorEmbed(
-            "No news found.",
-            "Admins can add news with the **/server news add** command."
-          )
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        "No news found.",
+        "Admins can add news with the **/server news add** command."
+      );
+
     if (page > sortedNews.length) page = sortedNews.length;
     if (page < 1) page = 1;
 
@@ -67,6 +65,15 @@ export default class View {
       })
       .on("collect", async i => {
         if (!i.isButton()) return;
+        if (i.user.id !== interaction.user.id) {
+          errorEmbed(
+            interaction,
+            "No.",
+            "You have not sent this command. Type **/server news view** to view news yourself."
+          );
+          return;
+        }
+
         if (i.customId === "left") {
           page--;
           if (page < 1) page = sortedNews.length;
@@ -75,10 +82,18 @@ export default class View {
           if (page > sortedNews.length) page = 1;
         }
 
-        currentNews = currentNews;
-        embed = embed;
+        currentNews = sortedNews[page - 1];
+        embed = new EmbedBuilder()
+          .setAuthor({ name: currentNews.author, iconURL: currentNews.authorPFP })
+          .setTitle(currentNews.title)
+          .setDescription(currentNews.body)
+          .setImage(currentNews.imageURL || null)
+          .setTimestamp(parseInt(currentNews.updatedAt))
+          .setFooter({ text: `Page ${page} of ${sortedNews.length} • ID: ${currentNews.id}` })
+          .setColor(genColor(200));
 
         await interaction.editReply({ embeds: [embed], components: [row] });
+        await i.deferUpdate();
       });
   }
 }

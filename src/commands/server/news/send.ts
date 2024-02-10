@@ -11,14 +11,15 @@ import {
 import { genColor } from "../../../utils/colorGen";
 import { errorEmbed } from "../../../utils/embeds/errorEmbed";
 import { sendChannelNews } from "../../../utils/sendChannelNews";
-import { addNews } from "../../../utils/database/news";
+import { sendNews } from "../../../utils/database/news";
+import { getSetting } from "../../../utils/database/settings";
 
-export default class Add {
+export default class Send {
   data: SlashCommandSubcommandBuilder;
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
-      .setName("add")
-      .setDescription("Adds news to your guild.");
+      .setName("send")
+      .setDescription("Send your news.");
   }
 
   async run(interaction: ChatInputCommandInteraction) {
@@ -26,12 +27,10 @@ export default class Add {
     const member = guild.members.cache.get(interaction.user.id)!;
     if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild))
       return await interaction.reply({
-        embeds: [errorEmbed("You need **Manage Server** permissions to add news.")]
+        embeds: [errorEmbed("You need **Manage Server** permissions to send news.")]
       });
 
-    const newsModal = new ModalBuilder()
-      .setCustomId("addnews")
-      .setTitle("Create new News for your server/project");
+    const newsModal = new ModalBuilder().setCustomId("sendnews").setTitle("Write your news out.");
 
     const titleInput = new TextInputBuilder()
       .setCustomId("title")
@@ -81,7 +80,7 @@ export default class Add {
       }
 
       sendChannelNews(guild, crypto.randomUUID()).catch(err => console.error(err));
-      addNews(
+      sendNews(
         guild.id,
         interaction.fields.getTextInputValue("title"),
         interaction.fields.getTextInputValue("body"),
@@ -89,9 +88,10 @@ export default class Add {
         interaction.user.displayName,
         interaction.user.avatarURL()!,
         null!,
-        null!,
-        null!
+        getSetting(guild.id, "news.channelID")!,
+        getSetting(guild.id, "news.roleID")!
       );
+
       await interaction.reply({
         embeds: [new EmbedBuilder().setTitle("✅ • News sent!").setColor(genColor(100))]
       });
