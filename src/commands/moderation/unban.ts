@@ -33,16 +33,14 @@ export default class Unban {
     const target = guild.bans.cache.map(user => user.user).filter(user => user.id === id)[0]!;
 
     if (!member.permissions.has(PermissionsBitField.Flags.BanMembers))
-      return await interaction.reply({
-        embeds: [
-          errorEmbed("You can't execute this command.", "You need the **Ban Members** permission.")
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "You need the **Ban Members** permission."
+      );
 
     if (target == undefined)
-      return await interaction.reply({
-        embeds: [errorEmbed("You can't unban this user.", "The user was never banned.")]
-      });
+      return errorEmbed(interaction, "You can't unban this user.", "The user was never banned.");
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: target.username, iconURL: target.displayAvatarURL() })

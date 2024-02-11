@@ -26,14 +26,11 @@ export default class Warns {
         .get(interaction.member?.user.id!)
         ?.permissions.has(PermissionsBitField.Flags.ModerateMembers)
     )
-      return await interaction.reply({
-        embeds: [
-          errorEmbed(
-            "You can't execute this command.",
-            "You need the **Moderate Members** permission."
-          )
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "You need the **Moderate Members** permission."
+      );
 
     const user = interaction.options.getUser("user")!;
     const warns = listUserModeration(guild.id, user.id, "WARN");

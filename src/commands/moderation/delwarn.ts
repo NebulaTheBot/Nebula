@@ -42,44 +42,29 @@ export default class Delwarn {
     const newWarns = warns.filter(warn => warn.id !== `${id}`);
 
     if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers))
-      return await interaction.reply({
-        embeds: [
-          errorEmbed(
-            "You can't execute this command.",
-            "You need the **Moderate Members** permission."
-          )
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "You need the **Moderate Members** permission."
+      );
 
-    if (target === member)
-      return await interaction.reply({
-        embeds: [errorEmbed("You can't remove a warn from yourself.")]
-      });
-
+    if (target === member) return errorEmbed(interaction, "You can't remove a warn from yourself.");
     if (newWarns.length === warns.length)
-      return await interaction.reply({
-        embeds: [errorEmbed(`There is no warn with the id of ${id}.`)]
-      });
+      return errorEmbed(interaction, `There is no warn with the id of ${id}.`);
 
     if (!target.manageable)
-      return await interaction.reply({
-        embeds: [
-          errorEmbed(
-            `You can't delete a warn from ${name}.`,
-            "The member has a higher role position than Nebula."
-          )
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        `You can't delete a warn from ${name}.`,
+        "The member has a higher role position than Nebula."
+      );
 
     if (member.roles.highest.position < target.roles.highest.position)
-      return await interaction.reply({
-        embeds: [
-          errorEmbed(
-            `You can't delete a warn from ${name}`,
-            "The member has a higher role position than you."
-          )
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        `You can't delete a warn from ${name}`,
+        "The member has a higher role position than you."
+      );
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })

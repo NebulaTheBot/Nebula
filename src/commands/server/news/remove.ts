@@ -30,15 +30,14 @@ export default class Remove {
     const member = guild.members.cache.get(user.id)!;
 
     if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild))
-      return await interaction.reply({
-        embeds: [errorEmbed("You need **Manage Server** permissions to delete news.")]
-      });
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "You need the **Manage Server** permission."
+      );
 
     const news = get(id);
-    if (!news)
-      return await interaction.reply({
-        embeds: [errorEmbed("The specified news don't exist.")]
-      });
+    if (!news) return errorEmbed(interaction, "The specified news don't exist.");
 
     const messageId = news?.messageID;
     const newsChannel = (await guild.channels

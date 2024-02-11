@@ -35,36 +35,29 @@ export default class Kick {
     const name = target.nickname ?? user.username;
 
     if (!member.permissions.has(PermissionsBitField.Flags.KickMembers))
-      return await interaction.reply({
-        embeds: [
-          errorEmbed("You can't execute this command.", "You need the **Kick Members** permission.")
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "You need the **Kick Members** permission."
+      );
 
-    if (target === member)
-      return await interaction.reply({ embeds: [errorEmbed("You can't kick yourself.")] });
-
+    if (target === member) return errorEmbed(interaction, "You can't kick yourself.");
     if (target.user.id === interaction.client.user.id)
-      return await interaction.reply({
-        embeds: [errorEmbed("You can't kick Nebula.")]
-      });
+      return errorEmbed(interaction, "You can't kick Nebula.");
 
     if (!target.manageable)
-      return await interaction.reply({
-        embeds: [
-          errorEmbed(
-            `You can't kick ${name}.`,
-            "The member has a higher role position than Nebula."
-          )
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        `You can't kick ${name}.`,
+        "The member has a higher role position than Nebula."
+      );
 
     if (member.roles.highest.position < target.roles.highest.position)
-      return await interaction.reply({
-        embeds: [
-          errorEmbed(`You can't kick ${name}.`, "The member has a higher role position than you.")
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        `You can't kick ${name}.`,
+        "The member has a higher role position than you."
+      );
 
     const reason = interaction.options.getString("reason");
     const embed = new EmbedBuilder()

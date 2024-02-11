@@ -32,16 +32,15 @@ export default class Edit {
         .guild!.members.cache.get(interaction.user.id)!
         .permissions.has(PermissionsBitField.Flags.ManageGuild)
     )
-      return await interaction.reply({
-        embeds: [errorEmbed("You need **Manage Server** permissions to add news.")]
-      });
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "You need the **Manage Server** permission."
+      );
 
     const id = interaction.options.getString("id", true).trim();
     const news = get(id);
-    if (!news)
-      return await interaction.reply({
-        embeds: [errorEmbed("The specified news doesn't exist.")]
-      });
+    if (!news) return errorEmbed(interaction, "The specified news doesn't exist.");
 
     const editModal = new ModalBuilder()
       .setCustomId("editnews")
@@ -87,23 +86,22 @@ export default class Edit {
     editModal.addComponents(firstActionRow, secondActionRow, thirdActionRow);
     await interaction.showModal(editModal).catch(err => console.error(err));
 
-    interaction.client.once("interactionCreate", async interaction => {
-      if (!interaction.isModalSubmit()) return;
+    interaction.client.once("interactionCreate", async i => {
+      if (!i.isModalSubmit()) return;
 
-      const imageURL = interaction.fields.getTextInputValue("imageurl");
+      const imageURL = i.fields.getTextInputValue("imageurl");
       if (imageURL) {
-        await interaction.reply({
-          embeds: [errorEmbed("The image URL you provided is invalid.")]
-        });
+        errorEmbed(interaction, "The image URL you provided is invalid.");
         return;
       }
 
       updateNews(
         id,
-        interaction.fields.getTextInputValue("title"),
-        interaction.fields.getTextInputValue("body"),
+        i.fields.getTextInputValue("title"),
+        i.fields.getTextInputValue("body"),
         imageURL
       );
+
       await interaction.reply({
         embeds: [new EmbedBuilder().setTitle("✅ • News edited!").setColor(genColor(100))]
       });

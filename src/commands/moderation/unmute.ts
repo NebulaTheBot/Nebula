@@ -31,17 +31,15 @@ export default class Unmute {
         .get(interaction.member!.user.id)!
         .permissions.has(PermissionsBitField.Flags.MuteMembers)
     )
-      return await interaction.reply({
-        embeds: [
-          errorEmbed("You can't execute this command.", "You need the **Mute Members** permission.")
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "You need the **Mute Members** permission."
+      );
 
     const user = interaction.options.getUser("user")!;
     if (members.get(user.id)?.communicationDisabledUntil === null)
-      return await interaction.reply({
-        embeds: [errorEmbed("You can't unmute this user.", "The user was never muted.")]
-      });
+      return errorEmbed(interaction, "You can't unmute this user.", "The user was never muted.");
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })

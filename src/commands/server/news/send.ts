@@ -26,9 +26,11 @@ export default class Send {
     const guild = interaction.guild!;
     const member = guild.members.cache.get(interaction.user.id)!;
     if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild))
-      return await interaction.reply({
-        embeds: [errorEmbed("You need **Manage Server** permissions to send news.")]
-      });
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "You need the **Manage Server** permission."
+      );
 
     const newsModal = new ModalBuilder().setCustomId("sendnews").setTitle("Write your news out.");
 
@@ -68,25 +70,23 @@ export default class Send {
 
     newsModal.addComponents(firstActionRow, secondActionRow, thirdActionRow);
     await interaction.showModal(newsModal).catch(err => console.error(err));
-    interaction.client.once("interactionCreate", async interaction => {
-      if (!interaction.isModalSubmit()) return;
+    interaction.client.once("interactionCreate", async i => {
+      if (!i.isModalSubmit()) return;
 
-      const imageURL = interaction.fields.getTextInputValue("imageurl");
+      const imageURL = i.fields.getTextInputValue("imageurl");
       if (imageURL) {
-        await interaction.reply({
-          embeds: [errorEmbed("The image URL you provided is invalid.")]
-        });
+        errorEmbed(interaction, "The image URL you provided is invalid.");
         return;
       }
 
       sendChannelNews(guild, crypto.randomUUID()).catch(err => console.error(err));
       sendNews(
         guild.id,
-        interaction.fields.getTextInputValue("title"),
-        interaction.fields.getTextInputValue("body"),
+        i.fields.getTextInputValue("title"),
+        i.fields.getTextInputValue("body"),
         imageURL!,
-        interaction.user.displayName,
-        interaction.user.avatarURL()!,
+        i.user.displayName,
+        i.user.avatarURL()!,
         null!,
         getSetting(guild.id, "news.channelID")!,
         getSetting(guild.id, "news.roleID")!
