@@ -33,39 +33,32 @@ export default class Send {
       );
 
     const newsModal = new ModalBuilder().setCustomId("sendnews").setTitle("Write your news out.");
-
-    const titleInput = new TextInputBuilder()
-      .setCustomId("title")
-      .setPlaceholder("Write a title")
-      .setStyle(TextInputStyle.Short)
-      .setMaxLength(100)
-      .setLabel("Title")
-      .setRequired(true);
-
-    const bodyInput = new TextInputBuilder()
-      .setCustomId("body")
-      .setPlaceholder("Insert your content here")
-      .setMaxLength(4000)
-      .setStyle(TextInputStyle.Paragraph)
-      .setLabel("Content (supports Markdown)")
-      .setRequired(true);
-
-    const imageURLInput = new TextInputBuilder()
-      .setCustomId("imageurl")
-      .setPlaceholder("Place a link to your image")
-      .setStyle(TextInputStyle.Short)
-      .setMaxLength(1000)
-      .setLabel("Image URL (placed at the bottom)")
-      .setRequired(false);
-
     const firstActionRow = new ActionRowBuilder().addComponents(
-      titleInput
+      new TextInputBuilder()
+        .setCustomId("title")
+        .setPlaceholder("Write a title")
+        .setStyle(TextInputStyle.Short)
+        .setMaxLength(100)
+        .setLabel("Title")
     ) as ActionRowBuilder<TextInputBuilder>;
+
     const secondActionRow = new ActionRowBuilder().addComponents(
-      bodyInput
+      new TextInputBuilder()
+        .setCustomId("body")
+        .setPlaceholder("Insert your content here")
+        .setMaxLength(4000)
+        .setStyle(TextInputStyle.Paragraph)
+        .setLabel("Content (supports Markdown)")
     ) as ActionRowBuilder<TextInputBuilder>;
+
     const thirdActionRow = new ActionRowBuilder().addComponents(
-      imageURLInput
+      new TextInputBuilder()
+        .setCustomId("imageurl")
+        .setPlaceholder("Place a link to your image")
+        .setStyle(TextInputStyle.Short)
+        .setMaxLength(1000)
+        .setLabel("Image URL (placed at the bottom)")
+        .setRequired(false)
     ) as ActionRowBuilder<TextInputBuilder>;
 
     newsModal.addComponents(firstActionRow, secondActionRow, thirdActionRow);
@@ -79,7 +72,7 @@ export default class Send {
         return;
       }
 
-      sendChannelNews(guild, crypto.randomUUID()).catch(err => console.error(err));
+      const id = crypto.randomUUID();
       sendNews(
         guild.id,
         i.fields.getTextInputValue("title"),
@@ -89,10 +82,12 @@ export default class Send {
         i.user.avatarURL()!,
         null!,
         getSetting(guild.id, "news.channelID")!,
-        getSetting(guild.id, "news.roleID")!
+        getSetting(guild.id, "news.roleID")!,
+        id
       );
+      sendChannelNews(guild, id).catch(err => console.error(err));
 
-      await interaction.reply({
+      await i.reply({
         embeds: [new EmbedBuilder().setTitle("✅ • News sent!").setColor(genColor(100))]
       });
     });

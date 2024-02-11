@@ -88,11 +88,13 @@ export default class Ban {
     }
 
     await target.ban({ reason: reason ?? undefined });
-    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel)
-      await dmChannel.send({
-        embeds: [embed.setTitle("🔨 • You were banned").setColor(genColor(0))]
-      });
     await interaction.reply({ embeds: [embed] });
+
+    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
+    if (!dmChannel) return;
+    if (target.user.bot) return;
+    await dmChannel.send({
+      embeds: [embed.setTitle("🔨 • You were banned").setColor(genColor(0))]
+    });
   }
 }

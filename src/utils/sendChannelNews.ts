@@ -4,6 +4,7 @@ import { get } from "./database/news";
 
 export async function sendChannelNews(guild: Guild, id: string) {
   const news = get(id);
+  console.log(news);
   if (!news) return;
 
   const channelToSend = guild.channels.cache.get(news.channelID) as TextChannel;
@@ -17,8 +18,7 @@ export async function sendChannelNews(guild: Guild, id: string) {
     .setAuthor({ name: news.author, iconURL: news.authorPFP })
     .setTitle(news.title)
     .setDescription(news.body)
-    .setImage(news.imageURL)
-    .setTimestamp(parseInt(news.updatedAt.toString()))
+    .setTimestamp(parseInt(news.updatedAt.toString()) ?? null)
     .setFooter({ text: `Latest news from ${guild.name}` })
     .setColor(genColor(200));
 

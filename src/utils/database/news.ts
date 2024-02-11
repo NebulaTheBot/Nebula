@@ -36,7 +36,8 @@ export function sendNews(
   authorPFP: string,
   messageID: string,
   channelID: string,
-  roleID: string
+  roleID: string,
+  id: string
 ) {
   sendQuery.run(
     guildID,
@@ -50,7 +51,7 @@ export function sendNews(
     messageID,
     channelID,
     roleID,
-    crypto.randomUUID()
+    id
   );
 }
 

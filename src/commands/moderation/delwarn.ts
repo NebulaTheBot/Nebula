@@ -89,9 +89,11 @@ export default class Delwarn {
     }
 
     removeModeration(guild.id, `${id}`);
-    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel)
-      await dmChannel.send({ embeds: [embed.setTitle("🤝 • Your warning was removed")] });
     await interaction.reply({ embeds: [embed] });
+
+    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
+    if (!dmChannel) return;
+    if (target.user.bot) return;
+    await dmChannel.send({ embeds: [embed.setTitle("🤝 • Your warning was removed")] });
   }
 }
