@@ -92,7 +92,7 @@ export default class Ban {
 
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
     if (!dmChannel) return;
-    if (target.user.bot) return;
+    if (user.bot) return;
     await dmChannel.send({
       embeds: [embed.setTitle("🔨 • You were banned").setColor(genColor(0))]
     });

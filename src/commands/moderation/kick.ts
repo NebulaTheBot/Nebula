@@ -88,11 +88,13 @@ export default class Kick {
     }
 
     await target.kick(reason ?? undefined);
-    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel)
-      await dmChannel.send({
-        embeds: [embed.setTitle("🥾 • You were kicked").setColor(genColor(0))]
-      });
     await interaction.reply({ embeds: [embed] });
+
+    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
+    if (!dmChannel) return;
+    if (user.bot) return;
+    await dmChannel.send({
+      embeds: [embed.setTitle("🥾 • You were kicked").setColor(genColor(0))]
+    });
   }
 }

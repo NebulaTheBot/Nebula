@@ -93,7 +93,7 @@ export default class Delwarn {
 
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
     if (!dmChannel) return;
-    if (target.user.bot) return;
+    if (user.bot) return;
     await dmChannel.send({ embeds: [embed.setTitle("🤝 • Your warning was removed")] });
   }
 }

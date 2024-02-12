@@ -69,8 +69,11 @@ export default class Unmute {
     }
 
     await members.get(user.id)!.edit({ communicationDisabledUntil: null });
-    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel) await dmChannel.send({ embeds: [embed.setTitle("🤝 • You were unmuted")] });
     await interaction.reply({ embeds: [embed] });
+
+    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
+    if (!dmChannel) return;
+    if (user.bot) return;
+    await dmChannel.send({ embeds: [embed.setTitle("🤝 • You were unmuted")] });
   }
 }

@@ -22,6 +22,7 @@ export async function sendChannelNews(guild: Guild, id: string) {
     .setFooter({ text: `Latest news from ${guild.name}` })
     .setColor(genColor(200));
 
+  if (news.imageURL !== null) embed.setImage(news.imageURL);
   return await channelToSend.send({
     embeds: [embed],
     content: roleToSend ? `<@&${roleToSend.id}>` : undefined

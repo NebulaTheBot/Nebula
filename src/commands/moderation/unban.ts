@@ -65,8 +65,11 @@ export default class Unban {
     }
 
     await guild.members.unban(id);
-    const dmChannel = (await target.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel) await dmChannel.send({ embeds: [embed.setTitle("🤝 • You were unbanned")] });
     await interaction.reply({ embeds: [embed] });
+
+    const dmChannel = (await target.createDM().catch(() => null)) as DMChannel | null;
+    if (!dmChannel) return;
+    if (target.bot) return;
+    await dmChannel.send({ embeds: [embed.setTitle("🤝 • You were unbanned")] });
   }
 }

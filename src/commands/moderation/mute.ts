@@ -106,11 +106,13 @@ export default class Mute {
     }
 
     await target.edit({ communicationDisabledUntil: time });
-    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel)
-      await dmChannel.send({
-        embeds: [embed.setTitle("🤐 • You were muted").setColor(genColor(0))]
-      });
     await interaction.reply({ embeds: [embed] });
+
+    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
+    if (!dmChannel) return;
+    if (user.bot) return;
+    await dmChannel.send({
+      embeds: [embed.setTitle("🤐 • You were muted").setColor(genColor(0))]
+    });
   }
 }

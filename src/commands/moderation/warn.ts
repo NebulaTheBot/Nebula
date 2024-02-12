@@ -89,11 +89,13 @@ export default class Warn {
     }
 
     addModeration(guild.id, user.id, "WARN", member.id, reason ?? undefined);
-    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel)
-      await dmChannel.send({
-        embeds: [embed.setTitle("⚠️ • You were warned").setColor(genColor(0))]
-      });
     await interaction.reply({ embeds: [embed] });
+
+    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
+    if (!dmChannel) return;
+    if (user.bot) return;
+    await dmChannel.send({
+      embeds: [embed.setTitle("⚠️ • You were warned").setColor(genColor(0))]
+    });
   }
 }

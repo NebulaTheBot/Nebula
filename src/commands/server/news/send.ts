@@ -73,7 +73,7 @@ export default class Send {
       }
 
       const id = crypto.randomUUID();
-      sendNews(
+      let news = sendNews(
         guild.id,
         i.fields.getTextInputValue("title"),
         i.fields.getTextInputValue("body"),
