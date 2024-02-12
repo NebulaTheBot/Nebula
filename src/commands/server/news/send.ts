@@ -11,7 +11,7 @@ import {
 import { genColor } from "../../../utils/colorGen";
 import { errorEmbed } from "../../../utils/embeds/errorEmbed";
 import { sendChannelNews } from "../../../utils/sendChannelNews";
-import { sendNews } from "../../../utils/database/news";
+import { get, sendNews } from "../../../utils/database/news";
 import { getSetting } from "../../../utils/database/settings";
 
 export default class Send {
@@ -51,33 +51,16 @@ export default class Send {
         .setLabel("Content (supports Markdown)")
     ) as ActionRowBuilder<TextInputBuilder>;
 
-    const thirdActionRow = new ActionRowBuilder().addComponents(
-      new TextInputBuilder()
-        .setCustomId("imageurl")
-        .setPlaceholder("Place a link to your image")
-        .setStyle(TextInputStyle.Short)
-        .setMaxLength(1000)
-        .setLabel("Image URL (placed at the bottom)")
-        .setRequired(false)
-    ) as ActionRowBuilder<TextInputBuilder>;
-
-    newsModal.addComponents(firstActionRow, secondActionRow, thirdActionRow);
+    newsModal.addComponents(firstActionRow, secondActionRow);
     await interaction.showModal(newsModal).catch(err => console.error(err));
     interaction.client.once("interactionCreate", async i => {
       if (!i.isModalSubmit()) return;
 
-      const imageURL = i.fields.getTextInputValue("imageurl");
-      if (imageURL) {
-        errorEmbed(interaction, "The image URL you provided is invalid.");
-        return;
-      }
-
       const id = crypto.randomUUID();
-      let news = sendNews(
+      sendNews(
         guild.id,
         i.fields.getTextInputValue("title"),
         i.fields.getTextInputValue("body"),
-        imageURL!,
         i.user.displayName,
         i.user.avatarURL()!,
         null!,
@@ -85,7 +68,10 @@ export default class Send {
         getSetting(guild.id, "news.roleID")!,
         id
       );
-      sendChannelNews(guild, id).catch(err => console.error(err));
+
+      await sendChannelNews(guild, id)
+        .catch(err => console.error(err))
+        .then(message => (get(id)!.messageID = message?.id!));
 
       await i.reply({
         embeds: [new EmbedBuilder().setTitle("✅ • News sent!").setColor(genColor(100))]

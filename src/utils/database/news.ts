@@ -7,7 +7,6 @@ const definition = {
     guildID: "TEXT",
     title: "TEXT",
     body: "TEXT",
-    imageURL: "TEXT",
     author: "TEXT",
     authorPFP: "TEXT",
     createdAt: "TIMESTAMP",
@@ -21,7 +20,7 @@ const definition = {
 
 const database = getDatabase(definition);
 const sendQuery = database.query(
-  "INSERT INTO news (guildID, title, body, imageURL, author, authorPFP, createdAt, updatedAt, messageID, channelID, roleID, id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12);"
+  "INSERT INTO news (guildID, title, body, author, authorPFP, createdAt, updatedAt, messageID, channelID, roleID, id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11);"
 );
 const listAllQuery = database.query("SELECT * FROM news WHERE guildID = $1;");
 const getIdQuery = database.query("SELECT * FROM news WHERE id = $1;");
@@ -31,7 +30,6 @@ export function sendNews(
   guildID: string,
   title: string,
   body: string,
-  imageURL: string | null,
   author: string,
   authorPFP: string,
   messageID: string,
@@ -43,7 +41,6 @@ export function sendNews(
     guildID,
     title,
     body,
-    imageURL,
     author,
     authorPFP,
     Date.now(),
@@ -63,14 +60,13 @@ export function get(id: string) {
   return getIdQuery.get(id) as TypeOfDefinition<typeof definition> | null;
 }
 
-export function updateNews(id: string, title: string, body: string, imageURL: string | null) {
+export function updateNews(id: string, title: string, body: string) {
   const lastElem = get(id)!;
   deleteQuery.run(id);
   sendQuery.run(
     lastElem.guildID,
     title,
     body,
-    imageURL,
     lastElem.author,
     lastElem.authorPFP,
     Date.now(),
