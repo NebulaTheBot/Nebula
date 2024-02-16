@@ -1,83 +1,68 @@
 import { getDatabase } from ".";
-import { TableDefinition, TypeOfDefinition } from "./types";
+import { FieldData, SqlType, TableDefinition, TypeOfDefinition } from "./types";
 
-const definition = {
+const tableDefinition = {
   name: "news",
   definition: {
     guildID: "TEXT",
-    title: "TEXT",
-    body: "TEXT",
-    author: "TEXT",
-    authorPFP: "TEXT",
-    createdAt: "TIMESTAMP",
-    updatedAt: "TIMESTAMP",
-    messageID: "TEXT",
-    channelID: "TEXT",
-    roleID: "TEXT",
-    id: "TEXT"
+    key: "TEXT",
+    value: "TEXT"
   }
 } satisfies TableDefinition;
 
-const database = getDatabase(definition);
-const sendQuery = database.query(
-  "INSERT INTO news (guildID, title, body, author, authorPFP, createdAt, updatedAt, messageID, channelID, roleID, id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11);"
-);
+export const newsDefinition = {
+  title: "TEXT",
+  body: "TEXT",
+  author: "TEXT",
+  authorPFP: "TEXT",
+  createdAt: "TIMESTAMP",
+  updatedAt: "TIMESTAMP",
+  messageID: "TEXT",
+  channelID: "TEXT",
+  roleID: "TEXT",
+  id: "TEXT"
+} satisfies Record<string, FieldData>;
+
+const database = getDatabase(tableDefinition);
+const sendQuery = database.query("INSERT INTO news (guildID, key, value) VALUES (?1, ?2, ?3);");
 const listAllQuery = database.query("SELECT * FROM news WHERE guildID = $1;");
-const getIdQuery = database.query("SELECT * FROM news WHERE id = $1;");
+const getQuery = database.query("SELECT * FROM news WHERE id = $1;");
 const deleteQuery = database.query("DELETE FROM news WHERE id = $1");
 
-export function sendNews(
+export function sendNews<K extends keyof typeof newsDefinition>(
   guildID: string,
-  title: string,
-  body: string,
-  author: string,
-  authorPFP: string,
-  messageID: string,
-  channelID: string,
-  roleID: string,
-  id: string
+  key: K,
+  value: TypeOfKey<K>
 ) {
-  sendQuery.run(
-    guildID,
-    title,
-    body,
-    author,
-    authorPFP,
-    Date.now(),
-    0,
-    messageID,
-    channelID,
-    roleID,
-    id
-  );
+  sendQuery.run(guildID, key, value);
 }
 
 export function listAllNews(guildID: string) {
-  return listAllQuery.all(guildID) as TypeOfDefinition<typeof definition>[];
+  return listAllQuery.all(guildID) as TypeOfDefinition<typeof tableDefinition>[];
 }
 
-export function get(id: string) {
-  return getIdQuery.get(id) as TypeOfDefinition<typeof definition> | null;
+export function get<K extends keyof typeof newsDefinition>(id: string): TypeOfKey<K> | null {
+  return getQuery.get(id) as TypeOfKey<K>;
+}
+
+export function set<K extends keyof typeof newsDefinition>(
+  id: string,
+  key: K,
+  value: TypeOfKey<K>
+) {
+  deleteQuery.run(id);
+  sendQuery.run(id, key, value);
 }
 
 export function updateNews(id: string, title: string, body: string) {
   const lastElem = get(id)!;
   deleteQuery.run(id);
-  sendQuery.run(
-    lastElem.guildID,
-    title,
-    body,
-    lastElem.author,
-    lastElem.authorPFP,
-    Date.now(),
-    0,
-    lastElem.messageID,
-    lastElem.channelID,
-    lastElem.roleID,
-    id
-  );
+  sendQuery.run(lastElem.guildID, key, value);
 }
 
 export function deleteNews(id: string) {
   deleteQuery.run(id);
 }
+
+// Utility type
+type TypeOfKey<T extends keyof typeof newsDefinition> = SqlType<(typeof newsDefinition)[T]>;

@@ -24,10 +24,9 @@ export default class Remove {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const user = interaction.user;
     const guild = interaction.guild!;
     const id = interaction.options.getString("id")!;
-    const member = guild.members.cache.get(user.id)!;
+    const member = guild.members.cache.get(interaction.user.id)!;
 
     if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild))
       return errorEmbed(
@@ -37,15 +36,16 @@ export default class Remove {
       );
 
     const news = get(id);
+    console.log(news);
     if (!news) return errorEmbed(interaction, "The specified news don't exist.");
 
-    const messageId = news?.messageID;
+    const messageID = news.messageID;
     const newsChannel = (await guild.channels
-      .fetch(news?.channelID ?? "")
-      .catch(() => null)) as TextChannel | null;
+      .fetch(news.channelID ?? interaction.channel?.id)
+      .catch(() => null)) as TextChannel;
+    console.log(newsChannel);
 
-    if (newsChannel) await newsChannel?.messages.delete(messageId).catch(() => null);
-
+    if (newsChannel) await newsChannel.messages.delete(messageID);
     deleteNews(id);
     await interaction.reply({
       embeds: [new EmbedBuilder().setTitle("✅ • News deleted!").setColor(genColor(100))]

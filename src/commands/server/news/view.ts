@@ -31,7 +31,7 @@ export default class View {
       return errorEmbed(
         interaction,
         "No news found.",
-        "Admins can add news with the **/server news add** command."
+        "Admins can add news with the **/server news send** command."
       );
 
     if (page > sortedNews.length) page = sortedNews.length;

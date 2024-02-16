@@ -11,7 +11,7 @@ import {
 import { genColor } from "../../../utils/colorGen";
 import { errorEmbed } from "../../../utils/embeds/errorEmbed";
 import { sendChannelNews } from "../../../utils/sendChannelNews";
-import { get, sendNews } from "../../../utils/database/news";
+import { sendNews } from "../../../utils/database/news";
 import { getSetting } from "../../../utils/database/settings";
 
 export default class Send {
@@ -64,15 +64,12 @@ export default class Send {
         i.user.displayName,
         i.user.avatarURL()!,
         null!,
-        getSetting(guild.id, "news.channelID")!,
+        getSetting(guild.id, "news.channelID")! ?? interaction.channel?.id,
         getSetting(guild.id, "news.roleID")!,
         id
       );
 
-      await sendChannelNews(guild, id)
-        .catch(err => console.error(err))
-        .then(message => (get(id)!.messageID = message?.id!));
-
+      await sendChannelNews(guild, id, interaction).catch(err => console.error(err));
       await i.reply({
         embeds: [new EmbedBuilder().setTitle("✅ • News sent!").setColor(genColor(100))]
       });

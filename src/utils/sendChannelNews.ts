@@ -1,14 +1,19 @@
-import { EmbedBuilder, Guild, Role, TextChannel } from "discord.js";
+import {
+  EmbedBuilder,
+  type Role,
+  type TextChannel,
+  type Guild,
+  type ChatInputCommandInteraction
+} from "discord.js";
 import { genColor } from "./colorGen";
-import { get } from "./database/news";
+import { get, set } from "./database/news";
 
-export async function sendChannelNews(guild: Guild, id: string) {
-  const news = get(id);
-  if (!news) return;
-
-  const channelToSend = guild.channels.cache.get(news.channelID) as TextChannel;
-  if (!channelToSend) return;
-
+export async function sendChannelNews(
+  guild: Guild,
+  id: string,
+  interaction: ChatInputCommandInteraction
+) {
+  const news = get(id)!;
   const role = news.roleID;
   let roleToSend: Role | undefined;
   if (role) roleToSend = guild.roles.cache.get(role);
@@ -21,8 +26,10 @@ export async function sendChannelNews(guild: Guild, id: string) {
     .setFooter({ text: `Latest news from ${guild.name}` })
     .setColor(genColor(200));
 
-  return await channelToSend.send({
-    embeds: [embed],
-    content: roleToSend ? `<@&${roleToSend.id}>` : undefined
-  });
+  return (guild.channels.cache.get(news.channelID ?? interaction.channel?.id) as TextChannel)
+    .send({
+      embeds: [embed],
+      content: roleToSend ? `<@&${roleToSend.id}>` : undefined
+    })
+    .then(message => set(id, "messageID", message?.id!));
 }
