@@ -4,7 +4,7 @@ import { FieldData, SqlType, TableDefinition, TypeOfDefinition } from "./types";
 const tableDefinition = {
   name: "news",
   definition: {
-    guildID: "TEXT",
+    id: "TEXT",
     key: "TEXT",
     value: "TEXT"
   }
@@ -24,17 +24,17 @@ export const newsDefinition = {
 } satisfies Record<string, FieldData>;
 
 const database = getDatabase(tableDefinition);
-const sendQuery = database.query("INSERT INTO news (guildID, key, value) VALUES (?1, ?2, ?3);");
-const listAllQuery = database.query("SELECT * FROM news WHERE guildID = $1;");
+const sendQuery = database.query("INSERT INTO news (id, key, value) VALUES (?1, ?2, ?3);");
+const listAllQuery = database.query("SELECT * FROM news WHERE id = $1;");
 const getQuery = database.query("SELECT * FROM news WHERE id = $1;");
 const deleteQuery = database.query("DELETE FROM news WHERE id = $1");
 
 export function sendNews<K extends keyof typeof newsDefinition>(
-  guildID: string,
+  id: string,
   key: K,
   value: TypeOfKey<K>
 ) {
-  sendQuery.run(guildID, key, value);
+  sendQuery.run((JSON.stringify(id), key, value) as unknown as typeof newsDefinition);
 }
 
 export function listAllNews(guildID: string) {
@@ -50,14 +50,16 @@ export function set<K extends keyof typeof newsDefinition>(
   key: K,
   value: TypeOfKey<K>
 ) {
-  deleteQuery.run(id);
-  sendQuery.run(id, key, value);
+  const doInsert = get(id) == null;
+  if (!doInsert) {
+    deleteQuery.all(id, key);
+  }
+  sendQuery.run((JSON.stringify(id), key, value) as unknown as typeof newsDefinition);
 }
 
-export function updateNews(id: string, title: string, body: string) {
-  const lastElem = get(id)!;
+export function updateNews(id: string, key: string, title: string, body: string) {
   deleteQuery.run(id);
-  sendQuery.run(lastElem.guildID, key, value);
+  sendQuery.run(id, key, value);
 }
 
 export function deleteNews(id: string) {
