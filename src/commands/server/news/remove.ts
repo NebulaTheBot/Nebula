@@ -8,6 +8,7 @@ import {
 import { genColor } from "../../../utils/colorGen";
 import { errorEmbed } from "../../../utils/embeds/errorEmbed";
 import { deleteNews, get } from "../../../utils/database/news";
+import { getSetting } from "../../../utils/database/settings";
 
 export default class Remove {
   data: SlashCommandSubcommandBuilder;
@@ -36,14 +37,12 @@ export default class Remove {
       );
 
     const news = get(id);
-    console.log(news);
     if (!news) return errorEmbed(interaction, "The specified news don't exist.");
 
     const messageID = news.messageID;
     const newsChannel = (await guild.channels
-      .fetch(news.channelID ?? interaction.channel?.id)
+      .fetch(getSetting(guild.id, "news.channelID")! ?? interaction.channel?.id)
       .catch(() => null)) as TextChannel;
-    console.log(newsChannel);
 
     if (newsChannel) await newsChannel.messages.delete(messageID);
     deleteNews(id);

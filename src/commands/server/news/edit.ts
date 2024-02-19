@@ -64,43 +64,19 @@ export default class Edit {
       .setValue(news.body)
       .setRequired(true);
 
-    const imageURLInput = new TextInputBuilder()
-      .setCustomId("imageurl")
-      .setPlaceholder("Big image URL (bottom)")
-      .setStyle(TextInputStyle.Short)
-      .setMaxLength(1000)
-      .setLabel("Big image URL (bottom)")
-      .setValue(news.imageURL)
-      .setRequired(false);
-
     const firstActionRow = new ActionRowBuilder().addComponents(
       titleInput
     ) as ActionRowBuilder<TextInputBuilder>;
     const secondActionRow = new ActionRowBuilder().addComponents(
       bodyInput
     ) as ActionRowBuilder<TextInputBuilder>;
-    const thirdActionRow = new ActionRowBuilder().addComponents(
-      imageURLInput
-    ) as ActionRowBuilder<TextInputBuilder>;
 
-    editModal.addComponents(firstActionRow, secondActionRow, thirdActionRow);
+    editModal.addComponents(firstActionRow, secondActionRow);
     await interaction.showModal(editModal).catch(err => console.error(err));
-
     interaction.client.once("interactionCreate", async i => {
       if (!i.isModalSubmit()) return;
 
-      const imageURL = i.fields.getTextInputValue("imageurl");
-      if (imageURL) {
-        errorEmbed(interaction, "The image URL you provided is invalid.");
-        return;
-      }
-
-      updateNews(
-        id,
-        i.fields.getTextInputValue("title"),
-        i.fields.getTextInputValue("body"),
-        imageURL
-      );
+      updateNews(id, i.fields.getTextInputValue("title"), i.fields.getTextInputValue("body"));
 
       await interaction.reply({
         embeds: [new EmbedBuilder().setTitle("✅ • News edited!").setColor(genColor(100))]

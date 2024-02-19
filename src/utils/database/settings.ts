@@ -17,6 +17,7 @@ export const settingsDefinition = {
   "log.channel": "INTEGER",
   "news.channelID": "TEXT",
   "news.roleID": "TEXT",
+  "news.editNews": "BOOL",
   "serverboard.inviteLink": "TEXT",
   "serverboard.shown": "BOOL"
 } satisfies Record<string, FieldData>;

@@ -71,7 +71,7 @@ export default class Poll {
 
     let embed = new EmbedBuilder()
       .setAuthor({
-        name: `•  Poll by ${member.user.username}`,
+        name: `•  ${member.user.username}`,
         iconURL: member.user.displayAvatarURL()
       })
       .setTitle(`${interaction.options.getString("question")}`)

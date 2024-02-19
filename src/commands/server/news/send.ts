@@ -12,7 +12,6 @@ import { genColor } from "../../../utils/colorGen";
 import { errorEmbed } from "../../../utils/embeds/errorEmbed";
 import { sendChannelNews } from "../../../utils/sendChannelNews";
 import { sendNews } from "../../../utils/database/news";
-import { getSetting } from "../../../utils/database/settings";
 
 export default class Send {
   data: SlashCommandSubcommandBuilder;
@@ -64,8 +63,6 @@ export default class Send {
         i.user.displayName,
         i.user.avatarURL()!,
         null!,
-        getSetting(guild.id, "news.channelID")! ?? interaction.channel?.id,
-        getSetting(guild.id, "news.roleID")!,
         id
       );
 
