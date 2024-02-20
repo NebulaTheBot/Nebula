@@ -13,7 +13,7 @@ const client = new Client({
     "GuildEmojisAndStickers",
     "GuildPresences",
     "MessageContent"
-  ],
+  ]
 });
 
 client.on("ready", async () => {

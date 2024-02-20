@@ -14,10 +14,10 @@ const tableDefinition = {
 export const settingsDefinition = {
   "levelling.enabled": "BOOL",
   "levelling.channel": "INTEGER",
-  "log.channel": "INTEGER",
+  "moderation.channel": "INTEGER",
   "news.channelID": "TEXT",
   "news.roleID": "TEXT",
-  "news.editNews": "BOOL",
+  "news.editOriginalMessage": "BOOL",
   "serverboard.inviteLink": "TEXT",
   "serverboard.shown": "BOOL"
 } satisfies Record<string, FieldData>;

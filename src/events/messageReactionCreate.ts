@@ -1,4 +1,4 @@
-import { type Client, type Guild, type User, type MessageReaction } from "discord.js";
+import type { Client, Guild, User, MessageReaction } from "discord.js";
 import { getPolls } from "../utils/database/poll";
 
 export default {

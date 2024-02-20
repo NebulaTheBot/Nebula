@@ -31,7 +31,7 @@ export default class Send {
         "You need the **Manage Server** permission."
       );
 
-    const newsModal = new ModalBuilder().setCustomId("sendnews").setTitle("Write your news out.");
+    const newsModal = new ModalBuilder().setCustomId("sendnews").setTitle("Write your news.");
     const firstActionRow = new ActionRowBuilder().addComponents(
       new TextInputBuilder()
         .setCustomId("title")

@@ -12,7 +12,9 @@ import { getSetting } from "./database/settings";
 export async function sendChannelNews(
   guild: Guild,
   id: string,
-  interaction: ChatInputCommandInteraction
+  interaction: ChatInputCommandInteraction,
+  title?: string,
+  body?: string,
 ) {
   const news = get(id)!;
   const role = getSetting(guild.id, "news.roleID");
@@ -21,8 +23,8 @@ export async function sendChannelNews(
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: `•  ${news.author}`, iconURL: news.authorPFP })
-    .setTitle(news.title)
-    .setDescription(news.body)
+    .setTitle(title ?? news.title)
+    .setDescription(body ?? news.body)
     .setTimestamp(parseInt(news.updatedAt.toString()) ?? null)
     .setFooter({ text: `Latest news from ${guild.name}\nID: ${news.id}` })
     .setColor(genColor(200));

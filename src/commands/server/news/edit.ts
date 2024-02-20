@@ -6,11 +6,15 @@ import {
   TextInputBuilder,
   ActionRowBuilder,
   TextInputStyle,
-  type ChatInputCommandInteraction
+  type ChatInputCommandInteraction,
+  type TextChannel,
+  type Role
 } from "discord.js";
 import { genColor } from "../../../utils/colorGen";
 import { errorEmbed } from "../../../utils/embeds/errorEmbed";
 import { get, updateNews } from "../../../utils/database/news";
+import { getSetting } from "../../../utils/database/settings";
+import { sendChannelNews } from "../../../utils/sendChannelNews";
 
 export default class Edit {
   data: SlashCommandSubcommandBuilder;
@@ -38,13 +42,14 @@ export default class Edit {
         "You need the **Manage Server** permission."
       );
 
+    const guild = interaction.guild!;
     const id = interaction.options.getString("id", true).trim();
     const news = get(id);
     if (!news) return errorEmbed(interaction, "The specified news doesn't exist.");
 
     const editModal = new ModalBuilder()
       .setCustomId("editnews")
-      .setTitle(`Edit News: ${news.title}`);
+      .setTitle(`Edit news: ${news.title}`);
 
     const titleInput = new TextInputBuilder()
       .setCustomId("title")
@@ -76,8 +81,32 @@ export default class Edit {
     interaction.client.once("interactionCreate", async i => {
       if (!i.isModalSubmit()) return;
 
-      updateNews(id, i.fields.getTextInputValue("title"), i.fields.getTextInputValue("body"));
+      const role = getSetting(guild.id, "news.roleID");
+      let roleToSend: Role | undefined;
+      if (role) roleToSend = guild.roles.cache.get(role);    
+      const title = i.fields.getTextInputValue("title");
+      const body = i.fields.getTextInputValue("body");
+      const newsEditable = getSetting(guild.id, "news.editOriginalMessage");
+      if (newsEditable === false) await sendChannelNews(guild, id, interaction, title, body);
 
+      const embed = new EmbedBuilder()
+        .setAuthor({ name: `•  ${news.author}`, iconURL: news.authorPFP })
+        .setTitle(title)
+        .setDescription(body)
+        .setTimestamp(parseInt(news.updatedAt.toString()) ?? null)
+        .setFooter({ text: `Edited news from ${guild.name}\nID: ${news.id}` })
+        .setColor(genColor(200));
+
+      (
+        guild.channels.cache.get(
+          getSetting(guild.id, "news.channelID")! ?? interaction.channel?.id
+        ) as TextChannel
+      )?.messages.edit(news.messageID, {
+        embeds: [embed],
+        content: roleToSend ? `<@&${roleToSend.id}>` : undefined
+      });
+
+      updateNews(id, title, body);
       await interaction.reply({
         embeds: [new EmbedBuilder().setTitle("✅ • News edited!").setColor(genColor(100))]
       });
