@@ -18,7 +18,12 @@ export const settingsDefinition = {
   "news.channelID": "TEXT",
   "news.roleID": "TEXT",
   "serverboard.inviteLink": "TEXT",
-  "serverboard.shown": "BOOL"
+  "serverboard.shown": "BOOL",
+  "welcome.text": "TEXT",
+  "welcome.goodbyeText": "TEXT",
+  "welcome.channel": "INTEGER",
+  "welcome.shown": "BOOL",
+  "welcome.goodbyeShown": "BOOL"
 } satisfies Record<string, FieldData>;
 
 export const settingsKeys = Object.keys(settingsDefinition) as (keyof typeof settingsDefinition)[];
