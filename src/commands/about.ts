@@ -47,7 +47,7 @@ export default class About {
         {
           name: "🔗 • Links",
           value:
-            "[GitHub](https://www.github.com/NebulaTheBot)・[YouTube](https://www.youtube.com/@NebulaTheBot)・[Instagram](https://instagram.com/NebulaTheBot)・[Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social)・[Guilded](https://guilded.gg/Nebula)・[Revolt](https://rvlt.gg/28TS9aXy)"
+            "[GitHub](https://www.github.com/NebulaTheBot) • [YouTube](https://www.youtube.com/@NebulaTheBot) • [Instagram](https://instagram.com/NebulaTheBot) • [Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social) • [Guilded](https://guilded.gg/Nebula) • [Revolt](https://rvlt.gg/28TS9aXy)"
         }
       )
       .setFooter({ text: `Made by the Nebula team with ${randomise(hearts)}` })

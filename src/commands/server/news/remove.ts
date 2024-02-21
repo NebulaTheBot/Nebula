@@ -8,6 +8,7 @@ import {
 import { genColor } from "../../../utils/colorGen";
 import { errorEmbed } from "../../../utils/embeds/errorEmbed";
 import { deleteNews, get } from "../../../utils/database/news";
+import { getSetting } from "../../../utils/database/settings";
 
 export default class Remove {
   data: SlashCommandSubcommandBuilder;
@@ -24,29 +25,26 @@ export default class Remove {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const user = interaction.user;
     const guild = interaction.guild!;
     const id = interaction.options.getString("id")!;
-    const member = guild.members.cache.get(user.id)!;
+    const member = guild.members.cache.get(interaction.user.id)!;
 
     if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild))
-      return await interaction.reply({
-        embeds: [errorEmbed("You need **Manage Server** permissions to delete news.")]
-      });
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "You need the **Manage Server** permission."
+      );
 
     const news = get(id);
-    if (!news)
-      return await interaction.reply({
-        embeds: [errorEmbed("The specified news don't exist.")]
-      });
+    if (!news) return errorEmbed(interaction, "The specified news don't exist.");
 
-    const messageId = news?.messageID;
+    const messageID = news.messageID;
     const newsChannel = (await guild.channels
-      .fetch(news?.channelID ?? "")
-      .catch(() => null)) as TextChannel | null;
+      .fetch(getSetting(guild.id, "news.channelID")! ?? interaction.channel?.id)
+      .catch(() => null)) as TextChannel;
 
-    if (newsChannel) await newsChannel?.messages.delete(messageId).catch(() => null);
-
+    if (newsChannel) await newsChannel.messages.delete(messageID);
     deleteNews(id);
     await interaction.reply({
       embeds: [new EmbedBuilder().setTitle("✅ • News deleted!").setColor(genColor(100))]

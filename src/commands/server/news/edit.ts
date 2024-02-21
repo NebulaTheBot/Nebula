@@ -6,11 +6,15 @@ import {
   TextInputBuilder,
   ActionRowBuilder,
   TextInputStyle,
-  type ChatInputCommandInteraction
+  type ChatInputCommandInteraction,
+  type TextChannel,
+  type Role
 } from "discord.js";
 import { genColor } from "../../../utils/colorGen";
 import { errorEmbed } from "../../../utils/embeds/errorEmbed";
 import { get, updateNews } from "../../../utils/database/news";
+import { getSetting } from "../../../utils/database/settings";
+import { sendChannelNews } from "../../../utils/sendChannelNews";
 
 export default class Edit {
   data: SlashCommandSubcommandBuilder;
@@ -32,20 +36,20 @@ export default class Edit {
         .guild!.members.cache.get(interaction.user.id)!
         .permissions.has(PermissionsBitField.Flags.ManageGuild)
     )
-      return await interaction.reply({
-        embeds: [errorEmbed("You need **Manage Server** permissions to add news.")]
-      });
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "You need the **Manage Server** permission."
+      );
 
+    const guild = interaction.guild!;
     const id = interaction.options.getString("id", true).trim();
     const news = get(id);
-    if (!news)
-      return await interaction.reply({
-        embeds: [errorEmbed("The specified news doesn't exist.")]
-      });
+    if (!news) return errorEmbed(interaction, "The specified news doesn't exist.");
 
     const editModal = new ModalBuilder()
       .setCustomId("editnews")
-      .setTitle(`Edit News: ${news.title}`);
+      .setTitle(`Edit news: ${news.title}`);
 
     const titleInput = new TextInputBuilder()
       .setCustomId("title")
@@ -65,45 +69,44 @@ export default class Edit {
       .setValue(news.body)
       .setRequired(true);
 
-    const imageURLInput = new TextInputBuilder()
-      .setCustomId("imageurl")
-      .setPlaceholder("Big image URL (bottom)")
-      .setStyle(TextInputStyle.Short)
-      .setMaxLength(1000)
-      .setLabel("Big image URL (bottom)")
-      .setValue(news.imageURL)
-      .setRequired(false);
-
     const firstActionRow = new ActionRowBuilder().addComponents(
       titleInput
     ) as ActionRowBuilder<TextInputBuilder>;
     const secondActionRow = new ActionRowBuilder().addComponents(
       bodyInput
     ) as ActionRowBuilder<TextInputBuilder>;
-    const thirdActionRow = new ActionRowBuilder().addComponents(
-      imageURLInput
-    ) as ActionRowBuilder<TextInputBuilder>;
 
-    editModal.addComponents(firstActionRow, secondActionRow, thirdActionRow);
+    editModal.addComponents(firstActionRow, secondActionRow);
     await interaction.showModal(editModal).catch(err => console.error(err));
+    interaction.client.once("interactionCreate", async i => {
+      if (!i.isModalSubmit()) return;
 
-    interaction.client.once("interactionCreate", async interaction => {
-      if (!interaction.isModalSubmit()) return;
+      const role = getSetting(guild.id, "news.roleID");
+      let roleToSend: Role | undefined;
+      if (role) roleToSend = guild.roles.cache.get(role);    
+      const title = i.fields.getTextInputValue("title");
+      const body = i.fields.getTextInputValue("body");
+      const newsEditable = getSetting(guild.id, "news.editOriginalMessage");
+      if (newsEditable === false) await sendChannelNews(guild, id, interaction, title, body);
 
-      const imageURL = interaction.fields.getTextInputValue("imageurl");
-      if (imageURL) {
-        await interaction.reply({
-          embeds: [errorEmbed("The image URL you provided is invalid.")]
-        });
-        return;
-      }
+      const embed = new EmbedBuilder()
+        .setAuthor({ name: `•  ${news.author}`, iconURL: news.authorPFP })
+        .setTitle(title)
+        .setDescription(body)
+        .setTimestamp(parseInt(news.updatedAt.toString()) ?? null)
+        .setFooter({ text: `Edited news from ${guild.name}\nID: ${news.id}` })
+        .setColor(genColor(200));
 
-      updateNews(
-        id,
-        interaction.fields.getTextInputValue("title"),
-        interaction.fields.getTextInputValue("body"),
-        imageURL
-      );
+      (
+        guild.channels.cache.get(
+          getSetting(guild.id, "news.channelID")! ?? interaction.channel?.id
+        ) as TextChannel
+      )?.messages.edit(news.messageID, {
+        embeds: [embed],
+        content: roleToSend ? `<@&${roleToSend.id}>` : undefined
+      });
+
+      updateNews(id, title, body);
       await interaction.reply({
         embeds: [new EmbedBuilder().setTitle("✅ • News edited!").setColor(genColor(100))]
       });

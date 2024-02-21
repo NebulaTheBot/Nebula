@@ -43,41 +43,36 @@ export default class Mute {
     const name = target.nickname ?? user.username;
 
     if (!member.permissions.has(PermissionsBitField.Flags.MuteMembers))
-      return await interaction.reply({
-        embeds: [
-          errorEmbed("You can't execute this command.", "You need the **Mute Members** permission.")
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "You need the **Mute Members** permission."
+      );
 
-    if (target === member)
-      return await interaction.reply({ embeds: [errorEmbed("You can't mute yourself.")] });
-
+    if (target === member) return errorEmbed(interaction, "You can't mute yourself.");
     if (target.user.id === interaction.client.user.id)
-      return await interaction.reply({
-        embeds: [errorEmbed("You can't mute Nebula.")]
-      });
+      return errorEmbed(interaction, "You can't mute Nebula.");
 
     if (!target.manageable)
-      return await interaction.reply({
-        embeds: [
-          errorEmbed(
-            `You can't mute ${name}.`,
-            "The member has a higher role position than Nebula."
-          )
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        `You can't mute ${name}.`,
+        "The member has a higher role position than Nebula."
+      );
 
     if (member.roles.highest.position < target.roles.highest.position)
-      return await interaction.reply({
-        embeds: [
-          errorEmbed(`You can't mute ${name}.`, "The member has a higher role position than you.")
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        `You can't mute ${name}.`,
+        "The member has a higher role position than you."
+      );
 
     if (!ms(duration) || ms(duration) > ms("28d"))
-      return await interaction.reply({
-        embeds: [errorEmbed("The duration is invalid or is above the 28 day limit.")]
-      });
+      return errorEmbed(
+        interaction,
+        `You can't mute ${name}`,
+        "The duration is invalid or is above the 28 day limit."
+      );
 
     const time = new Date(
       Date.parse(new Date().toISOString()) + Date.parse(new Date(ms(duration)).toISOString())
@@ -111,11 +106,13 @@ export default class Mute {
     }
 
     await target.edit({ communicationDisabledUntil: time });
-    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel)
-      await dmChannel.send({
-        embeds: [embed.setTitle("🤐 • You were muted").setColor(genColor(0))]
-      });
     await interaction.reply({ embeds: [embed] });
+
+    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
+    if (!dmChannel) return;
+    if (user.bot) return;
+    await dmChannel.send({
+      embeds: [embed.setTitle("🤐 • You were muted").setColor(genColor(0))]
+    });
   }
 }

@@ -41,24 +41,16 @@ export default class Purge {
     const member = guild.members.cache.get(interaction.member?.user.id!)!;
 
     if (!member.permissions.has(PermissionsBitField.Flags.ManageMessages))
-      return await interaction.reply({
-        embeds: [
-          errorEmbed(
-            "You can't execute this command",
-            "You need the **Manage Messages** permission."
-          )
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        "You can't execute this command",
+        "You need the **Manage Messages** permission."
+      );
 
     if (amount > 100)
-      return await interaction.reply({
-        embeds: [errorEmbed("You can only purge up to 100 messages at a time.")]
-      });
+      return errorEmbed(interaction, "You can only purge up to 100 messages at a time.");
 
-    if (amount < 1)
-      return await interaction.reply({
-        embeds: [errorEmbed("You must purge at least 1 message.")]
-      });
+    if (amount < 1) return errorEmbed(interaction, "You must purge at least 1 message.");
 
     const channelOption = interaction.options.getChannel("channel")!;
     const channel = guild.channels.cache.get(interaction.channel?.id ?? channelOption.id)!;

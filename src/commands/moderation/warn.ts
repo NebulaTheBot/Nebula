@@ -36,39 +36,29 @@ export default class Warn {
     const name = target.nickname ?? user.username;
 
     if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers))
-      return await interaction.reply({
-        embeds: [
-          errorEmbed(
-            "You can't execute this command.",
-            "You need the **Moderate Members** permission."
-          )
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "You need the **Moderate Members** permission."
+      );
 
-    if (target === member)
-      return await interaction.reply({ embeds: [errorEmbed("You can't warn yourself.")] });
-
+    if (target === member) return errorEmbed(interaction, "You can't warn yourself.");
     if (target.user.id === interaction.client.user.id)
-      return await interaction.reply({
-        embeds: [errorEmbed("You can't warn Nebula.")]
-      });
+      return errorEmbed(interaction, "You can't warn Nebula.");
 
     if (!target.manageable)
-      return await interaction.reply({
-        embeds: [
-          errorEmbed(
-            `You can't warn ${name}.`,
-            "The member has a higher role position than Nebula."
-          )
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        `You can't warn ${name}.`,
+        "The member has a higher role position than Nebula."
+      );
 
     if (member.roles.highest.position < target.roles.highest.position)
-      return await interaction.reply({
-        embeds: [
-          errorEmbed(`You can't warn ${name}.`, "The member has a higher role position than you.")
-        ]
-      });
+      return errorEmbed(
+        interaction,
+        `You can't warn ${name}.`,
+        "The member has a higher role position than you."
+      );
 
     const reason = interaction.options.getString("reason");
     const embed = new EmbedBuilder()
@@ -99,11 +89,13 @@ export default class Warn {
     }
 
     addModeration(guild.id, user.id, "WARN", member.id, reason ?? undefined);
-    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (dmChannel)
-      await dmChannel.send({
-        embeds: [embed.setTitle("⚠️ • You were warned").setColor(genColor(0))]
-      });
     await interaction.reply({ embeds: [embed] });
+
+    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
+    if (!dmChannel) return;
+    if (user.bot) return;
+    await dmChannel.send({
+      embeds: [embed.setTitle("⚠️ • You were warned").setColor(genColor(0))]
+    });
   }
 }

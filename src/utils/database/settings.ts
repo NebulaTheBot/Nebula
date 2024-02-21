@@ -5,7 +5,7 @@ import { FieldData, SqlType, TableDefinition, TypeOfDefinition } from "./types";
 const tableDefinition = {
   name: "settings",
   definition: {
-    guild: "TEXT",
+    guildID: "TEXT",
     key: "TEXT",
     value: "TEXT"
   }
@@ -14,9 +14,10 @@ const tableDefinition = {
 export const settingsDefinition = {
   "levelling.enabled": "BOOL",
   "levelling.channel": "INTEGER",
-  "log.channel": "INTEGER",
+  "moderation.channel": "INTEGER",
   "news.channelID": "TEXT",
   "news.roleID": "TEXT",
+  "news.editOriginalMessage": "BOOL",
   "serverboard.inviteLink": "TEXT",
   "serverboard.shown": "BOOL",
   "welcome.text": "TEXT",
@@ -28,18 +29,22 @@ export const settingsDefinition = {
 
 export const settingsKeys = Object.keys(settingsDefinition) as (keyof typeof settingsDefinition)[];
 const database = getDatabase(tableDefinition);
-const getQuery = database.query("SELECT * FROM settings WHERE guild = $1 AND key = $2;");
+const getQuery = database.query("SELECT * FROM settings WHERE guildID = $1 AND key = $2;");
 const listPublicQuery = database.query(
   "SELECT * FROM settings WHERE key = 'serverboard.shown' AND value = 'TRUE';"
 );
-const removeQuery = database.query("DELETE FROM settings WHERE guild = $1 AND key = $2;");
-const insertQuery = database.query("INSERT INTO settings (guild, key, value) VALUES (?1, ?2, ?3);");
+const deleteQuery = database.query("DELETE FROM settings WHERE guildID = $1 AND key = $2;");
+const insertQuery = database.query(
+  "INSERT INTO settings (guildID, key, value) VALUES (?1, ?2, ?3);"
+);
 
 export function getSetting<K extends keyof typeof settingsDefinition>(
-  guild: string,
+  guildID: string,
   key: K
 ): TypeOfKey<K> | null {
-  let res = getQuery.all(JSON.stringify(guild), key) as TypeOfDefinition<typeof tableDefinition>[];
+  let res = getQuery.all(JSON.stringify(guildID), key) as TypeOfDefinition<
+    typeof tableDefinition
+  >[];
   if (res.length == 0) return null;
   switch (settingsDefinition[key]) {
     case "TEXT":
@@ -53,20 +58,20 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
 }
 
 export function setSetting<K extends keyof typeof settingsDefinition>(
-  guild: string,
+  guildID: string,
   key: K,
   value: TypeOfKey<K>
 ) {
-  const doInsert = getSetting(guild, key) == null;
+  const doInsert = getSetting(guildID, key) == null;
   if (!doInsert) {
-    removeQuery.all(JSON.stringify(guild), key);
+    deleteQuery.all(JSON.stringify(guildID), key);
   }
-  insertQuery.run(JSON.stringify(guild), key, value);
+  insertQuery.run(JSON.stringify(guildID), key, value);
 }
 
 export function listPublicServers() {
   return (listPublicQuery.all() as TypeOfDefinition<typeof tableDefinition>[]).map(entry =>
-    JSON.parse(entry.guild)
+    JSON.parse(entry.guildID)
   );
 }
 
