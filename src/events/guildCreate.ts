@@ -17,7 +17,7 @@ export default {
         .createDM()
         .catch(() => null)) as DMChannel | null;
       const embed = new EmbedBuilder()
-        .setTitle("👋 • Welcome to Nebula!")
+        .setTitle("👋  •  Welcome to Nebula!")
         .setDescription(
           [
             "Nebula is a multiplatform, multipurpose bot with the ability to add extensions to have additional features.",

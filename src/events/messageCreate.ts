@@ -51,8 +51,8 @@ export default {
       }
 
       const embed = new EmbedBuilder()
-        .setAuthor({ name: author.displayName, iconURL: author.avatarURL() || undefined })
-        .setTitle("⚡ • Level Up!")
+        .setAuthor({ name: `•  ${author.displayName}`, iconURL: author.avatarURL() || undefined })
+        .setTitle("⚡  •  Level Up!")
         .setDescription(
           [
             `**Congratulations, ${author.displayName}**!`,

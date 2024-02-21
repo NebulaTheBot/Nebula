@@ -35,8 +35,8 @@ export default class Warns {
     const user = interaction.options.getUser("user")!;
     const warns = listUserModeration(guild.id, user.id, "WARN");
     const embed = new EmbedBuilder()
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`✅ • Warns of ${user.username}`)
+      .setAuthor({ name: `•  ${user.displayName}`, iconURL: user.displayAvatarURL() })
+      .setTitle(`✅  •  Warns of ${user.displayName}`)
       .setFields(
         warns.length > 0
           ? warns.map(warn => {

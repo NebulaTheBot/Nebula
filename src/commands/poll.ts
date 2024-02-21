@@ -71,7 +71,7 @@ export default class Poll {
 
     let embed = new EmbedBuilder()
       .setAuthor({
-        name: `•  ${member.user.username}`,
+        name: `•  ${member.user.displayName}`,
         iconURL: member.user.displayAvatarURL()
       })
       .setTitle(`${interaction.options.getString("question")}`)
@@ -88,7 +88,7 @@ export default class Poll {
     if (image) embed.setImage(image.url);
     if (channel) {
       const successEmbed = new EmbedBuilder()
-        .setTitle("✅ • Poll has been created successfully")
+        .setTitle("✅  •  Poll has been created successfully")
         .setDescription(`Poll is sent to ${channel}.`)
         .setColor(genColor(100));
 

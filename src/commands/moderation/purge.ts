@@ -55,7 +55,7 @@ export default class Purge {
     const channelOption = interaction.options.getChannel("channel")!;
     const channel = guild.channels.cache.get(interaction.channel?.id ?? channelOption.id)!;
     const embed = new EmbedBuilder()
-      .setTitle(`✅ • Purged ${amount} messages.`)
+      .setTitle(`✅  •  Purged ${amount} messages.`)
       .setDescription(
         [
           `**Moderator**: ${interaction.user.username}`,
@@ -73,7 +73,7 @@ export default class Purge {
         ? await channel.bulkDelete(amount + 1, true)
         : await channel.bulkDelete(amount, true);
 
-    const logChannel = getSetting(guild.id, "log.channel");
+    const logChannel = getSetting(guild.id, "moderation.channel");
     if (logChannel) {
       const channel = await guild.channels.cache
         .get(`${logChannel}`)

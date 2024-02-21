@@ -68,7 +68,7 @@ export default class Send {
 
       await sendChannelNews(guild, id, interaction).catch(err => console.error(err));
       await i.reply({
-        embeds: [new EmbedBuilder().setTitle("✅ • News sent!").setColor(genColor(100))]
+        embeds: [new EmbedBuilder().setTitle("✅  •  News sent!").setColor(genColor(100))]
       });
     });
   }

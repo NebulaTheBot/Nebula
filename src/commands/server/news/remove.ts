@@ -47,7 +47,7 @@ export default class Remove {
     if (newsChannel) await newsChannel.messages.delete(messageID);
     deleteNews(id);
     await interaction.reply({
-      embeds: [new EmbedBuilder().setTitle("✅ • News deleted!").setColor(genColor(100))]
+      embeds: [new EmbedBuilder().setTitle("✅  •  News deleted!").setColor(genColor(100))]
     });
   }
 }

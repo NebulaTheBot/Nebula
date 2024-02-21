@@ -43,10 +43,10 @@ export default class ServerInfo {
       );
 
     const embed = new EmbedBuilder()
-      .setTitle(`\`${key}\` has been set to \`${value}\``)
+      .setTitle(`✅  •  \`${key}\` has been set to \`${value}\``)
       .setColor(genColor(100));
 
-    setSetting(interaction.guildId!, key, value);
+    setSetting(interaction.guildId!, key, value as keyof typeof settingsDefinition);
     interaction.reply({ embeds: [embed] });
   }
 

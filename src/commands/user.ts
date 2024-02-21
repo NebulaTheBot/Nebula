@@ -27,13 +27,11 @@ export default class User {
     const target = guild.members.cache
       .filter(member => member.user.id === id)
       .map(user => user)[0]!;
-    const selectedUser = target.user!;
 
+    const selectedUser = target.user!;
     let embed = new EmbedBuilder()
       .setAuthor({
-        name: `•  ${target.nickname == null ? selectedUser.username : target.nickname}${
-          selectedUser.discriminator == "0" ? "" : `#${selectedUser.discriminator}`
-        }`,
+        name: `•  ${target.nickname ?? selectedUser.displayName}`,
         iconURL: target.displayAvatarURL()
       })
       .setFields(

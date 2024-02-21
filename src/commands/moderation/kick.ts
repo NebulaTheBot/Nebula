@@ -32,7 +32,7 @@ export default class Kick {
     const members = guild.members.cache!;
     const member = members.get(interaction.member?.user.id!)!;
     const target = members.get(user.id)!;
-    const name = target.nickname ?? user.username;
+    const name = user.displayName;
 
     if (!member.permissions.has(PermissionsBitField.Flags.KickMembers))
       return errorEmbed(
@@ -61,11 +61,11 @@ export default class Kick {
 
     const reason = interaction.options.getString("reason");
     const embed = new EmbedBuilder()
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`✅ • Kicked <@${user.id}>`)
+      .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })
+      .setTitle(`✅  •  Kicked ${name}`)
       .setDescription(
         [
-          `**Moderator**: ${interaction.user.username}`,
+          `**Moderator**: ${interaction.user.displayName}`,
           `**Reason**: ${reason ?? "No reason provided"}`
         ].join("\n")
       )
@@ -73,7 +73,7 @@ export default class Kick {
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
-    const logChannel = getSetting(guild.id, "log.channel");
+    const logChannel = getSetting(guild.id, "moderation.channel");
     if (logChannel) {
       const channel = await guild.channels.cache
         .get(`${logChannel}`)

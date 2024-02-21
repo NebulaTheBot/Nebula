@@ -61,8 +61,8 @@ export default class Ban {
 
     const reason = interaction.options.getString("reason");
     const embed = new EmbedBuilder()
-      .setAuthor({ name: `• ${name}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`✅ • Banned ${name}`)
+      .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })
+      .setTitle(`✅  •  Banned ${name}`)
       .setDescription(
         [
           `**Moderator**: ${interaction.user.displayName}`,
@@ -73,7 +73,7 @@ export default class Ban {
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
-    const logChannel = getSetting(guild.id, "log.channel");
+    const logChannel = getSetting(guild.id, "moderation.channel");
     if (logChannel) {
       const channel = await guild.channels.cache
         .get(`${logChannel}`)

@@ -20,7 +20,7 @@ export default class About {
     const shards = client.shard?.count;
     const hearts = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
     const embed = new EmbedBuilder()
-      .setAuthor({ name: "•  About", iconURL: client.user.displayAvatarURL() })
+      .setAuthor({ name: "•  About Nebula", iconURL: client.user.displayAvatarURL() })
       .setDescription(
         "Nebula is a multiplatform, multipurpose bot with the ability to add extensions to have additional features."
       )

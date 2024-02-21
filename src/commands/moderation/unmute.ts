@@ -42,11 +42,11 @@ export default class Unmute {
       return errorEmbed(interaction, "You can't unmute this user.", "The user was never muted.");
 
     const embed = new EmbedBuilder()
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`✅ • Unmuted ${user.username}`)
+      .setAuthor({ name: `•  ${user.displayName}`, iconURL: user.displayAvatarURL() })
+      .setTitle(`✅  •  Unmuted ${user.displayName}`)
       .setDescription(
         [
-          `**Moderator**: ${interaction.user.username}`,
+          `**Moderator**: ${interaction.user.displayName}`,
           `**Date**: <t:${Math.floor(Date.now() / 1000)}:f>`
         ].join("\n")
       )
@@ -54,7 +54,7 @@ export default class Unmute {
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
-    const logChannel = getSetting(guild.id, "log.channel");
+    const logChannel = getSetting(guild.id, "moderation.channel");
     if (logChannel) {
       const channel = await guild.channels.cache
         .get(`${logChannel}`)

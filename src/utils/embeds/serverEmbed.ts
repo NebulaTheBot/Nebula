@@ -49,7 +49,7 @@ export async function serverEmbed(options: Options) {
   if (options.showInvite && invite !== null) generalValues.push(`**Invite link**: ${invite}`);
 
   const embed = new EmbedBuilder()
-    .setAuthor({ name: `${pages ? `#${page}  •  ` : ""}${guild.name}`, iconURL: guild.iconURL()! })
+    .setAuthor({ name: `•  ${pages ? `#${page}  •  ` : ""}${guild.name}`, iconURL: guild.iconURL()! })
     .setDescription(guild.description ? guild.description : null)
     .setFields({ name: "📃 • General", value: generalValues.join("\n") })
     .setFooter({ text: `Server ID: ${guild.id}${pages ? ` • Page ${page}/${pages}` : ""}` })

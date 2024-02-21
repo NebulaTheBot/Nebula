@@ -38,7 +38,7 @@ export default class View {
     if (page < 1) page = 1;
 
     let embed = new EmbedBuilder()
-      .setAuthor({ name: currentNews.author, iconURL: currentNews.authorPFP })
+      .setAuthor({ name: `•  ${currentNews.author}`, iconURL: currentNews.authorPFP })
       .setTitle(currentNews.title)
       .setDescription(currentNews.body)
       .setImage(currentNews.imageURL || null)
@@ -84,7 +84,7 @@ export default class View {
 
         currentNews = sortedNews[page - 1];
         embed = new EmbedBuilder()
-          .setAuthor({ name: currentNews.author, iconURL: currentNews.authorPFP })
+          .setAuthor({ name: `•  ${currentNews.author}`, iconURL: currentNews.authorPFP })
           .setTitle(currentNews.title)
           .setDescription(currentNews.body)
           .setImage(currentNews.imageURL || null)

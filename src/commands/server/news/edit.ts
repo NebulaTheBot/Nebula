@@ -83,7 +83,7 @@ export default class Edit {
 
       const role = getSetting(guild.id, "news.roleID");
       let roleToSend: Role | undefined;
-      if (role) roleToSend = guild.roles.cache.get(role);    
+      if (role) roleToSend = guild.roles.cache.get(role);
       const title = i.fields.getTextInputValue("title");
       const body = i.fields.getTextInputValue("body");
       const newsEditable = getSetting(guild.id, "news.editOriginalMessage");
@@ -108,7 +108,7 @@ export default class Edit {
 
       updateNews(id, title, body);
       await interaction.reply({
-        embeds: [new EmbedBuilder().setTitle("✅ • News edited!").setColor(genColor(100))]
+        embeds: [new EmbedBuilder().setTitle("✅  •  News edited!").setColor(genColor(100))]
       });
     });
   }

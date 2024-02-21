@@ -36,7 +36,7 @@ export default class Delwarn {
     const members = guild.members.cache;
     const member = members.get(interaction.member?.user.id!)!;
     const target = members.get(user.id)!;
-    const name = target.nickname ?? user.username;
+    const name = user.displayName;
     const id = interaction.options.getNumber("id", true);
     const warns = listUserModeration(guild.id, user.id, "WARN");
     const newWarns = warns.filter(warn => warn.id !== `${id}`);
@@ -67,14 +67,14 @@ export default class Delwarn {
       );
 
     const embed = new EmbedBuilder()
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`✅ • Removed warning`)
-      .setDescription(`**Moderator**: ${interaction.user.username}`)
+      .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })
+      .setTitle(`✅  •  Removed warning from ${name}`)
+      .setDescription(`**Moderator**: ${interaction.user.displayName}`)
       .setThumbnail(user.displayAvatarURL())
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
-    const logChannel = getSetting(guild.id, "log.channel");
+    const logChannel = getSetting(guild.id, "moderation.channel");
     if (logChannel) {
       const channel = await guild.channels.cache
         .get(`${logChannel}`)

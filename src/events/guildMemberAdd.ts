@@ -1,8 +1,12 @@
 import {
-  EmbedBuilder, type Client, type GuildMember,
-  type TextChannel, type ColorResolvable
+  EmbedBuilder,
+  type Client,
+  type GuildMember,
+  type TextChannel,
+  type ColorResolvable
 } from "discord.js";
-import { genColor, genRGBColor } from "../utils/colorGen.js";
+import { genColor, genRGBColor } from "../utils/colorGen";
+import { getSetting } from "../utils/database/settings";
 import Vibrant from "node-vibrant";
 import sharp from "sharp";
 
@@ -10,23 +14,33 @@ export default {
   name: "guildMemberAdd",
   event: class GuildMemberAdd {
     client: Client;
-
     constructor(client: Client) {
       this.client = client;
     }
 
     async run(member: GuildMember) {
-      const id = "1079612083307548704";
-      const channel = await member.guild.channels.cache.find(channel => channel.id === id)!.fetch() as TextChannel;
-      const avatarURL = member.displayAvatarURL();
+      const guildID = member.guild.id;
+      const id = getSetting(guildID, "welcome.channel");
+      if (!id) return;
+      const channel = (await member.guild.channels.cache
+        .find(channel => channel.id === id)
+        ?.fetch()) as TextChannel;
 
+      let text = getSetting(guildID, "welcome.text");
+      if (text?.includes("(username)"))
+        text = text.replaceAll("(username)", member.user.displayName);
+
+      if (text?.includes("(usercount)"))
+        text = text.replaceAll("(usercount)", `${member.guild.memberCount}`);
+
+      const avatarURL = member.displayAvatarURL();
       const embed = new EmbedBuilder()
-        .setAuthor({
-          name: `•  ${member.nickname == null ? member.user.username : member.nickname}`,
-          iconURL: avatarURL
-        })
-        .setTitle("Welcome!")
-        .setDescription(`Enjoy your stay in **${member.guild.name}**!`)
+        .setAuthor({ name: `•  ${member.user.displayName}`, iconURL: avatarURL })
+        .setTitle("👋  •  Welcome!")
+        .setDescription(
+          text ??
+            `Welcome, ${member.user.displayName}! Interestingly, you just helped us reach ${member.guild.memberCount} members. Enjoy, and have a nice day!`
+        )
         .setFooter({ text: `User ID: ${member.id}` })
         .setThumbnail(avatarURL)
         .setColor(genColor(200));
@@ -41,4 +55,4 @@ export default {
       await channel.send({ embeds: [embed] });
     }
   }
-}
+};

@@ -30,7 +30,9 @@ export default class Unban {
     const id = interaction.options.getString("id")!;
     const guild = interaction.guild!;
     const member = guild.members.cache.get(interaction.member?.user.id!)!;
-    const target = guild.bans.cache.map(user => user.user).filter(user => user.id === id)[0]!;
+    const target = (await guild.bans.fetch())
+      .map(user => user.user)
+      .filter(user => user.id === id)[0]!;
 
     if (!member.permissions.has(PermissionsBitField.Flags.BanMembers))
       return errorEmbed(
@@ -43,14 +45,14 @@ export default class Unban {
       return errorEmbed(interaction, "You can't unban this user.", "The user was never banned.");
 
     const embed = new EmbedBuilder()
-      .setAuthor({ name: target.username, iconURL: target.displayAvatarURL() })
-      .setTitle(`✅ • Unbanned ${target.username}`)
-      .setDescription(`**Moderator**: ${interaction.user.username}`)
+      .setAuthor({ name: `•  ${target.displayName}`, iconURL: target.displayAvatarURL() })
+      .setTitle(`✅  •  Unbanned ${target.displayName}`)
+      .setDescription(`**Moderator**: ${interaction.user.displayName}`)
       .setThumbnail(target.displayAvatarURL())
       .setFooter({ text: `User ID: ${id}` })
       .setColor(genColor(100));
 
-    const logChannel = getSetting(guild.id, "log.channel");
+    const logChannel = getSetting(guild.id, "moderation.channel");
     if (logChannel) {
       const channel = await guild.channels.cache
         .get(`${logChannel}`)

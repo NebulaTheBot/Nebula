@@ -13,8 +13,8 @@ const tableDefinition = {
 
 export const settingsDefinition = {
   "levelling.enabled": "BOOL",
-  "levelling.channel": "INTEGER",
-  "moderation.channel": "INTEGER",
+  "levelling.channel": "TEXT",
+  "moderation.channel": "TEXT",
   "news.channelID": "TEXT",
   "news.roleID": "TEXT",
   "news.editOriginalMessage": "BOOL",
@@ -22,9 +22,7 @@ export const settingsDefinition = {
   "serverboard.shown": "BOOL",
   "welcome.text": "TEXT",
   "welcome.goodbyeText": "TEXT",
-  "welcome.channel": "INTEGER",
-  "welcome.shown": "BOOL",
-  "welcome.goodbyeShown": "BOOL"
+  "welcome.channel": "TEXT"
 } satisfies Record<string, FieldData>;
 
 export const settingsKeys = Object.keys(settingsDefinition) as (keyof typeof settingsDefinition)[];
