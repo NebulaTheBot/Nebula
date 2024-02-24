@@ -20,9 +20,9 @@ export default class About {
     const shards = client.shard?.count;
     const hearts = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
     const embed = new EmbedBuilder()
-      .setAuthor({ name: "•  About Nebula", iconURL: client.user.displayAvatarURL() })
+      .setAuthor({ name: "•  About Sokora", iconURL: client.user.displayAvatarURL() })
       .setDescription(
-        "Nebula is a multiplatform, multipurpose bot with the ability to add extensions to have additional features."
+        "Sokora is a multiplatform, multipurpose bot with the ability to add extensions to have additional features."
       )
       .setFields(
         {
@@ -38,10 +38,11 @@ export default class About {
           name: "🌌 • Entities involved",
           value: [
             "**Head developer**: Goos",
-            "**Developers**: Froxcey, Golem64, Pigpot, ThatBOI",
+            "**Developers**: Froxcey, Golem64, ThatBOI",
             "**Designers**: ArtyH, Optix, proJM, Slider_on_the_black",
-            "**Translators**: Dimkauzh, Golem64, Optix, SaFire, ThatBOI",
-            "And **YOU**, for using Nebula."
+            "**Translators**: Dimkauzh, Golem64, Optix, SaFire, ThatBOI, Trynera",
+            "**Testers**: Blaze, Dimkauzh, fishy, flojo, Trynera",
+            "And **YOU**, for using Sokora."
           ].join("\n")
         },
         {
@@ -50,7 +51,7 @@ export default class About {
             "[GitHub](https://www.github.com/NebulaTheBot) • [YouTube](https://www.youtube.com/@NebulaTheBot) • [Instagram](https://instagram.com/NebulaTheBot) • [Mastodon](https://mastodon.online/@NebulaTheBot@mastodon.social) • [Guilded](https://guilded.gg/Nebula) • [Revolt](https://rvlt.gg/28TS9aXy)"
         }
       )
-      .setFooter({ text: `Made by the Nebula team with ${randomise(hearts)}` })
+      .setFooter({ text: `Made by the Sokora team with ${randomise(hearts)}` })
       .setThumbnail(client.user.displayAvatarURL())
       .setColor(genColor(270));
 

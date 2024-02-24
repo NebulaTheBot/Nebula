@@ -12,11 +12,11 @@ export default {
   event: class MessageCreate {
     async run(message: Message) {
       const author = message.author;
-      const guild = message.guild!;
       if (author.bot) return;
+      const guild = message.guild!;
 
       // Easter egg handler
-      if (guild.id === "1079612082636472420") {
+      if (guild.id === "903852579837059113") {
         const eventsPath = join(process.cwd(), "src", "events", "easterEggs");
 
         for (const easterEggFile of readdirSync(eventsPath))

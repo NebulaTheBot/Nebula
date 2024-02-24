@@ -15,6 +15,7 @@ export const settingsDefinition = {
   "levelling.enabled": "BOOL",
   "levelling.channel": "TEXT",
   "moderation.channel": "TEXT",
+  "moderation.logMessages": "BOOL",
   "news.channelID": "TEXT",
   "news.roleID": "TEXT",
   "news.editOriginalMessage": "BOOL",

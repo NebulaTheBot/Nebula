@@ -22,24 +22,25 @@ export default {
       const guildID = member.guild.id;
       const id = getSetting(guildID, "welcome.channel");
       if (!id) return;
+
+      let text = getSetting(guildID, "welcome.text");
+      const user = member.user;
+      const guild = member.guild;
       const channel = (await member.guild.channels.cache
         .find(channel => channel.id === id)
         ?.fetch()) as TextChannel;
 
-      let text = getSetting(guildID, "welcome.text");
-      if (text?.includes("(username)"))
-        text = text.replaceAll("(username)", member.user.displayName);
-
-      if (text?.includes("(usercount)"))
-        text = text.replaceAll("(usercount)", `${member.guild.memberCount}`);
+      if (text?.includes("(name)")) text = text.replaceAll("(name)", user.displayName);
+      if (text?.includes("(count)")) text = text.replaceAll("(count)", `${guild.memberCount}`);
+      if (text?.includes("(servername)")) text = text.replaceAll("(servername)", `${guild.name}`);
 
       const avatarURL = member.displayAvatarURL();
       const embed = new EmbedBuilder()
-        .setAuthor({ name: `•  ${member.user.displayName}`, iconURL: avatarURL })
+        .setAuthor({ name: `•  ${user.displayName}`, iconURL: avatarURL })
         .setTitle("👋  •  Welcome!")
         .setDescription(
           text ??
-            `Welcome, ${member.user.displayName}! Interestingly, you just helped us reach ${member.guild.memberCount} members. Enjoy, and have a nice day!`
+            `Welcome to ${guild.name}, **${user.displayName}**! Interestingly, you just helped us reach **${guild.memberCount}** members. Enjoy, and have a nice day!`
         )
         .setFooter({ text: `User ID: ${member.id}` })
         .setThumbnail(avatarURL)
