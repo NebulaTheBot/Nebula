@@ -1,5 +1,6 @@
 import type { Client, Guild, User, MessageReaction } from "discord.js";
 import { getPolls } from "../utils/database/poll";
+import { getSetting } from "../utils/database/settings";
 
 export default {
   name: "messageReactionCreate",
@@ -10,6 +11,7 @@ export default {
     }
 
     async run(guild: Guild, user: User, reaction: MessageReaction) {
+      if (getSetting(guild.id, "poll.voteOnOneOption") == false) return;
       if (user.bot) return;
 
       const messageIds = getPolls(guild.id);
