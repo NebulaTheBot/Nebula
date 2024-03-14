@@ -88,7 +88,7 @@ export default class Poll {
     if (image) embed.setImage(image.url);
     if (channel) {
       const successEmbed = new EmbedBuilder()
-        .setTitle("✅  •  Poll has been created successfully")
+        .setTitle("Poll has been created.")
         .setDescription(`Poll is sent to ${channel}.`)
         .setColor(genColor(100));
 

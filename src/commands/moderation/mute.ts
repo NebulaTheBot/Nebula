@@ -79,7 +79,7 @@ export default class Mute {
     ).toISOString();
     const embed = new EmbedBuilder()
       .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`✅  •  Muted ${name}`)
+      .setTitle(`Muted ${name}.`)
       .setDescription(
         [
           `**Moderator**: ${interaction.user.displayName}`,
@@ -112,7 +112,7 @@ export default class Mute {
     if (!dmChannel) return;
     if (user.bot) return;
     await dmChannel.send({
-      embeds: [embed.setTitle("🤐 • You were muted").setColor(genColor(0))]
+      embeds: [embed.setTitle("You got muted.").setColor(genColor(0))]
     });
   }
 }

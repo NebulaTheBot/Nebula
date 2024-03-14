@@ -62,7 +62,7 @@ export default class Ban {
     const reason = interaction.options.getString("reason");
     const embed = new EmbedBuilder()
       .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`✅  •  Banned ${name}`)
+      .setTitle(`Banned ${name}.`)
       .setDescription(
         [
           `**Moderator**: ${interaction.user.displayName}`,
@@ -94,7 +94,7 @@ export default class Ban {
     if (!dmChannel) return;
     if (user.bot) return;
     await dmChannel.send({
-      embeds: [embed.setTitle("🔨 • You were banned").setColor(genColor(0))]
+      embeds: [embed.setTitle("You got banned.").setColor(genColor(0))]
     });
   }
 }

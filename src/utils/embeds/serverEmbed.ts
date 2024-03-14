@@ -1,8 +1,7 @@
-import { EmbedBuilder, type ColorResolvable, type Guild } from "discord.js";
-import { genColor, genRGBColor } from "../colorGen";
+import { EmbedBuilder, type Guild } from "discord.js";
+import { genColor } from "../colorGen";
 import { getSetting } from "../database/settings";
-import Vibrant from "node-vibrant";
-import sharp from "sharp";
+import { imageColor } from "../imageColor";
 
 type Options = {
   guild: Guild;
@@ -49,20 +48,17 @@ export async function serverEmbed(options: Options) {
   if (options.showInvite && invite !== null) generalValues.push(`**Invite link**: ${invite}`);
 
   const embed = new EmbedBuilder()
-    .setAuthor({ name: `•  ${pages ? `#${page}  •  ` : ""}${guild.name}`, iconURL: guild.iconURL()! })
+    .setAuthor({
+      name: `•  ${pages ? `#${page}  •  ` : ""}${guild.name}`,
+      iconURL: guild.iconURL()!
+    })
     .setDescription(guild.description ? guild.description : null)
     .setFields({ name: "📃 • General", value: generalValues.join("\n") })
     .setFooter({ text: `Server ID: ${guild.id}${pages ? ` • Page ${page}/${pages}` : ""}` })
     .setThumbnail(guild.iconURL())
     .setColor(genColor(200));
 
-  try {
-    const imageBuffer = await (await fetch(guild.iconURL()!)).arrayBuffer();
-    const image = sharp(imageBuffer).toFormat("jpg");
-    const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant!;
-    embed.setColor(genRGBColor(r, g, b) as ColorResolvable);
-  } catch {}
-
+  imageColor(embed, guild);
   if (options.roles)
     embed.addFields({
       name: `🎭 • ${roles.size - 1} ${roles.size === 1 ? "role" : "roles"}`,
@@ -72,7 +68,7 @@ export async function serverEmbed(options: Options) {
           : `${sortedRoles
               .slice(0, 5)
               .map(role => `<@&${role[0]}>`)
-              .join(", ")}${roles.size > 5 ? ` **and ${roles.size - 5} more**` : ""}`
+              .join(", ")}${roles.size > 5 ? ` and **${roles.size - 5}** more` : ""}`
     });
 
   embed.addFields(

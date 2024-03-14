@@ -4,7 +4,7 @@ import { getSetting } from "../utils/database/settings";
 
 export default {
   name: "messageDelete",
-  event: class messageDelete {
+  event: class MessageDelete {
     async run(message: Message) {
       const author = message.author;
       if (author.bot) return;
@@ -17,12 +17,12 @@ export default {
 
       const embed = new EmbedBuilder()
         .setAuthor({ name: `•  ${author.displayName}`, iconURL: author.displayAvatarURL() })
-        .setTitle("🗑️  •  Message has been deleted.")
+        .setTitle("Message has been deleted.")
         .addFields({
           name: "🗞️ • Deleted message",
           value: codeBlock(message.content)
         })
-        .setFooter({ text: `Message ID: ${message.id}` })
+        .setFooter({ text: `Message ID: ${message.id}\nUser ID: ${message.author.id}` })
         .setThumbnail(author.displayAvatarURL())
         .setColor(genColor(60));
 

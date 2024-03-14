@@ -63,7 +63,7 @@ export default class Warn {
     const reason = interaction.options.getString("reason");
     const embed = new EmbedBuilder()
       .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`✅  •  Warned ${name}`)
+      .setTitle(`Warned ${name}.`)
       .setDescription(
         [
           `**Moderator**: ${interaction.user.displayName}`,
@@ -95,7 +95,7 @@ export default class Warn {
     if (!dmChannel) return;
     if (user.bot) return;
     await dmChannel.send({
-      embeds: [embed.setTitle("⚠️ • You were warned").setColor(genColor(0))]
+      embeds: [embed.setTitle("You got warned.").setColor(genColor(0))]
     });
   }
 }

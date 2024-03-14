@@ -14,7 +14,7 @@ const tableDefinition = {
 export const settingsDefinition = {
   "levelling.enabled": "BOOL",
   "levelling.channel": "TEXT",
-  "levelling.blockChannelIds": "LIST", // TODO: Add this to the levelling command
+  //"levelling.blockedChannels": "LIST", // TODO: Add this to the levelling command
   "poll.voteOnOneOption": "BOOL",
   "moderation.channel": "TEXT",
   "moderation.logMessages": "BOOL",
@@ -52,8 +52,8 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
       return res[0].value as TypeOfKey<K>;
     case "BOOL":
       return (res[0].value == "true") as TypeOfKey<K>;
-    case "LIST":
-      return (res[0].value.split(",") as unknown) as TypeOfKey<K>; // TODO: Make this type usable
+    // case "LIST":
+    //   return (res[0].value.split(",") as unknown) as TypeOfKey<K>; // TODO: Make this type usable
     default:
       // TODO: Implement more data types
       return "WIP" as TypeOfKey<K>;

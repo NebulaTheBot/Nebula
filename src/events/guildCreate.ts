@@ -12,20 +12,23 @@ export default {
     }
 
     async run(guild: Guild) {
-      const hearts = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
       const dmChannel = (await (await guild.fetchOwner())
         .createDM()
-        .catch(() => null)) as DMChannel | null;
+        .catch(() => null)) as DMChannel | undefined;
+
+      let emojis = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
+      if (Math.round(Math.random() * 100) <= 5) emojis = ["⌨️", "💻", "🖥️"];
+
       const embed = new EmbedBuilder()
-        .setTitle("👋  •  Welcome to Nebula!")
+        .setTitle("Welcome to Sokora!")
         .setDescription(
           [
-            "Nebula is a multiplatform, multipurpose bot with the ability to add extensions to have additional features.",
+            "Sokora is a multipurpose Discord bot that lets you manage your servers easily.",
             "To manage the bot, use the **/server settings** command.",
-            "Nebula is in an early stage of development. If you find bugs, please go to our [official server](https://discord.gg/c6C25P4BuY) and report them."
+            "Sokora is in an early stage of development. If you find bugs, please go to our [official server](https://discord.gg/c6C25P4BuY) and report them."
           ].join("\n\n")
         )
-        .setFooter({ text: `Made by the Nebula team with ${randomise(hearts)}` })
+        .setFooter({ text: `Made with ${randomise(emojis)} by the Sokora team` })
         .setColor(genColor(200));
 
       await new Commands(guild.client).registerCommandsForGuild(guild);

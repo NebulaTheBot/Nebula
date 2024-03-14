@@ -46,7 +46,7 @@ export default class Unban {
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: `•  ${target.displayName}`, iconURL: target.displayAvatarURL() })
-      .setTitle(`✅  •  Unbanned ${target.displayName}`)
+      .setTitle(`Unbanned ${target.displayName}.`)
       .setDescription(`**Moderator**: ${interaction.user.displayName}`)
       .setThumbnail(target.displayAvatarURL())
       .setFooter({ text: `User ID: ${id}` })
@@ -72,6 +72,6 @@ export default class Unban {
     const dmChannel = (await target.createDM().catch(() => null)) as DMChannel | null;
     if (!dmChannel) return;
     if (target.bot) return;
-    await dmChannel.send({ embeds: [embed.setTitle("🤝 • You were unbanned")] });
+    await dmChannel.send({ embeds: [embed.setTitle("You got unbanned.")] });
   }
 }

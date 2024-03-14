@@ -21,7 +21,7 @@ export default {
 
       const embed = new EmbedBuilder()
         .setAuthor({ name: `•  ${author.displayName}`, iconURL: author.displayAvatarURL() })
-        .setTitle("✍  •  Message has been edited.")
+        .setTitle("Message has been edited.")
         .addFields(
           {
             name: "🕰️ • Old message",
@@ -32,7 +32,7 @@ export default {
             value: codeBlock(newContent)
           }
         )
-        .setFooter({ text: `Message ID: ${oldMessage.id}` })
+        .setFooter({ text: `Message ID: ${oldMessage.id}\nUser ID: ${oldMessage.author.id}` })
         .setThumbnail(author.displayAvatarURL())
         .setColor(genColor(60));
 

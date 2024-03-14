@@ -16,7 +16,7 @@ export function errorEmbed(
   const content = [`**${title}**`];
   if (reason != undefined) content.push(reason);
   const embed = new EmbedBuilder()
-    .setTitle("❌  •  Something went wrong!")
+    .setTitle("Something went wrong!")
     .setDescription(content.join("\n"))
     .setColor(genColor(0));
 

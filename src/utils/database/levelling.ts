@@ -14,7 +14,9 @@ const tableDefinition = {
 const database = getDatabase(tableDefinition);
 const getQuery = database.query("SELECT * FROM levelling WHERE guild = $1 AND user = $2;");
 const deleteQuery = database.query("DELETE FROM levelling WHERE guild = $1 AND user = $2;");
-const insertQuery = database.query("INSERT INTO levelling (guild, user, level, exp) VALUES (?1, ?2, ?3, ?4);");
+const insertQuery = database.query(
+  "INSERT INTO levelling (guild, user, level, exp) VALUES (?1, ?2, ?3, ?4);"
+);
 
 export function getLevel(guildID: string, userID: string): [number, number] {
   const res = getQuery.all(guildID, userID) as TypeOfDefinition<typeof tableDefinition>[];
@@ -23,7 +25,6 @@ export function getLevel(guildID: string, userID: string): [number, number] {
 }
 
 export function setLevel(guildID: string | number, userID: string, level: number, exp: number) {
-  if (getQuery.all(guildID, userID).length != 0)
-    deleteQuery.run(guildID, userID, level, exp);
+  if (getQuery.all(guildID, userID).length != 0) deleteQuery.run(guildID, userID);
   insertQuery.run(guildID, userID, level, exp);
 }

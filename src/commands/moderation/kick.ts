@@ -62,7 +62,7 @@ export default class Kick {
     const reason = interaction.options.getString("reason");
     const embed = new EmbedBuilder()
       .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`✅  •  Kicked ${name}`)
+      .setTitle(`Kicked ${name}.`)
       .setDescription(
         [
           `**Moderator**: ${interaction.user.displayName}`,
@@ -94,7 +94,7 @@ export default class Kick {
     if (!dmChannel) return;
     if (user.bot) return;
     await dmChannel.send({
-      embeds: [embed.setTitle("🥾 • You were kicked").setColor(genColor(0))]
+      embeds: [embed.setTitle("You got kicked.").setColor(genColor(0))]
     });
   }
 }

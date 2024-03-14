@@ -55,7 +55,7 @@ export default class Purge {
     const channelOption = interaction.options.getChannel("channel")!;
     const channel = guild.channels.cache.get(interaction.channel?.id ?? channelOption.id)!;
     const embed = new EmbedBuilder()
-      .setTitle(`✅  •  Purged ${amount} messages.`)
+      .setTitle(`Purged ${amount} message${amount == 1 ? "" : "s"}.`)
       .setDescription(
         [
           `**Moderator**: ${interaction.user.username}`,

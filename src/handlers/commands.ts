@@ -114,7 +114,6 @@ export default class Commands {
     await this.loadCommands();
     const guilds = this.client.guilds.cache;
 
-    console.log("Adding commands to guilds...");
     for (const guildID of guilds.keys()) {
       const disabledCommands = getDisabledCommands(guildID);
       if (disabledCommands.length > 0) await this.loadCommands(...disabledCommands);

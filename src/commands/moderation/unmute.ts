@@ -43,7 +43,7 @@ export default class Unmute {
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: `•  ${user.displayName}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`✅  •  Unmuted ${user.displayName}`)
+      .setTitle(`Unmuted ${user.displayName}.`)
       .setDescription(
         [
           `**Moderator**: ${interaction.user.displayName}`,
@@ -74,6 +74,6 @@ export default class Unmute {
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
     if (!dmChannel) return;
     if (user.bot) return;
-    await dmChannel.send({ embeds: [embed.setTitle("🤝 • You were unmuted")] });
+    await dmChannel.send({ embeds: [embed.setTitle("You got unmuted.")] });
   }
 }

@@ -1,14 +1,7 @@
-import {
-  EmbedBuilder,
-  type Client,
-  type GuildMember,
-  type TextChannel,
-  type ColorResolvable
-} from "discord.js";
-import { genColor, genRGBColor } from "../utils/colorGen";
+import { EmbedBuilder, type Client, type GuildMember, type TextChannel } from "discord.js";
+import { genColor } from "../utils/colorGen";
 import { getSetting } from "../utils/database/settings";
-import Vibrant from "node-vibrant";
-import sharp from "sharp";
+import { imageColor } from "../utils/imageColor";
 
 export default {
   name: "guildMemberAdd",
@@ -37,7 +30,7 @@ export default {
       const avatarURL = member.displayAvatarURL();
       const embed = new EmbedBuilder()
         .setAuthor({ name: `•  ${user.displayName}`, iconURL: avatarURL })
-        .setTitle("👋  •  Welcome!")
+        .setTitle("Welcome!")
         .setDescription(
           text ??
             `Welcome to ${guild.name}, **${user.displayName}**! Interestingly, you just helped us reach **${guild.memberCount}** members. Enjoy, and have a nice day!`
@@ -46,13 +39,7 @@ export default {
         .setThumbnail(avatarURL)
         .setColor(genColor(200));
 
-      try {
-        const imageBuffer = await (await fetch(avatarURL)).arrayBuffer();
-        const image = sharp(imageBuffer).toFormat("jpg");
-        const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant!;
-        embed.setColor(genRGBColor(r, g, b) as ColorResolvable);
-      } catch {}
-
+      imageColor(embed, undefined, member);
       await channel.send({ embeds: [embed] });
     }
   }

@@ -68,7 +68,7 @@ export default class Delwarn {
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`✅  •  Removed warning from ${name}`)
+      .setTitle(`Removed a warning from ${name}.`)
       .setDescription(`**Moderator**: ${interaction.user.displayName}`)
       .setThumbnail(user.displayAvatarURL())
       .setFooter({ text: `User ID: ${user.id}` })
@@ -94,6 +94,6 @@ export default class Delwarn {
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
     if (!dmChannel) return;
     if (user.bot) return;
-    await dmChannel.send({ embeds: [embed.setTitle("🤝 • Your warning was removed")] });
+    await dmChannel.send({ embeds: [embed.setTitle("Your warning has been removed.")] });
   }
 }

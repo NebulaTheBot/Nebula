@@ -1,15 +1,19 @@
 import {
   SlashCommandSubcommandBuilder,
   EmbedBuilder,
-  type ColorResolvable,
-  type ChatInputCommandInteraction
+  ButtonBuilder,
+  ButtonStyle,
+  ButtonInteraction,
+  ActionRowBuilder,
+  ComponentType,
+  type ChatInputCommandInteraction,
+  type Role
 } from "discord.js";
-import { genColor, genRGBColor } from "../utils/colorGen";
+import { genColor } from "../utils/colorGen";
 import { get as getLevelRewards } from "../utils/database/levelRewards";
 import { getSetting } from "../utils/database/settings";
 import { getLevel, setLevel } from "../utils/database/levelling";
-import Vibrant from "node-vibrant";
-import sharp from "sharp";
+import { imageColor } from "../utils/imageColor";
 
 export default class User {
   data: SlashCommandSubcommandBuilder;
@@ -38,67 +42,25 @@ export default class User {
         {
           name: selectedUser?.bot === false ? "👤 • User info" : "🤖 • Bot info",
           value: [
-            `**Username**: ${selectedUser.username}`,
-            `**Display name**: ${
+            `Username's **${selectedUser.username}**`,
+            `Display name's ${
               selectedUser.displayName === selectedUser.username
-                ? "*None*"
-                : selectedUser.displayName
+                ? "*not there*"
+                : `**${selectedUser.displayName}**`
             }`,
-            `**Created on** <t:${Math.round(selectedUser.createdAt.valueOf() / 1000)}:D>`
-          ].join("\n"),
-          inline: true
+            `Created on **<t:${Math.round(selectedUser.createdAt.valueOf() / 1000)}:D>**`
+          ].join("\n")
         },
         {
           name: "👥 • Member info",
-          value: `**Joined on** <t:${Math.round(target.joinedAt?.valueOf()! / 1000)}:D>`,
-          inline: true
+          value: `Joined on **<t:${Math.round(target.joinedAt?.valueOf()! / 1000)}:D>**`
         }
       )
       .setFooter({ text: `User ID: ${target.id}` })
       .setThumbnail(target.displayAvatarURL()!)
       .setColor(genColor(200));
 
-    try {
-      const imageBuffer = await (await fetch(target.displayAvatarURL()!)).arrayBuffer();
-      const image = sharp(imageBuffer).toFormat("jpg");
-      const { r, g, b } = (await new Vibrant(await image.toBuffer()).getPalette()).Vibrant!;
-      embed.setColor(genRGBColor(r, g, b) as ColorResolvable);
-    } catch {}
-
-    if (getSetting(`${guild.id}`, "levelling.enabled")) {
-      const [guildExp, guildLevel] = getLevel(`${guild.id}`, `${target.id}`)!;
-      if (!guildExp && !guildLevel) setLevel(`${guild.id}`, `${target.id}`, 0, 0);
-
-      const formattedExpUntilLevelup = Math.floor(
-        100 * 1.25 * ((guildLevel ?? 0) + 1)
-      )?.toLocaleString("en-US");
-      let rewards = [];
-      let nextReward;
-
-      for (const { roleID, level } of getLevelRewards(`${guild.id}`)) {
-        if (guildLevel < level) {
-          if (nextReward) break;
-          nextReward = { roleID, level };
-          break;
-        }
-
-        rewards.push(await guild.roles.fetch(`${roleID}`)?.catch(() => {}));
-      }
-
-      embed.addFields({
-        name: `⚡ • Level ${guildLevel ?? 0}`,
-        value: [
-          `**${guildExp.toLocaleString("en-US") ?? 0}/${formattedExpUntilLevelup}** EXP`,
-          `**Next level**: ${(guildLevel ?? 0) + 1}`,
-          `${
-            rewards.length > 0
-              ? rewards.map(reward => `<@&${reward?.id}>`).join(" ")
-              : "*No rewards unlocked*"
-          }`
-        ].join("\n")
-      });
-    }
-
+    imageColor(embed, undefined, target);
     const guildRoles = guild.roles.cache.filter(role => target.roles.cache.has(role.id))!;
     const memberRoles = [...guildRoles].sort(
       (role1, role2) => role2[1].position - role1[1].position
@@ -116,6 +78,77 @@ export default class User {
           .join(", ")}${memberRoles.length > 5 ? ` **and ${memberRoles.length - 5} more**` : ""}`
       });
 
-    await interaction.reply({ embeds: [embed] });
+    if (!getSetting(`${guild.id}`, "levelling.enabled"))
+      await interaction.reply({ embeds: [embed] });
+
+    const [guildExp, guildLevel] = getLevel(`${guild.id}`, `${target.id}`)!;
+    if (!guildExp && !guildLevel) setLevel(`${guild.id}`, `${target.id}`, 0, 0);
+
+    const formattedExpUntilLevelup = Math.floor(
+      100 * 1.25 * ((guildLevel ?? 0) + 1)
+    )?.toLocaleString("en-US");
+    let rewards: (void | Role | null)[] = [];
+    let nextReward;
+
+    for (const { roleID, level } of getLevelRewards(`${guild.id}`)) {
+      if (guildLevel < level) {
+        if (nextReward) break;
+        nextReward = { roleID, level };
+        break;
+      }
+
+      rewards.push(await guild.roles.fetch(`${roleID}`)?.catch(() => {}));
+    }
+
+    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("general")
+        .setLabel("•  General")
+        .setEmoji("📃")
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("level")
+        .setLabel("•  Level")
+        .setEmoji("⚡")
+        .setStyle(ButtonStyle.Primary)
+    );
+
+    const reply = await interaction.reply({ embeds: [embed], components: [row] });
+    reply
+      .createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 })
+      .on("collect", async (i: ButtonInteraction) => {
+        let testEmbed: EmbedBuilder = new EmbedBuilder();
+        const levelEmbed = new EmbedBuilder()
+          .setAuthor({
+            name: `•  ${target.nickname ?? selectedUser.displayName}`,
+            iconURL: target.displayAvatarURL()
+          })
+          .setFields({
+            name: `⚡ • Level ${guildLevel ?? 0}`,
+            value: [
+              `**${guildExp.toLocaleString("en-US") ?? 0}/${formattedExpUntilLevelup}** EXP`,
+              `**Next level**: ${(guildLevel ?? 0) + 1}`,
+              `${
+                rewards.length > 0
+                  ? rewards.map(reward => `<@&${reward?.id}>`).join(" ")
+                  : "*No rewards unlocked*"
+              }`
+            ].join("\n")
+          })
+          .setFooter({ text: `User ID: ${target.id}` })
+          .setThumbnail(target.displayAvatarURL()!)
+          .setColor(genColor(200));
+
+        imageColor(levelEmbed, undefined, target);
+        switch (i.customId) {
+          case "general":
+            testEmbed = embed;
+          case "level":
+            testEmbed = levelEmbed;
+        }
+
+        await reply.edit({ embeds: [testEmbed], components: [row] });
+        i.update({});
+      });
   }
 }
