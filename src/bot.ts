@@ -1,6 +1,6 @@
 import { Client, ActivityType } from "discord.js";
-import Commands from "./handlers/commands.js";
-import Events from "./handlers/events.js";
+import Commands from "./handlers/commands";
+import Events from "./handlers/events";
 
 const client = new Client({
   presence: {
@@ -12,13 +12,13 @@ const client = new Client({
     "GuildMessages",
     "GuildEmojisAndStickers",
     "GuildPresences",
+    "GuildBans",
     "MessageContent"
   ]
 });
 
 client.on("ready", async () => {
   new Events(client);
-  console.log("Starting all commands.");
   await new Commands(client).registerCommands();
   console.log("ちーっす！");
 });

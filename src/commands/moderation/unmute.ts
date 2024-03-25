@@ -1,78 +1,79 @@
 import {
-  SlashCommandSubcommandBuilder, EmbedBuilder, PermissionsBitField,
-  type ChatInputCommandInteraction, TextChannel, DMChannel,
-  Channel, ChannelType
+  SlashCommandSubcommandBuilder,
+  EmbedBuilder,
+  PermissionsBitField,
+  TextChannel,
+  DMChannel,
+  ChannelType,
+  type Channel,
+  type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor } from "../../utils/colorGen.js";
-import errorEmbed from "../../utils/embeds/errorEmbed.js";
-import { getSettingsTable } from "../../utils/database.js";
-import { QuickDB } from "quick.db";
+import { genColor } from "../../utils/colorGen";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { getSetting } from "../../utils/database/settings";
 
 export default class Unmute {
   data: SlashCommandSubcommandBuilder;
-  db: QuickDB<any>;
-
-  constructor(db: QuickDB<any>) {
-    this.db = db;
+  constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("unmute")
       .setDescription("Unmutes a user.")
-      .addUserOption(user => user
-        .setName("user")
-        .setDescription("The user that you want to unmute.")
-        .setRequired(true)
+      .addUserOption(user =>
+        user.setName("user").setDescription("The user that you want to unmute.").setRequired(true)
       );
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const user = interaction.options.getUser("user");
-    const members = interaction.guild.members.cache;
-    const member = members.get(interaction.member.user.id);
-    const selectedMember = members.get(user.id);
-    const name = selectedMember.nickname ?? user.username;
+    const guild = interaction.guild!;
+    const members = guild.members.cache!;
+    if (
+      !members
+        .get(interaction.member!.user.id)!
+        .permissions.has(PermissionsBitField.Flags.MuteMembers)
+    )
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "You need the **Mute Members** permission."
+      );
 
-    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;;
-    let unmuteEmbed = new EmbedBuilder()
-      .setTitle(`✅ • Unmuted ${user.username}`)
-      .setDescription([
-        `**Moderator**: <@${interaction.user.id}>`,
-        `**Date**: <t:${Math.floor(Date.now() / 1000)}:f>`
-      ].join("\n"))
-      .setAuthor({ name: `• ${name}`, iconURL: user.displayAvatarURL() })
+    const user = interaction.options.getUser("user")!;
+    if (members.get(user.id)?.communicationDisabledUntil === null)
+      return errorEmbed(interaction, "You can't unmute this user.", "The user was never muted.");
+
+    const embed = new EmbedBuilder()
+      .setAuthor({ name: `•  ${user.displayName}`, iconURL: user.displayAvatarURL() })
+      .setTitle(`Unmuted ${user.displayName}.`)
+      .setDescription(
+        [
+          `**Moderator**: ${interaction.user.displayName}`,
+          `**Date**: <t:${Math.floor(Date.now() / 1000)}:f>`
+        ].join("\n")
+      )
       .setThumbnail(user.displayAvatarURL())
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
-    const embedDM = new EmbedBuilder()
-      .setTitle(`🤝 • You were unmuted`)
-      .setDescription([
-        `**Moderator**: ${interaction.user.username}`,
-        `**Date**: <t:${Math.floor(Date.now() / 1000)}:f>`
-      ].join("\n"))
-      .setThumbnail(user.displayAvatarURL())
-      .setAuthor({ name: `• ${user.username}`, iconURL: user.displayAvatarURL() })
-      .setFooter({ text: `User ID: ${user.id}` })
-      .setColor(genColor(100));
 
-    if (!member.permissions.has(PermissionsBitField.Flags.MuteMembers))
-      return await interaction.followUp({ embeds: [errorEmbed("You need the **Mute Members** permission to execute this command.")] });
-
-    const db = this.db;
-    const settingsTable = await getSettingsTable(db);
-    const logChannel = await settingsTable?.get(`${interaction.guild.id}.logChannel`).then(
-      (channel: string | null) => channel
-    ).catch(() => null);
+    const logChannel = getSetting(guild.id, "moderation.channel");
     if (logChannel) {
-      const channel = await interaction.guild.channels.cache.get(logChannel).fetch().then(
-        (channel: Channel) => {
+      const channel = await guild.channels.cache
+        .get(`${logChannel}`)
+        ?.fetch()
+        .then((channel: Channel) => {
           if (channel.type != ChannelType.GuildText) return null;
           return channel as TextChannel;
-        }
-      ).catch(() => null);
-      if (channel) await channel.send({ embeds: [unmuteEmbed] });
+        })
+        .catch(() => null);
+
+      if (channel) await channel.send({ embeds: [embed] });
     }
 
-    if (dmChannel) await dmChannel.send({ embeds: [embedDM] });
-    await selectedMember.edit({ communicationDisabledUntil: null });
-    await interaction.followUp({ embeds: [unmuteEmbed] });
+    await members.get(user.id)!.edit({ communicationDisabledUntil: null });
+    await interaction.reply({ embeds: [embed] });
+
+    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
+    if (!dmChannel) return;
+    if (user.bot) return;
+    await dmChannel.send({ embeds: [embed.setTitle("You got unmuted.")] });
   }
 }

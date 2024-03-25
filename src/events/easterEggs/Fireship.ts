@@ -3,7 +3,6 @@ import type { Message } from "discord.js";
 export default class FireShip {
   async run(message: Message) {
     const content = message.content.toLowerCase();
-
     if (
       content.startsWith("this has been") &&
       content.endsWith("in 100 seconds") &&
