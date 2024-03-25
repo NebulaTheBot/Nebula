@@ -20,15 +20,13 @@ export default {
         const eventsPath = join(process.cwd(), "src", "events", "easterEggs");
 
         for (const easterEggFile of readdirSync(eventsPath))
-          new (await import(pathToFileURL(join(eventsPath, easterEggFile)).toString())).default().run(
-            message,
-            ...message.content
-          );
+          new (
+            await import(pathToFileURL(join(eventsPath, easterEggFile)).toString())
+          ).default().run(message, ...message.content);
       }
 
       // Levelling
       const levelChannelId = getSetting(guild.id, "levelling.channel");
-      if (!levelChannelId) return;
       if (!getSetting(guild.id, "levelling.enabled")) return;
 
       const [guildExp, guildLevel] = getLevel(guild.id, author.id);
@@ -64,10 +62,12 @@ export default {
         .setTimestamp()
         .setColor(genColor(200));
 
-      (guild.channels.cache.get(`${levelChannelId}`) as TextChannel).send({
-        embeds: [embed],
-        content: `<@${author.id}>`
-      });
+      if (levelChannelId)
+        (guild.channels.cache.get(`${levelChannelId}`) as TextChannel).send({
+          embeds: [embed],
+          content: `<@${author.id}>`
+        });
+
       for (const { level, roleID } of getLevelRewards(guild.id)) {
         const role = guild.roles.cache.get(`${roleID}`);
         if (!role) continue;

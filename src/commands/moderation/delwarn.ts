@@ -56,7 +56,7 @@ export default class Delwarn {
       return errorEmbed(
         interaction,
         `You can't delete a warn from ${name}.`,
-        "The member has a higher role position than Nebula."
+        "The member has a higher role position than Sokora."
       );
 
     if (member.roles.highest.position < target.roles.highest.position)

@@ -2,7 +2,7 @@ import {
   Client,
   InteractionType,
   EmbedBuilder,
-  SlashCommandSubcommandBuilder,
+  SlashCommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
 import {
@@ -10,13 +10,13 @@ import {
   setSetting,
   settingsDefinition,
   settingsKeys
-} from "../../utils/database/settings";
-import { genColor } from "../../utils/colorGen";
+} from "../utils/database/settings";
+import { genColor } from "../utils/colorGen";
 
-export default class ServerInfo {
-  data: SlashCommandSubcommandBuilder;
+export default class Settings {
+  data: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
   constructor() {
-    this.data = new SlashCommandSubcommandBuilder()
+    this.data = new SlashCommandBuilder()
       .setName("settings")
       .setDescription("Configure the bot")
       .addStringOption(string =>

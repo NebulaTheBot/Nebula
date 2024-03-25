@@ -51,13 +51,13 @@ export default class Mute {
 
     if (target === member) return errorEmbed(interaction, "You can't mute yourself.");
     if (target.user.id === interaction.client.user.id)
-      return errorEmbed(interaction, "You can't mute Nebula.");
+      return errorEmbed(interaction, "You can't mute Sokora.");
 
     if (!target.manageable)
       return errorEmbed(
         interaction,
         `You can't mute ${name}.`,
-        "The member has a higher role position than Nebula."
+        "The member has a higher role position than Sokora."
       );
 
     if (member.roles.highest.position < target.roles.highest.position)

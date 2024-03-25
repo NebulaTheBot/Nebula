@@ -1,5 +1,5 @@
 import {
-  SlashCommandSubcommandBuilder,
+  SlashCommandBuilder,
   ButtonBuilder,
   ActionRowBuilder,
   ButtonStyle,
@@ -12,11 +12,11 @@ import { listPublicServers } from "../utils/database/settings";
 import { errorEmbed } from "../utils/embeds/errorEmbed";
 
 export default class Serverboard {
-  data: SlashCommandSubcommandBuilder;
+  data: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
   constructor() {
-    this.data = new SlashCommandSubcommandBuilder()
+    this.data = new SlashCommandBuilder()
       .setName("serverboard")
-      .setDescription("Shows the servers that have Nebula.")
+      .setDescription("Shows the servers that have Sokora.")
       .addNumberOption(number =>
         number.setName("page").setDescription("The page you want to see.")
       );
@@ -32,7 +32,7 @@ export default class Serverboard {
       return errorEmbed(
         interaction,
         "No public server found",
-        "By some magical miracle, all the servers using Nebula turned off their visibility. Use /server settings key:`serverboard.shown` value:`TRUE` to make your server publicly visible."
+        "By some magical miracle, all the servers using Sokora turned off their visibility. Use /server settings key:`serverboard.shown` value:`TRUE` to make your server publicly visible."
       );
 
     const argPage = interaction.options.get("page")?.value as number;

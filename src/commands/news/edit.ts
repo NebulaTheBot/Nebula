@@ -10,11 +10,11 @@ import {
   type TextChannel,
   type Role
 } from "discord.js";
-import { genColor } from "../../../utils/colorGen";
-import { errorEmbed } from "../../../utils/embeds/errorEmbed";
-import { get, updateNews } from "../../../utils/database/news";
-import { getSetting } from "../../../utils/database/settings";
-import { sendChannelNews } from "../../../utils/sendChannelNews";
+import { genColor } from "../../utils/colorGen";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { get, updateNews } from "../../utils/database/news";
+import { getSetting } from "../../utils/database/settings";
+import { sendChannelNews } from "../../utils/sendChannelNews";
 
 export default class Edit {
   data: SlashCommandSubcommandBuilder;

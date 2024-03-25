@@ -1,4 +1,4 @@
-# Nebula Contributing Guide
+# Sokora Contributing Guide
 
 ## Prerequisites
 - Basic knowledge of [TypeScript](https://typescriptlang.org/) and [discord.js](https://discord.js.org/).

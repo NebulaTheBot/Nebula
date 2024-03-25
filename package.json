@@ -1,8 +1,8 @@
 {
-  "name": "nebula",
-  "description": "Welcome to Nebula, the multipurpose, multiplatform bot.",
+  "name": "sokora",
+  "description": "Welcome to Sokora, the multipurpose, multiplatform bot.",
   "contributors": [
-    "The Nebula team",
+    "The Sokora team",
     "The GitHub contributors"
   ],
   "version": "0.1.0",

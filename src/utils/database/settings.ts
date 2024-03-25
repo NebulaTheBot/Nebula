@@ -15,7 +15,6 @@ export const settingsDefinition = {
   "levelling.enabled": "BOOL",
   "levelling.channel": "TEXT",
   //"levelling.blockedChannels": "LIST", // TODO: Add this to the levelling command
-  "poll.voteOnOneOption": "BOOL",
   "moderation.channel": "TEXT",
   "moderation.logMessages": "BOOL",
   "news.channelID": "TEXT",

@@ -49,7 +49,7 @@ export async function serverEmbed(options: Options) {
 
   const embed = new EmbedBuilder()
     .setAuthor({
-      name: `•  ${pages ? `#${page}  •  ` : ""}${guild.name}`,
+      name: `  ${pages ? `#${page}  •  ` : "•  "}${guild.name}`,
       iconURL: guild.iconURL()!
     })
     .setDescription(guild.description ? guild.description : null)

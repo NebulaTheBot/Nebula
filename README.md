@@ -9,9 +9,9 @@
 </div>
 
 # About
-Nebula is a multiplatform, multipurpose bot with the ability to add extensions to have additional features.
+Sokora is a multiplatform, multipurpose bot with the ability to add extensions to have additional features.
 
-**Please note that Nebula is currently unstable and is only usable within Discord.**
+**Please note that Sokora is currently unstable and is only usable within Discord.**
 
 # Contributing
 While we're developing the multiplatform version of the bot, you can still [help us](CONTRIBUTING.MD) if you find any bugs.

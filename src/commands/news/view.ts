@@ -6,9 +6,9 @@ import {
   ButtonStyle,
   type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor } from "../../../utils/colorGen";
-import { errorEmbed } from "../../../utils/embeds/errorEmbed";
-import { listAllNews } from "../../../utils/database/news";
+import { genColor } from "../../utils/colorGen";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { listAllNews } from "../../utils/database/news";
 
 export default class View {
   data: SlashCommandSubcommandBuilder;

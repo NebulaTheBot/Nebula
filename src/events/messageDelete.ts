@@ -1,3 +1,4 @@
+// TODO: display the person who deleted the message
 import { codeBlock, EmbedBuilder, type Message, type TextChannel, type Channel } from "discord.js";
 import { genColor } from "../utils/colorGen";
 import { getSetting } from "../utils/database/settings";

@@ -5,10 +5,10 @@ import {
   TextChannel,
   type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor } from "../../../utils/colorGen";
-import { errorEmbed } from "../../../utils/embeds/errorEmbed";
-import { deleteNews, get } from "../../../utils/database/news";
-import { getSetting } from "../../../utils/database/settings";
+import { genColor } from "../../utils/colorGen";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { deleteNews, get } from "../../utils/database/news";
+import { getSetting } from "../../utils/database/settings";
 
 export default class Remove {
   data: SlashCommandSubcommandBuilder;

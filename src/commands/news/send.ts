@@ -8,10 +8,10 @@ import {
   TextInputStyle,
   type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor } from "../../../utils/colorGen";
-import { errorEmbed } from "../../../utils/embeds/errorEmbed";
-import { sendChannelNews } from "../../../utils/sendChannelNews";
-import { sendNews } from "../../../utils/database/news";
+import { genColor } from "../../utils/colorGen";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { sendChannelNews } from "../../utils/sendChannelNews";
+import { sendNews } from "../../utils/database/news";
 
 export default class Send {
   data: SlashCommandSubcommandBuilder;

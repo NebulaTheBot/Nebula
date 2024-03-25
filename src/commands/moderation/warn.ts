@@ -44,13 +44,13 @@ export default class Warn {
 
     if (target === member) return errorEmbed(interaction, "You can't warn yourself.");
     if (target.user.id === interaction.client.user.id)
-      return errorEmbed(interaction, "You can't warn Nebula.");
+      return errorEmbed(interaction, "You can't warn Sokora.");
 
     if (!target.manageable)
       return errorEmbed(
         interaction,
         `You can't warn ${name}.`,
-        "The member has a higher role position than Nebula."
+        "The member has a higher role position than Sokora."
       );
 
     if (member.roles.highest.position < target.roles.highest.position)

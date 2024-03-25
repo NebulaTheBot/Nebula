@@ -1,5 +1,5 @@
 import {
-  SlashCommandSubcommandBuilder,
+  SlashCommandBuilder,
   EmbedBuilder,
   ButtonBuilder,
   ButtonStyle,
@@ -16,9 +16,9 @@ import { getLevel, setLevel } from "../utils/database/levelling";
 import { imageColor } from "../utils/imageColor";
 
 export default class User {
-  data: SlashCommandSubcommandBuilder;
+  data: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
   constructor() {
-    this.data = new SlashCommandSubcommandBuilder()
+    this.data = new SlashCommandBuilder()
       .setName("user")
       .setDescription("Shows your (or another user's) info.")
       .addUserOption(user => user.setName("user").setDescription("Select the user."));

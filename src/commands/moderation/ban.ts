@@ -43,13 +43,13 @@ export default class Ban {
 
     if (target === member) return errorEmbed(interaction, "You can't ban yourself.");
     if (target.user.id === interaction.client.user.id)
-      return errorEmbed(interaction, "You can't ban Nebula.");
+      return errorEmbed(interaction, "You can't ban Sokora.");
 
     if (!target.manageable)
       return errorEmbed(
         interaction,
         `You can't ban ${name}.`,
-        "The member has a higher role position than Nebula."
+        "The member has a higher role position than Sokora."
       );
 
     if (member.roles.highest.position < target.roles.highest.position)

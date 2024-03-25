@@ -43,13 +43,13 @@ export default class Kick {
 
     if (target === member) return errorEmbed(interaction, "You can't kick yourself.");
     if (target.user.id === interaction.client.user.id)
-      return errorEmbed(interaction, "You can't kick Nebula.");
+      return errorEmbed(interaction, "You can't kick Sokora.");
 
     if (!target.manageable)
       return errorEmbed(
         interaction,
         `You can't kick ${name}.`,
-        "The member has a higher role position than Nebula."
+        "The member has a higher role position than Sokora."
       );
 
     if (member.roles.highest.position < target.roles.highest.position)

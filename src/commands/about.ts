@@ -1,15 +1,11 @@
-import {
-  SlashCommandSubcommandBuilder,
-  EmbedBuilder,
-  type ChatInputCommandInteraction
-} from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder, type ChatInputCommandInteraction } from "discord.js";
 import { genColor } from "../utils/colorGen";
 import { randomise } from "../utils/randomise";
 
 export default class About {
-  data: SlashCommandSubcommandBuilder;
+  data: SlashCommandBuilder;
   constructor() {
-    this.data = new SlashCommandSubcommandBuilder()
+    this.data = new SlashCommandBuilder()
       .setName("about")
       .setDescription("Shows information about the bot.");
   }
