@@ -33,6 +33,26 @@ export default class User {
       .map(user => user)[0]!;
 
     const selectedUser = target.user!;
+    let serverInfo = [`Joined on **<t:${Math.round(target.joinedAt?.valueOf()! / 1000)}:D>**`];
+    const guildRoles = guild.roles.cache.filter(role => target.roles.cache.has(role.id))!;
+    const memberRoles = [...guildRoles].sort(
+      (role1, role2) => role2[1].position - role1[1].position
+    );
+    memberRoles.pop();
+
+    if (target.premiumSinceTimestamp != null)
+      serverInfo.push(`Boosting since **${target.premiumSinceTimestamp}**`);
+
+    if (memberRoles.length !== 0)
+      serverInfo.push(
+        `**${guildRoles.filter(role => target.roles.cache.has(role.id)).size! - 1}** ${
+          memberRoles.length === 1 ? "role" : "roles"
+        } • ${memberRoles
+          .slice(0, 5)
+          .map(role => `<@&${role[1].id}>`)
+          .join(", ")}${memberRoles.length > 3 ? ` **and ${memberRoles.length - 4} more**` : ""}`
+      );
+
     let embed = new EmbedBuilder()
       .setAuthor({
         name: `•  ${target.nickname ?? selectedUser.displayName}`,
@@ -40,10 +60,10 @@ export default class User {
       })
       .setFields(
         {
-          name: selectedUser?.bot === false ? "👤 • User info" : "🤖 • Bot info",
+          name: `<:realdiscord:1221878641462345788> • Discord info`,
           value: [
-            `Username's **${selectedUser.username}**`,
-            `Display name's ${
+            `Username is **${selectedUser.username}**`,
+            `Display name is ${
               selectedUser.displayName === selectedUser.username
                 ? "*not there*"
                 : `**${selectedUser.displayName}**`
@@ -52,8 +72,8 @@ export default class User {
           ].join("\n")
         },
         {
-          name: "👥 • Member info",
-          value: `Joined on **<t:${Math.round(target.joinedAt?.valueOf()! / 1000)}:D>**`
+          name: "📒 • Server info",
+          value: serverInfo.join("\n")
         }
       )
       .setFooter({ text: `User ID: ${target.id}` })
@@ -61,23 +81,6 @@ export default class User {
       .setColor(genColor(200));
 
     imageColor(embed, undefined, target);
-    const guildRoles = guild.roles.cache.filter(role => target.roles.cache.has(role.id))!;
-    const memberRoles = [...guildRoles].sort(
-      (role1, role2) => role2[1].position - role1[1].position
-    );
-    memberRoles.pop();
-
-    if (memberRoles.length !== 0)
-      embed.addFields({
-        name: `🎭 • ${guildRoles.filter(role => target.roles.cache.has(role.id)).size! - 1} ${
-          memberRoles.length === 1 ? "role" : "roles"
-        }`,
-        value: `${memberRoles
-          .slice(0, 5)
-          .map(role => `<@&${role[1].id}>`)
-          .join(", ")}${memberRoles.length > 5 ? ` **and ${memberRoles.length - 5} more**` : ""}`
-      });
-
     if (!getSetting(`${guild.id}`, "levelling.enabled"))
       await interaction.reply({ embeds: [embed] });
 
